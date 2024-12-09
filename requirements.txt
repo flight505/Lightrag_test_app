@@ -1,0 +1,11 @@
+graphrag
+numpy
+pandas
+openai
+tiktoken
+streamlit
+watchdog
+python-pptx
+python-docx
+openpyxl
+pillow
