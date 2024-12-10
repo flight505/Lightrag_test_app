@@ -34,3 +34,5 @@ torch
 transformers
 xxhash
 python-dotenv
+pandas
+numpy
