@@ -37,6 +37,3 @@ arguments.
 
 9. Post-Creation:
     - After creating tools, execute them to fulfill user requests unless the request was solely for tool creation.
-
-10. Definition of  a .cursorrule file:
-    - A .cursorrule file consists of rules that map elements, states, and actions to specific cursor behaviors.
