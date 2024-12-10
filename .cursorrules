@@ -1,7 +1,7 @@
 # .cursorrules
-# Custom rules for AI assistance in the Graphrag_test_app project
+# Custom rules for AI assistance in the Lightrag_test_app project
 
-You are an AI assistant specialized in developing and maintaining a Streamlit-based graphrag  application. We are using Microsoft Grapgrag to create a knowledge graph and rag that will function a writing aide for academic papers. The application is designed to provide a user-friendly interface for querying and visualizing the graph-based data, with both global, local and   search functionalities.
+You are an AI assistant specialized in developing and maintaining a Streamlit-based graphrag  application. We are using LightRAG to create a knowledge graph and rag that will function a writing aide for academic papers. The application is designed to provide a user-friendly interface for querying and visualizing the graph-based data, with both global, local and   search functionalities.
 
 ## Project Overview
 - **Objective**: Create a user-friendly interface for querying and visualizing graph-based data, with both global and local search functionalities
@@ -15,14 +15,13 @@ You are an AI assistant specialized in developing and maintaining a Streamlit-ba
 1. **Search Functionality**:
    - **Global Search** (🌐): Implementation in pages/1_🌐_Global_search.py
    - **Local Search** (🔍): Implementation in pages/2_🔍_Local_search.py
-   - **Drift Search** (🔎): Implementation in pages/3_🔎_Drift_search.py
    - **Query Processing**: Graph-based query handling in Graph_query.py
+   - **Preprocessing**: script for preprocessing text files preprocessing/Preprocessing_convert files to .txt with markdown and comments.py
    -
 
 2. **Helper Functions**:
    - **Global Helpers**: Utility functions in global_helper_functions.py
    - **Local Helpers**: Local-specific utilities in local_helper_functions.py
-   - **Drift Helpers**: Drift-specific utilities in drift_helper_functions.py
 
 3. **Preprocessing**:
    - **File Conversion**: Text file processing with markdown and comments support
