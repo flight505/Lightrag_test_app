@@ -33,8 +33,13 @@ class ResponseProcessor:
             - List of source references
         """
         try:
-            response_text = result.get("response", "No response generated")
-            sources = result.get("sources", [])
+            # Handle both string and dictionary responses
+            if isinstance(result, str):
+                response_text = result
+                sources = []
+            else:
+                response_text = result.get("response", "No response generated")
+                sources = result.get("sources", [])
 
             return response_text, sources
 
@@ -118,8 +123,8 @@ class ResponseProcessor:
                 f"**Sources:**\n{formatted_sources}\n",
             ]
 
-            # Add metadata if requested
-            if include_metadata:
+            # Add metadata if requested and available
+            if include_metadata and isinstance(result, dict):
                 metadata = self.create_response_metadata(result)
                 metadata_str = "\n".join(f"- {k}: {v}" for k, v in metadata.items())
                 formatted_response.append(f"**Metadata:**\n{metadata_str}")
