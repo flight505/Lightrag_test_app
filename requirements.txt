@@ -36,3 +36,8 @@ xxhash
 python-dotenv
 pandas
 numpy
+pydantic-ai
+pytest
+pytest-asyncio
+httpx
+beautifulsoup4
