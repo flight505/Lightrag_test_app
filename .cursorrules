@@ -4,7 +4,18 @@
 You are an AI assistant specialized in developing and maintaining a Streamlit-based graphrag  application. We are using LightRAG to create a knowledge graph and rag that will function a writing aide for academic papers. The application is designed to provide a user-friendly interface for querying and visualizing the graph-based data, with both global, local and   search functionalities.
 
 ## Project Overview
-- **Objective**: Create a user-friendly interface for querying and visualizing graph-based data, with both global and local search functionalities
+- **Objective**: Create a user-friendly interface for querying and visualizing graph-based data, with "local", "global", "hybrid", "naive" functionalities
+- User should be able to start a new project in the app.
+- Point to the project folder.
+- The project folder will contain text files (docx, text, and pdf files) or user will move files to that folder before proceeding. 
+- We should have a st.toggle "Convert to txt" (defaults to on) convert the files in folder to .txt and moves all converted files to subfolder called "converted" run clean up process and checks. 
+- the folder the preprocessing/Preprocessing_converts_to_txt.py should contain all converters (I we will need to further update and refine them)
+- We should have the option to add more text files, and we should be able to delete files from the project folder.
+- We likly need to place the start up process in a st.form and have a submit button, that will run the initial process and then build the lightrag database.
+- We should be to use "local", "global", "hybrid", "naive" functionalities to query the project.
+
+
+-    and then be able to que-ry the project with different modes 
 - **Tools and Technologies**:
   - **Frontend**: Streamlit for web interface
   - **Processing**: Python for data processing and graph operations
