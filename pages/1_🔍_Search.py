@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 import os
 import pickle
 import time
@@ -13,6 +14,9 @@ from termcolor import colored
 
 from lightrag_helpers import ResponseProcessor
 from lightrag_init import DEFAULT_MODEL, SUPPORTED_MODELS, LightRAGManager
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Page configuration
 st.set_page_config(page_title="LightRAG Search", page_icon="🔍", layout="wide")
@@ -42,6 +46,8 @@ if "chat_settings" not in st.session_state:
         "context_length": 5,
         "summarize_enabled": True,
     }
+if "response_type" not in st.session_state:
+    st.session_state["response_type"] = "detailed paragraph"
 
 
 # Helper functions
@@ -208,18 +214,25 @@ with st.sidebar:
 
     with st.form("configuration_form"):
         st.markdown("**Configure your search:**")
-        api_key = st.text_input("Your API key", type="password")
+        # Get API key from environment variable first
+        api_key = os.getenv("OPENAI_API_KEY", "")
+        if not api_key:
+            api_key = st.text_input("Your API key", type="password")
+        else:
+            st.success("Using API key from environment variable")
         model = st.selectbox(
             "Select your query model",
             options=SUPPORTED_MODELS,
             index=SUPPORTED_MODELS.index(DEFAULT_MODEL),
         )
         input_dir = st.text_input(
-            "Document directory", help="Path to your local document directory"
+            "Document directory",
+            help="Path to your local document directory",
+            value="./dickens",
         )
         response_type = st.text_input(
             "Response type",
-            "detailed paragraph",
+            key="response_type",
             help="Format for the response (e.g., detailed paragraph, bullet points, table)",
         )
 
@@ -387,10 +400,18 @@ with query_container:
                 "Enter your query:",
                 label_visibility="collapsed",
                 placeholder="Type your query here...",
+                key="query_input",
             )
-            query_submitted = st.form_submit_button("Submit Query")
+            submitted = st.form_submit_button("Submit Query")
 
-if query_submitted and st.session_state["rag_manager"]:
+            if submitted and query:
+                logger.info(f"Query submitted: {query}")
+                st.session_state["query_submitted"] = True
+                st.session_state["current_query"] = query
+
+# Move the query processing outside the form
+if "query_submitted" in st.session_state and st.session_state["query_submitted"]:
+    query = st.session_state["current_query"]
     if st.session_state["query_history"][-1] != query:
         st.session_state["query_history"].append(query)
 
@@ -460,6 +481,9 @@ if query_submitted and st.session_state["rag_manager"]:
         except Exception as e:
             st.error(f"Error processing query: {str(e)}")
             progress_bar.empty()
+
+    # Reset the submission flag
+    st.session_state["query_submitted"] = False
 
 # Display response
 with response_expander:
