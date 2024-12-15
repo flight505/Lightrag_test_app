@@ -1,38 +1,76 @@
 # .cursorrules
 # Custom rules for AI assistance in the Lightrag_test_app project
 
-You are an AI assistant specialized in developing and maintaining a Streamlit-based graphrag  application. We are using LightRAG to create a knowledge graph and rag that will function a writing aide for academic papers. The application is designed to provide a user-friendly interface for querying and visualizing the graph-based data, with both global, local and   search functionalities.
+You are an AI assistant specialized in developing and maintaining a Streamlit-based LightRAG application.
 
 ## Project Overview
-- **Objective**: Create a user-friendly interface for querying and visualizing graph-based data, with "local", "global", "hybrid", "naive" functionalities
-- User should be able to start a new project in the app.
-- Point to the project folder.
-- The project folder will contain text files (docx, text, and pdf files) or user will move files to that folder before proceeding. 
-- We should have a st.toggle "Convert to txt" (defaults to on) convert the files in folder to .txt and moves all converted files to subfolder called "converted" run clean up process and checks. 
-- the folder the preprocessing/Preprocessing_converts_to_txt.py should contain all converters (I we will need to further update and refine them)
-- We should have the option to add more text files, and we should be able to delete files from the project folder.
-- We likly need to place the start up process in a st.form and have a submit button, that will run the initial process and then build the lightrag database.
-- We should be to use "local", "global", "hybrid", "naive" functionalities to query the project.
 
+### Objective
+The LightRAG application is designed to serve as a comprehensive tool for academic research, providing a user-friendly interface for querying and visualizing graph-based data. It leverages a knowledge graph and retrieval-augmented generation (RAG) system to handle large datasets and complex queries efficiently. Key features include:
 
--    and then be able to que-ry the project with different modes 
-- **Tools and Technologies**:
-  - **Frontend**: Streamlit for web interface
-  - **Processing**: Python for data processing and graph operations
-  - **Helper Functions**: Separated into global and local utilities
-  - **File Processing**: Custom preprocessing for text files with markdown support
+- **Multi-Mode Search**: Supports local, global, hybrid, and naive search functionalities.
+- **File Handling**: Converts various document formats (docx, text, pdf) to .txt and organizes them into a "converted" subfolder.
+- **User Interface**: Streamlit-based interface for easy configuration and query submission.
+- **Source Tracking**: Maintains references to original documents for academic integrity.
+
+### Implemented
+- **Search Functionality**: Implemented in `pages/1_🔍_Search.py` with support for multiple search modes.
+- **Preprocessing**: Script for converting files to .txt format located in `preprocessing/Preprocessing_convert files to .txt with markdown and comments.py`.
+- **Session Management**: Utilizes Streamlit session state to manage user interactions and query history.
+- **Error Handling**: Comprehensive try-except blocks with logging for debugging.
+
+### Next Steps
+1. **Enhanced File Handling**:
+   - Implement additional file format support and improve conversion accuracy.
+   - Suggestion: Use libraries like `pdfminer` for better PDF handling.
+
+2. **Usability Improvements**:
+   - Refine the user interface to make configuration options more intuitive.
+   - Suggestion: Add tooltips and help sections for new users.
+
+3. **Performance Optimization**:
+   - Optimize query processing to reduce response time.
+   - Suggestion: Implement caching mechanisms for frequently accessed data.
+
+4. **Documentation and Tutorials**:
+   - Develop comprehensive user guides and video tutorials.
+   - Suggestion: Include examples of common use cases to help users get started quickly.
+
+5. **Testing and Validation**:
+   - Conduct thorough testing of all functionalities, especially edge cases.
+   - Suggestion: Use automated testing frameworks to ensure reliability.
+
+Here's an organized overview of the core components and helper functions in your project:
 
 ## Core Components
-1. **Search Functionality**:
-   - **Global Search** (🌐): Implementation in pages/1_🌐_Global_search.py
-   - **Local Search** (🔍): Implementation in pages/2_🔍_Local_search.py
-   - **Query Processing**: Graph-based query handling in Graph_query.py
-   - **Preprocessing**: script for preprocessing text files preprocessing/Preprocessing_convert files to .txt with markdown and comments.py
-   -
 
-2. **Helper Functions**:
-   - **Global Helpers**: Utility functions in global_helper_functions.py
-   - **Local Helpers**: Local-specific utilities in local_helper_functions.py
+1. **Search Functionality**:
+   - **Implementation**: Located in `pages/1_🔍_Search.py`, this module provides various search functionalities:
+     - **Local Search**: Searches within a specific dataset or context.
+     - **Global Search**: Searches across multiple datasets or the entire application.
+     - **Hybrid Search**: Combines local and global search strategies for comprehensive results.
+     - **Naive Search**: A straightforward search approach without advanced algorithms.
+   - **Preprocessing**: The script `preprocessing/Preprocessing_convert_files_to_txt_with_markdown_and_comments.py` handles the conversion of various file formats into `.txt` files, incorporating markdown and comments to facilitate effective search operations.
+
+## Helper Functions
+
+1. **Global Helpers**:
+   - **Purpose**: Manage the mapping of generated responses to source documents, ensuring traceability and context.
+   - **Key Functions**:
+     - `retrieve_single_report_ids`: Extracts unique report IDs from responses.
+     - `map_text_unit_ids`: Merges entity and relationship data to establish traceability.
+     - `map_text_unit_content`: Associates text content with traceability data.
+     - `map_titles`: Maps document titles to traceability data.
+     - `most_frequent_sources`: Identifies frequently referenced source documents.
+
+2. **Local Helpers**:
+   - **Purpose**: Handle data specific to local contexts, focusing on entity and relationship extraction.
+   - **Key Functions**:
+     - `map_reports_entities_relationships`: Extracts and maps entity and relationship IDs.
+     - `combine_query_response_sources`: Formats query responses with source references.
+     - `retrieve_text_units`: Retrieves text units related to specific queries.
+
+These helper functions ensure efficient data processing and accurate mapping of responses to their sources, supporting the application's core functionalities.
 
 3. **Preprocessing**:
    - **File Conversion**: Text file processing with markdown and comments support
@@ -45,8 +83,7 @@ You are an AI assistant specialized in developing and maintaining a Streamlit-ba
   - Use termcolor for console output
   - Define major constants in UPPERCASE
   - Implement clear error handling with try-except blocks
-  - "pipeline" syntax, specifically using the pipe operator | in Python. 
-  - use logging for debugging purposes
+  - Use logging for debugging purposes
 
 ## File Organization
 - **Pages**: Store Streamlit pages in the /pages directory
