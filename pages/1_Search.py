@@ -213,6 +213,40 @@ with st.sidebar:
         help="Search: Single query mode\nChat: Interactive conversation mode",
     )
 
+    # Separate the directory form from the configuration form
+    with st.form("directory_form"):
+        st.markdown("**Create and Manage Document Store:**")
+        parent_dir = "DB"
+
+        # Ensure the parent directory exists
+        if not os.path.exists(parent_dir):
+            os.makedirs(parent_dir)
+            st.info(f"Created parent directory: {parent_dir}")
+
+        # List existing directories for selection
+        existing_stores = [
+            d for d in os.listdir(parent_dir) if os.path.isdir(os.path.join(parent_dir, d))
+        ]
+        selected_store = st.selectbox("Select existing store", options=existing_stores)
+
+        # Input for new store name
+        new_store_name = st.text_input("New document directory", value="")
+
+        # Button to create or manage store
+        create_store = st.form_submit_button("Create and Manage Store")
+        if create_store:
+            if new_store_name:
+                # Create new store if a name is provided
+                sub_dir_path = create_document_directory(parent_dir, new_store_name)
+                update_gitignore_for_parent(parent_dir)
+                st.success(f"Store created at: {sub_dir_path}")
+            elif selected_store:
+                # Manage existing store
+                st.success(f"Managing existing store: {selected_store}")
+            else:
+                st.warning("Please enter a new store name or select an existing store.")
+
+    # Configuration form
     with st.form("configuration_form"):
         st.markdown("**Configure your search:**")
         # Get API key from environment variable first
@@ -226,16 +260,7 @@ with st.sidebar:
             options=SUPPORTED_MODELS,
             index=SUPPORTED_MODELS.index(DEFAULT_MODEL),
         )
-        parent_dir = "DB"
-        sub_dir_name = st.text_input("Document directory", value="new_store")
         
-        with st.form("directory_form"):
-            create_store = st.form_submit_button("Create and Manage Store")
-            if create_store:
-                sub_dir_path = create_document_directory(parent_dir, sub_dir_name)
-                update_gitignore_for_parent(parent_dir)
-                st.success(f"Store created at: {sub_dir_path}")
-
         response_type = st.text_input(
             "Response type",
             key="response_type",
@@ -262,10 +287,13 @@ with st.sidebar:
 
         if config_submitted:
             try:
+                # Determine the input directory based on user selection or creation
+                input_dir = new_store_name if new_store_name else selected_store
+
                 # Initialize LightRAG manager
                 st.session_state["rag_manager"] = LightRAGManager(
                     api_key=api_key,
-                    input_dir=sub_dir_name,
+                    input_dir=input_dir,
                     model_name=model,
                     chunk_size=chunk_size,
                     chunk_overlap=chunk_overlap,
