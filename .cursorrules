@@ -9,13 +9,13 @@ The LightRAG application is designed to serve as a comprehensive tool for academ
 - **Source Tracking**: Maintains references to original documents for academic integrity.
 
 - **Search Functionality**:
-**Implementation**: Located in `pages/1_🔍_Search.py`, this module provides various search functionalities: 
+**Implementation**: Located in `pages/1_Search.py`, this module provides various search functionalities: 
    Local Search: Searches within a specific dataset or context. 
    Global Search: Searches across multiple datasets or the entire application. 
    Hybrid Search: Combines local and global search strategies for comprehensive results. 
    Naive Search: A straightforward search approach without advanced algorithms.
 
-- **Preprocessing**: Script for converting files to .txt format located in `preprocessing/Preprocessing_convert files to .txt with markdown and comments.py`.
+- **Preprocessing**: Script for converting files to .txt format located in `scr/preprocessing_functions.py`.
 - **Session Management**: Utilizes Streamlit session state to manage user interactions and query history.
 - **Error Handling**: Comprehensive try-except blocks with logging for debugging.
 
