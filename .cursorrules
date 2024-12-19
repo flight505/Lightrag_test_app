@@ -1,11 +1,6 @@
-# .cursorrules
-# Custom rules for AI assistance in the Lightrag_test_app project
-
 You are an AI assistant specialized in developing and maintaining a Streamlit-based LightRAG application.
 
 ## Project Overview
-
-### Objective
 The LightRAG application is designed to serve as a comprehensive tool for academic research, providing a user-friendly interface for querying and visualizing graph-based data. It leverages a knowledge graph and retrieval-augmented generation (RAG) system to handle large datasets and complex queries efficiently. Key features include:
 
 - **Multi-Mode Search**: Supports local, global, hybrid, and naive search functionalities.
@@ -13,44 +8,22 @@ The LightRAG application is designed to serve as a comprehensive tool for academ
 - **User Interface**: Streamlit-based interface for easy configuration and query submission.
 - **Source Tracking**: Maintains references to original documents for academic integrity.
 
-### Implemented
-- **Search Functionality**: Implemented in `pages/1_🔍_Search.py` with support for multiple search modes.
+- **Search Functionality**:
+**Implementation**: Located in `pages/1_🔍_Search.py`, this module provides various search functionalities: 
+   Local Search: Searches within a specific dataset or context. 
+   Global Search: Searches across multiple datasets or the entire application. 
+   Hybrid Search: Combines local and global search strategies for comprehensive results. 
+   Naive Search: A straightforward search approach without advanced algorithms.
+
 - **Preprocessing**: Script for converting files to .txt format located in `preprocessing/Preprocessing_convert files to .txt with markdown and comments.py`.
 - **Session Management**: Utilizes Streamlit session state to manage user interactions and query history.
 - **Error Handling**: Comprehensive try-except blocks with logging for debugging.
 
-### Next Steps
-1. **Enhanced File Handling**:
-   - Implement additional file format support and improve conversion accuracy.
-   - Suggestion: Use libraries like `pdfminer` for better PDF handling.
+- **Usability Improvements**:Refine the user interface to make configuration options more intuitive. Add tooltips and help sections for new users.
 
-2. **Usability Improvements**:
-   - Refine the user interface to make configuration options more intuitive.
-   - Suggestion: Add tooltips and help sections for new users.
+- **Performance Optimization**: Optimize query processing to reduce response time. Implement caching mechanisms for frequently accessed data.
 
-3. **Performance Optimization**:
-   - Optimize query processing to reduce response time.
-   - Suggestion: Implement caching mechanisms for frequently accessed data.
-
-4. **Documentation and Tutorials**:
-   - Develop comprehensive user guides and video tutorials.
-   - Suggestion: Include examples of common use cases to help users get started quickly.
-
-5. **Testing and Validation**:
-   - Conduct thorough testing of all functionalities, especially edge cases.
-   - Suggestion: Use automated testing frameworks to ensure reliability.
-
-Here's an organized overview of the core components and helper functions in your project:
-
-## Core Components
-
-1. **Search Functionality**:
-   - **Implementation**: Located in `pages/1_🔍_Search.py`, this module provides various search functionalities:
-     - **Local Search**: Searches within a specific dataset or context.
-     - **Global Search**: Searches across multiple datasets or the entire application.
-     - **Hybrid Search**: Combines local and global search strategies for comprehensive results.
-     - **Naive Search**: A straightforward search approach without advanced algorithms.
-   - **Preprocessing**: The script `preprocessing/Preprocessing_convert_files_to_txt_with_markdown_and_comments.py` handles the conversion of various file formats into `.txt` files, incorporating markdown and comments to facilitate effective search operations.
+- **Testing and Validation**: Conduct thorough testing of all functionalities, especially edge cases. Suggestion: Use automated testing frameworks to ensure reliability.
 
 ## Helper Functions
 
@@ -70,12 +43,6 @@ Here's an organized overview of the core components and helper functions in your
      - `combine_query_response_sources`: Formats query responses with source references.
      - `retrieve_text_units`: Retrieves text units related to specific queries.
 
-These helper functions ensure efficient data processing and accurate mapping of responses to their sources, supporting the application's core functionalities.
-
-3. **Preprocessing**:
-   - **File Conversion**: Text file processing with markdown and comments support
-   - **Data Preparation**: Standardized preprocessing pipeline
-
 ## Coding Standards
 - **Language**: Python 3.10+
 - **Style Guide**: 
@@ -87,8 +54,7 @@ These helper functions ensure efficient data processing and accurate mapping of 
 
 ## File Organization
 - **Pages**: Store Streamlit pages in the /pages directory
-- **Preprocessing**: Keep preprocessing scripts in /preprocessing
-- **Helpers**: Maintain separate files for global and local helper functions
+- **Preprocessing**: preprocessing, global and local helper functions scripts in src/
 
 ## Best Practices
 1. **Code Structure**:
@@ -106,22 +72,7 @@ These helper functions ensure efficient data processing and accurate mapping of 
    - Maintain an up-to-date requirements.txt
    - Avoid hardcoding configuration values
 
-## Documentation
-- **Code Comments**: Provide clear, concise documentation for functions
-- **README**: Keep README.md updated with setup and usage instructions
-- **Inline Documentation**: Use descriptive variable names and comments
-
-## Security
-- **API Keys**: Store in environment variables
-- **File Operations**: Implement safe file handling practices
-- **Input Validation**: Validate all user inputs before processing
-
 ## Testing
 - **Manual Testing**: Test both global and local search functionalities
 - **Error Cases**: Verify proper handling of edge cases
 - **UI Testing**: Ensure Streamlit interface remains responsive
-
-## Performance
-- **Optimization**: Focus on efficient graph operations
-- **Memory Management**: Handle large datasets efficiently
-- **Response Time**: Optimize search query performance
