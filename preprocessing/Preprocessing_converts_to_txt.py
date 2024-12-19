@@ -1,11 +1,53 @@
 import os
+import json
 from zipfile import ZipFile
 from xml.etree import ElementTree as etree
 from docx import Document
 from openpyxl import load_workbook
 from pptx import Presentation
 
-# helper functions
+# Path to the file that tracks indexed files
+INDEXED_FILES_TRACKER = "indexed_files.json"
+
+def load_indexed_files():
+    """Load the list of already indexed files."""
+    if os.path.exists(INDEXED_FILES_TRACKER):
+        with open(INDEXED_FILES_TRACKER, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return []
+
+def save_indexed_files(indexed_files):
+    """Save the list of indexed files."""
+    with open(INDEXED_FILES_TRACKER, "w", encoding="utf-8") as f:
+        json.dump(indexed_files, f)
+
+def get_current_files(input_dir):
+    """Get a list of current files in the directory."""
+    return set(os.listdir(input_dir))
+
+def update_indexed_files(input_dir):
+    """Update the list of indexed files based on the current directory state."""
+    indexed_files = set(load_indexed_files())
+    current_files = get_current_files(input_dir)
+
+    # Determine new and removed files
+    new_files = current_files - indexed_files
+    removed_files = indexed_files - current_files
+
+    # Process new files
+    for file in new_files:
+        if file.endswith((".docx", ".pptx", ".xlsx")):
+            # Call the appropriate conversion function based on file type
+            if file.endswith(".docx"):
+                docx_to_txt(input_dir, output_dir)
+            elif file.endswith(".pptx"):
+                pptx_to_txt(input_dir, output_dir)
+            elif file.endswith(".xlsx"):
+                xlsx_to_txt(input_dir, output_dir)
+
+    # Update the indexed files list
+    indexed_files = (indexed_files - removed_files) | new_files
+    save_indexed_files(list(indexed_files))
 
 def docx_to_txt(input_dir, output_dir):
     """Converts .docx files in input_dir to .txt files in output_dir with tables formatted as Markdown
@@ -240,11 +282,25 @@ def process_paragraph(paragraph, comments):
 # main function
 
 def convert_files(input_dir, output_dir):
-    """Converts .docx, .pptx, and .xlsx files in input_dir to .txt files in output_dir with Markdown formatting
-    and comments preserved."""
-    docx_to_txt(input_dir, output_dir)
-    pptx_to_txt(input_dir, output_dir)
-    xlsx_to_txt(input_dir, output_dir)
+    """Convert new files in input_dir to .txt files in output_dir."""
+    indexed_files = load_indexed_files()
+    new_files = get_new_files(input_dir, indexed_files)
+
+    for file in new_files:
+        if file.endswith((".docx", ".pptx", ".xlsx")):
+            # Call the appropriate conversion function based on file type
+            if file.endswith(".docx"):
+                docx_to_txt(input_dir, output_dir)
+            elif file.endswith(".pptx"):
+                pptx_to_txt(input_dir, output_dir)
+            elif file.endswith(".xlsx"):
+                xlsx_to_txt(input_dir, output_dir)
+
+            # Add the file to the list of indexed files
+            indexed_files.append(file)
+
+    # Save the updated list of indexed files
+    save_indexed_files(indexed_files)
 
 # declare paths
 input_dirs=[
