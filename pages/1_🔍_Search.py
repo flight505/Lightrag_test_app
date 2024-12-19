@@ -12,8 +12,8 @@ import streamlit as st
 from docx import Document
 from termcolor import colored
 
-from lightrag_helpers import ResponseProcessor
-from lightrag_init import DEFAULT_MODEL, SUPPORTED_MODELS, LightRAGManager
+from src.lightrag_helpers import ResponseProcessor
+from src.lightrag_init import DEFAULT_MODEL, SUPPORTED_MODELS, LightRAGManager
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
