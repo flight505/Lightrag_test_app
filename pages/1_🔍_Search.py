@@ -14,6 +14,7 @@ from termcolor import colored
 
 from src.lightrag_helpers import ResponseProcessor
 from src.lightrag_init import DEFAULT_MODEL, SUPPORTED_MODELS, LightRAGManager
+from src.file_manager import create_document_directory, update_gitignore_for_parent
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -225,11 +226,16 @@ with st.sidebar:
             options=SUPPORTED_MODELS,
             index=SUPPORTED_MODELS.index(DEFAULT_MODEL),
         )
-        input_dir = st.text_input(
-            "Document directory",
-            help="Path to your local document directory",
-            value="./dickens",
-        )
+        parent_dir = "DB"
+        sub_dir_name = st.text_input("Document directory", value="new_store")
+        
+        with st.form("directory_form"):
+            create_store = st.form_submit_button("Create and Manage Store")
+            if create_store:
+                sub_dir_path = create_document_directory(parent_dir, sub_dir_name)
+                update_gitignore_for_parent(parent_dir)
+                st.success(f"Store created at: {sub_dir_path}")
+
         response_type = st.text_input(
             "Response type",
             key="response_type",
@@ -252,14 +258,14 @@ with st.sidebar:
                 help="Controls response creativity (0: focused, 1: creative)",
             )
 
-        config_submitted = st.form_submit_button("Configure search")
+        config_submitted = st.form_submit_button("Initialize and Index Documents")
 
         if config_submitted:
             try:
                 # Initialize LightRAG manager
                 st.session_state["rag_manager"] = LightRAGManager(
                     api_key=api_key,
-                    input_dir=input_dir,
+                    input_dir=sub_dir_name,
                     model_name=model,
                     chunk_size=chunk_size,
                     chunk_overlap=chunk_overlap,
