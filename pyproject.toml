@@ -14,7 +14,7 @@ dependencies = [
     "pillow",
     "termcolor",
     "marker-pdf",
-    "aioboto3>=13.2.0",
+    "aioboto3",
     "python-dotenv",
     "ollama",
     "openai",
@@ -43,6 +43,12 @@ dependencies = [
     "torch",
     "transformers",
     "xxhash",
+    "pdfminer.six",
+    "beautifulsoup4",
+    "nest_asyncio",
+    "pydantic-ai",
+    "httpx",
+    "pytest-asyncio",
 ]
 
 [build-system]
