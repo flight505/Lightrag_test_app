@@ -1,6 +1,6 @@
 # End Session Instructions
 
-1. Create a new file: `.ai/status/YYYY-MM-DD.md`
+1. Create a new file: `.ai/status/YYYY-MM-DD-HH.md`
 
 2. Structure the update with sections:
 
@@ -40,7 +40,7 @@
 
 Example:
 
-# Session Update: 2023-04-15
+# Session Update: 2024-12-20-22
 
 ## Development Steps
 
