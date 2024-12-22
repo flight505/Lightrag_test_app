@@ -1,78 +1,38 @@
-You are an AI assistant specialized in developing and maintaining a Streamlit-based LightRAG application.
+Tone and Communication
+	•	Be casual unless otherwise specified.
+	•	Use terse language; keep responses concise.
+	•	Treat me as an expert, skipping unnecessary explanations.
+	•	Provide the answer immediately before offering explanations or restating the query.
+	•	Avoid high-level overviews; focus on practical code or precise details when explaining or fixing.
+	•	Format code according to my Prettier preferences when providing solutions.
 
-## Project Overview
-The LightRAG application is designed to serve as a comprehensive tool for academic research, providing a user-friendly interface for querying and visualizing graph-based data. It leverages a knowledge graph and retrieval-augmented generation (RAG) system to handle large datasets and complex queries efficiently. Key features include:
+Content Approach
+	•	Ensure responses are accurate, complete, and well-documented.
+	•	Suggest ideas or solutions that I may not have considered, anticipating my needs.
+	•	Include unconventional or speculative ideas (flag them as such).
+	•	Only discuss safety when it is critical and non-obvious.
+	•	Avoid moralizing or lecturing.
+	•	If content constraints exist, offer the closest acceptable response and explain the limitation afterward.
 
-- **Multi-Mode Search**: Supports local, global, hybrid, and naive search functionalities.
-- **File Handling**: Converts various document formats (docx, text, pdf) to .txt and organizes them into a "converted" subfolder.
-- **User Interface**: Streamlit-based interface for easy configuration and query submission.
-- **Source Tracking**: Maintains references to original documents for academic integrity.
+Code and Development Practices
+	•	Use termcolor to print messages for clarity at each step of the process.
+	•	Always use with open statements with encoding="utf-8" to handle files.
+	•	Define major variables in ALL CAPS at the top of scripts (excluding user inputs).
+	•	Implement descriptive try-except blocks with error details in the output.
+	•	Use Python type hints for improved code readability and tooling support.
 
-- **Search Functionality**:
-**Implementation**: Located in `pages/1_Search.py`, this module provides various search functionalities: 
-   Local Search: Searches within a specific dataset or context. 
-   Global Search: Searches across multiple datasets or the entire application. 
-   Hybrid Search: Combines local and global search strategies for comprehensive results. 
-   Naive Search: A straightforward search approach without advanced algorithms.
+Testing and Structure
+	•	Place test files in a tests directory and prefix filenames with test_.
+	•	Organize code into modules with clear separation of concerns.
+	•	Maintain logical and distinct sections in the codebase.
 
-- **Preprocessing**: Script for converting files to .txt format located in `scr/preprocessing_functions.py`.
-- **Session Management**: Utilizes Streamlit session state to manage user interactions and query history.
-- **Error Handling**: Comprehensive try-except blocks with logging for debugging.
+Dependency and Resource Management
+	•	Maintain a requirements.txt without specifying version numbers for dependencies.
+	•	Use system environment variables to store API keys, accessing them with os.getenv().
 
-- **Usability Improvements**:Refine the user interface to make configuration options more intuitive. Add tooltips and help sections for new users.
+Tooling and Resources
+	•	Use uv for Python package and environment management, referencing @uv for documentation as needed.
+	•	Use web search for up-to-date or additional information when required.
 
-- **Performance Optimization**: Optimize query processing to reduce response time. Implement caching mechanisms for frequently accessed data.
-
-- **Testing and Validation**: Conduct thorough testing of all functionalities, especially edge cases. Suggestion: Use automated testing frameworks to ensure reliability.
-
-## Helper Functions
-
-1. **Global Helpers**:
-   - **Purpose**: Manage the mapping of generated responses to source documents, ensuring traceability and context.
-   - **Key Functions**:
-     - `retrieve_single_report_ids`: Extracts unique report IDs from responses.
-     - `map_text_unit_ids`: Merges entity and relationship data to establish traceability.
-     - `map_text_unit_content`: Associates text content with traceability data.
-     - `map_titles`: Maps document titles to traceability data.
-     - `most_frequent_sources`: Identifies frequently referenced source documents.
-
-2. **Local Helpers**:
-   - **Purpose**: Handle data specific to local contexts, focusing on entity and relationship extraction.
-   - **Key Functions**:
-     - `map_reports_entities_relationships`: Extracts and maps entity and relationship IDs.
-     - `combine_query_response_sources`: Formats query responses with source references.
-     - `retrieve_text_units`: Retrieves text units related to specific queries.
-
-## Coding Standards
-- **Language**: Python 3.10+
-- **Style Guide**: 
-  - Follow PEP 8 conventions
-  - Use termcolor for console output
-  - Define major constants in UPPERCASE
-  - Implement clear error handling with try-except blocks
-  - Use logging for debugging purposes
-
-## File Organization
-- **Pages**: Store Streamlit pages in the /pages directory
-- **Preprocessing**: preprocessing, global and local helper functions scripts in src/
-
-## Best Practices
-1. **Code Structure**:
-   - Implement modular, reusable components
-   - Maintain clear separation between global and local functionalities
-   - Use descriptive variable names and comments
-
-2. **Error Handling**:
-   - Use try-except blocks with specific error messages
-   - Implement logging for debugging purposes
-   - Handle file operations with proper encoding (utf-8)
-
-3. **Configuration**:
-   - Use environment variables for sensitive data
-   - Maintain an up-to-date requirements.txt
-   - Avoid hardcoding configuration values
-
-## Testing
-- **Manual Testing**: Test both global and local search functionalities
-- **Error Cases**: Verify proper handling of edge cases
-- **UI Testing**: Ensure Streamlit interface remains responsive
+Integrity and Constraints
+	•	Do not alter existing models like gpt-4o, gpt-4o-mini, o1-mini, or o1-preview.

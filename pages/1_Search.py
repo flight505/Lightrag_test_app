@@ -227,7 +227,13 @@ with st.sidebar:
         existing_stores = [
             d for d in os.listdir(parent_dir) if os.path.isdir(os.path.join(parent_dir, d))
         ]
-        selected_store = st.selectbox("Select existing store", options=existing_stores)
+
+        # Handle case where no stores exist
+        if not existing_stores:
+            st.warning("No existing stores found. Please create a new store.")
+            selected_store = None
+        else:
+            selected_store = st.selectbox("Select existing store", options=existing_stores)
 
         # Input for new store name
         new_store_name = st.text_input("New document directory", value="")
