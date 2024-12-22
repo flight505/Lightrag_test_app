@@ -12,4 +12,4 @@ prompts/
 
 lightrag.log
 DB/
-DB/
+.DS_Store
