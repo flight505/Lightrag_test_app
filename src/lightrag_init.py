@@ -8,6 +8,7 @@ from lightrag.llm import gpt_4o_complete, gpt_4o_mini_complete, openai_embedding
 from lightrag.utils import EmbeddingFunc
 from termcolor import colored
 from src.file_manager import DB_ROOT
+from src.document_validator import DocumentValidator
 
 # Configure logging
 logging.basicConfig(
@@ -72,6 +73,9 @@ class LightRAGManager:
                 ),
             )
 
+            # Add validator
+            self.validator = DocumentValidator(working_dir=full_working_dir)
+
             print(colored("LightRAG initialization successful!", "green"))
 
         except Exception as e:
@@ -93,31 +97,39 @@ class LightRAGManager:
             if not os.path.exists(full_input_dir):
                 raise FileNotFoundError(f"Directory not found: {full_input_dir}")
 
-            # Track loaded documents
+            # Validate store first
+            validation_results = self.validator.validate_store(self.input_dir)
+            
+            if validation_results['errors']:
+                for error in validation_results['errors']:
+                    logger.warning(f"Validation error: {error}")
+                    print(colored(f"Warning: {error}", "yellow"))
+                    
+            if not validation_results['valid_files']:
+                raise Exception("No valid documents found to load")
+                
+            # Load only valid files
             loaded_files = []
             total_size = 0
-
-            # Walk through the directory and load all text files
-            for root, _, files in os.walk(full_input_dir):
-                txt_files = [f for f in files if f.endswith(".txt")]
-                print(colored(f"Found text files: {txt_files}", "cyan"))  # Debug line
-
-                if not txt_files:
-                    continue
-
-                for file in txt_files:
-                    file_path = os.path.join(root, file)
-                    try:
-                        with open(file_path, "r", encoding="utf-8") as f:
-                            content = f.read()
-                            size = len(content)
-                            if size > 0:
-                                self.rag.insert(content)
-                                loaded_files.append(file)
-                                total_size += size
-                                print(colored(f"Successfully loaded: {file_path}", "green"))  # Debug line
-                    except Exception as e:
-                        print(colored(f"Error loading file {file_path}: {str(e)}", "red"))
+            
+            for file_path in validation_results['valid_files']:
+                try:
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        content = f.read()
+                        is_valid, error = self.validator.validate_content(content)
+                        
+                        if is_valid:
+                            self.rag.insert(content)
+                            loaded_files.append(os.path.basename(file_path))
+                            total_size += len(content)
+                            print(colored(f"Successfully loaded: {file_path}", "green"))
+                        else:
+                            logger.warning(f"Content validation failed for {file_path}: {error}")
+                            print(colored(f"Warning: {error}", "yellow"))
+                            
+                except Exception as e:
+                    logger.error(f"Error loading file {file_path}: {str(e)}")
+                    print(colored(f"Error loading file {file_path}: {str(e)}", "red"))
 
             # Provide feedback about loaded documents
             if loaded_files:
