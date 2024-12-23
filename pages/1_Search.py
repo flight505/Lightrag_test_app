@@ -18,6 +18,9 @@ from src.file_manager import create_store_directory, DB_ROOT
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+file_handler = logging.FileHandler('chat.log')
+file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+logger.addHandler(file_handler)
 
 # Page configuration
 st.set_page_config(page_title="LightRAG Search", page_icon="🔍", layout="wide")
@@ -446,29 +449,55 @@ with query_container:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
-                # Add message controls
-                if message["role"] == "assistant":
-                    msg_col1, msg_col2 = st.columns([1, 4])
-                    with msg_col1:
-                        if st.button("📋", key=f"copy_{i}", help="Copy response"):
-                            st.write("Copied to clipboard!")
-                            message["content"]
-
         # Chat input
-        if prompt := st.chat_input(
-            "Type your message here...",
-            key="chat_input",
-            max_chars=1000,
-        ):
+        if prompt := st.chat_input("Type your message here...", key="chat_input"):
+            logger.info(f"Chat input received: {prompt}")
+            
             # Add user message to chat history
             st.session_state["chat_history"].append({"role": "user", "content": prompt})
 
-            # Get conversation context
-            context = get_conversation_context()
+            try:
+                # Get conversation context
+                context = get_conversation_context()
+                logger.debug(f"Context retrieved: {context}")
 
-            # Prepare query with context
-            query = f"{context}\nCurrent query: {prompt}" if context else prompt
-            query_submitted = True
+                # Prepare query with context
+                query = f"{context}\nCurrent query: {prompt}" if context else prompt
+                logger.info(f"Prepared query: {query}")
+
+                # Process query with progress indicator
+                with st.status("Processing query...") as status:
+                    result = st.session_state["rag_manager"].query(query)
+                    logger.info(f"Query result: {result}")
+
+                    if result and result.get("response"):
+                        # Format response with sources
+                        formatted_response = (
+                            f"{result['response']}\n\n"
+                            f"*Mode: {result.get('mode', 'unknown')}*\n"
+                            f"*Sources:*\n"
+                            f"{st.session_state['response_processor'].format_sources(result.get('sources', []))}"
+                        )
+                        
+                        # Add assistant response to chat history
+                        st.session_state["chat_history"].append({
+                            "role": "assistant",
+                            "content": formatted_response
+                        })
+                        logger.info("Response added to chat history")
+                        
+                        # Update conversation context
+                        manage_conversation_context(query, result["response"])
+                        
+                        # Force streamlit to rerun and show the new message
+                        st.rerun()
+                    else:
+                        logger.error("No valid response received")
+                        st.error("Failed to get a response. Please try again.")
+
+            except Exception as e:
+                logger.error(f"Error processing chat: {str(e)}", exc_info=True)
+                st.error(f"Error processing chat: {str(e)}")
     else:
         # Standard search input
         with st.form("query_form", clear_on_submit=True):

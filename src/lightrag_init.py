@@ -1,6 +1,7 @@
 import logging
 import os
 from typing import Optional
+from datetime import datetime
 
 from lightrag import LightRAG, QueryParam
 from lightrag.llm import gpt_4o_complete, gpt_4o_mini_complete, openai_embedding
@@ -146,22 +147,25 @@ class LightRAGManager:
     def query(self, query_text: str, response_type: Optional[str] = None) -> dict:
         """Execute query using LightRAG"""
         try:
+            logger.info(f"Processing query: {query_text}")
             print(colored("Processing query...", "cyan"))
 
             # Add response type to query if specified
             if response_type:
-                formatted_query = (
-                    f"Please provide a response in {response_type} format: {query_text}"
-                )
+                formatted_query = f"Please provide a response in {response_type} format: {query_text}"
             else:
                 formatted_query = query_text
+            
+            logger.debug(f"Formatted query: {formatted_query}")
 
             # Execute query with different modes
             modes = ["naive", "local", "global", "hybrid"]
             
             for mode in modes:
                 try:
+                    logger.info(f"Trying {mode} mode...")
                     print(colored(f"Trying {mode} mode...", "cyan"))
+                    
                     result = self.rag.query(
                         formatted_query,
                         param=QueryParam(
@@ -170,36 +174,45 @@ class LightRAGManager:
                         ),
                     )
                     
+                    logger.debug(f"Raw result from {mode} mode: {result}")
+                    
                     # Check if we got a valid response
                     if isinstance(result, dict) and result.get('response'):
+                        logger.info(f"{mode} mode successful")
                         print(colored(f"{mode} mode successful!", "green"))
                         return {
                             "response": result['response'],
                             "mode": mode,
-                            "sources": result.get('sources', []),  # Sources are in the result
-                            "time": None,
+                            "sources": result.get('sources', []),
+                            "time": datetime.now().isoformat(),
                             "token_usage": None,
                         }
                     elif isinstance(result, str) and not result.startswith("Sorry"):
+                        logger.info(f"{mode} mode successful (string response)")
                         print(colored(f"{mode} mode successful!", "green"))
                         return {
                             "response": result,
                             "mode": mode,
-                            "sources": [],  # No sources available for string response
-                            "time": None,
+                            "sources": [],
+                            "time": datetime.now().isoformat(),
                             "token_usage": None,
                         }
 
                 except Exception as mode_error:
+                    logger.warning(f"Error in {mode} mode: {str(mode_error)}")
                     print(colored(f"Error in {mode} mode: {str(mode_error)}", "yellow"))
                     continue
 
             # If no mode was successful, try hybrid mode one last time
+            logger.info("Falling back to hybrid mode...")
             print(colored("Falling back to hybrid mode...", "yellow"))
+            
             result = self.rag.query(
                 formatted_query,
                 param=QueryParam(mode="hybrid"),
             )
+            
+            logger.debug(f"Final hybrid mode result: {result}")
 
             # Format the final response
             if isinstance(result, dict):
@@ -207,7 +220,7 @@ class LightRAGManager:
                     "response": result.get('response', ''),
                     "mode": "hybrid",
                     "sources": result.get('sources', []),
-                    "time": None,
+                    "time": datetime.now().isoformat(),
                     "token_usage": None,
                 }
             else:
@@ -215,14 +228,14 @@ class LightRAGManager:
                     "response": str(result),
                     "mode": "hybrid",
                     "sources": [],
-                    "time": None,
+                    "time": datetime.now().isoformat(),
                     "token_usage": None,
                 }
 
         except Exception as e:
             error_msg = f"Error processing query: {str(e)}"
+            logger.error(error_msg, exc_info=True)
             print(colored(error_msg, "red"))
-            logger.error(error_msg)
             raise
 
     def get_relevant_sources(self, query_result: dict) -> list:
