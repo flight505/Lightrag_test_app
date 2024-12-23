@@ -14,7 +14,7 @@ from termcolor import colored
 
 from src.lightrag_helpers import ResponseProcessor
 from src.lightrag_init import DEFAULT_MODEL, SUPPORTED_MODELS, LightRAGManager
-from src.file_manager import create_document_directory, update_gitignore_for_parent
+from src.file_manager import create_store_directory, DB_ROOT
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -49,6 +49,12 @@ if "chat_settings" not in st.session_state:
     }
 if "response_type" not in st.session_state:
     st.session_state["response_type"] = "detailed paragraph"
+if "status_ready" not in st.session_state:
+    st.session_state["status_ready"] = False
+if "active_store" not in st.session_state:
+    st.session_state["active_store"] = None
+if "api_key_shown" not in st.session_state:
+    st.session_state["api_key_shown"] = False
 
 
 # Helper functions
@@ -216,51 +222,66 @@ with st.sidebar:
     # Separate the directory form from the configuration form
     with st.form("directory_form"):
         st.markdown("**Create and Manage Document Store:**")
-        parent_dir = "DB"
-
-        # Ensure the parent directory exists
-        if not os.path.exists(parent_dir):
-            os.makedirs(parent_dir)
-            st.info(f"Created parent directory: {parent_dir}")
-
-        # List existing directories for selection
+        
+        # List existing stores from DB directory
+        if not os.path.exists(DB_ROOT):
+            os.makedirs(DB_ROOT)
+            st.info(f"Created root directory: {DB_ROOT}")
+            
         existing_stores = [
-            d for d in os.listdir(parent_dir) if os.path.isdir(os.path.join(parent_dir, d))
+            d for d in os.listdir(DB_ROOT) 
+            if os.path.isdir(os.path.join(DB_ROOT, d))
         ]
 
-        # Handle case where no stores exist
-        if not existing_stores:
+        # Handle store selection
+        if existing_stores:
+            selected_store = st.selectbox("Select existing store", options=existing_stores)
+            if selected_store != st.session_state["active_store"]:
+                st.session_state["active_store"] = selected_store
+                st.toast(f"Using store: {selected_store}")
+        else:
             st.warning("No existing stores found. Please create a new store.")
             selected_store = None
-        else:
-            selected_store = st.selectbox("Select existing store", options=existing_stores)
 
         # Input for new store name
-        new_store_name = st.text_input("New document directory", value="")
+        new_store_name = st.text_input("New store name", value="")
 
         # Button to create or manage store
         create_store = st.form_submit_button("Create and Manage Store")
         if create_store:
             if new_store_name:
-                # Create new store if a name is provided
-                sub_dir_path = create_document_directory(parent_dir, new_store_name)
-                update_gitignore_for_parent(parent_dir)
-                st.success(f"Store created at: {sub_dir_path}")
-            elif selected_store:
-                # Manage existing store
-                st.success(f"Managing existing store: {selected_store}")
-            else:
+                store_path = create_store_directory(new_store_name)
+                if store_path:
+                    if os.path.exists(os.path.join(DB_ROOT, new_store_name)):
+                        st.session_state["active_store"] = new_store_name
+                        st.toast(f"Created new store: {new_store_name}")
+                    else:
+                        st.error("Failed to create store in DB directory")
+                else:
+                    st.error("Failed to create store")
+            elif not selected_store:
                 st.warning("Please enter a new store name or select an existing store.")
 
     # Configuration form
     with st.form("configuration_form"):
         st.markdown("**Configure your search:**")
+        
         # Get API key from environment variable first
         api_key = os.getenv("OPENAI_API_KEY", "")
         if not api_key:
             api_key = st.text_input("Your API key", type="password")
+        elif not st.session_state["api_key_shown"]:
+            st.toast("Using API key from environment variable")
+            st.session_state["api_key_shown"] = True
+
+        # Store validation without redundant toast
+        if not st.session_state["active_store"]:
+            st.warning("Please create or select a store before initializing")
+            store_ready = False
         else:
-            st.success("Using API key from environment variable")
+            store_ready = True
+            active_store = st.session_state["active_store"]
+
         model = st.selectbox(
             "Select your query model",
             options=SUPPORTED_MODELS,
@@ -292,23 +313,34 @@ with st.sidebar:
         config_submitted = st.form_submit_button("Initialize and Index Documents")
 
         if config_submitted:
-            try:
-                # Determine the input directory based on user selection or creation
-                input_dir = new_store_name if new_store_name else selected_store
+            if not store_ready:
+                st.error("Please create or select a store first")
+            elif not api_key:
+                st.error("API key is required")
+            else:
+                try:
+                    status_placeholder = st.empty()
+                    status = status_placeholder.status("Initializing LightRAG...")
+                    
+                    # Initialize LightRAG manager
+                    st.session_state["rag_manager"] = LightRAGManager(
+                        api_key=api_key,
+                        input_dir=active_store,
+                        model_name=model,
+                        chunk_size=chunk_size,
+                        chunk_overlap=chunk_overlap,
+                    )
+                    
+                    status.write("Loading documents...")
+                    st.session_state["rag_manager"].load_documents()
+                    
+                    status.update(label="Search configured successfully!", state="complete")
+                    st.session_state["status_ready"] = True
+                    status_placeholder.empty() # Clear the status after success
 
-                # Initialize LightRAG manager
-                st.session_state["rag_manager"] = LightRAGManager(
-                    api_key=api_key,
-                    input_dir=input_dir,
-                    model_name=model,
-                    chunk_size=chunk_size,
-                    chunk_overlap=chunk_overlap,
-                )
-                # Load documents
-                st.session_state["rag_manager"].load_documents()
-                st.success("Search configured successfully!")
-            except Exception as e:
-                st.error(f"Configuration error: {str(e)}")
+
+                except Exception as e:
+                    st.error(f"Configuration error: {str(e)}")
 
     # Add clear history button outside the form
     if st.button("Clear History", type="secondary"):
@@ -373,14 +405,18 @@ with col1:
     query_container = st.container()
     response_expander = st.expander("🔽 Response and Sources", expanded=True)
     key_points_expander = st.expander("🔑 Key Points")
+    st.session_state
 
 with col2:
     # Sidebar information
     with st.expander("ℹ️ Session Info", expanded=True):
+        if st.session_state["status_ready"]:
+            st.write("**Status:** Ready")
         st.write("**Query Count:**", len(st.session_state["query_history"]) - 1)
         if st.session_state["rag_manager"]:
             st.write("**Model:**", st.session_state["rag_manager"].model_name)
-            st.write("**Directory:**", st.session_state["rag_manager"].input_dir)
+            st.write("**Store:**", st.session_state["rag_manager"].input_dir)
+
 
     debug_expander = st.expander("⚠️ Debug Information")
 
