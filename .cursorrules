@@ -15,7 +15,7 @@ Content Approach
 	•	If content constraints exist, offer the closest acceptable response and explain the limitation afterward.
 
 Code and Development Practices
-	•	Use termcolor to print messages for clarity at each step of the process.
+	•	Use termcolor for console output
 	•	Always use with open statements with encoding="utf-8" to handle files.
 	•	Define major variables in ALL CAPS at the top of scripts (excluding user inputs).
 	•	Implement descriptive try-except blocks with error details in the output.
