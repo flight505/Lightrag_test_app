@@ -6,6 +6,7 @@ from lightrag import LightRAG, QueryParam
 from lightrag.llm import gpt_4o_complete, gpt_4o_mini_complete, openai_embedding
 from lightrag.utils import EmbeddingFunc
 from termcolor import colored
+from src.file_manager import DB_ROOT
 
 # Configure logging
 logging.basicConfig(
@@ -48,8 +49,14 @@ class LightRAGManager:
                 gpt_4o_mini_complete if model_name == "gpt-4o-mini" else gpt_4o_complete
             )
 
+            # Initialize LightRAG with full path
+            full_working_dir = os.path.join(DB_ROOT, self.input_dir)
+            
+            # Create directory if it doesn't exist
+            os.makedirs(full_working_dir, exist_ok=True)
+
             self.rag = LightRAG(
-                working_dir=self.input_dir,
+                working_dir=full_working_dir,
                 llm_model_func=llm_func,
                 llm_model_kwargs={
                     "api_key": self.api_key,
@@ -76,18 +83,23 @@ class LightRAGManager:
         """Load documents from input directory"""
         try:
             print(colored("Loading documents...", "cyan"))
+            
+            # Construct full path using DB_ROOT
+            full_input_dir = os.path.join(DB_ROOT, self.input_dir)
+            print(colored(f"Looking for files in: {full_input_dir}", "cyan"))  # Debug line
 
             # Check if directory exists
-            if not os.path.exists(self.input_dir):
-                raise FileNotFoundError(f"Directory not found: {self.input_dir}")
+            if not os.path.exists(full_input_dir):
+                raise FileNotFoundError(f"Directory not found: {full_input_dir}")
 
             # Track loaded documents
             loaded_files = []
             total_size = 0
 
             # Walk through the directory and load all text files
-            for root, _, files in os.walk(self.input_dir):
+            for root, _, files in os.walk(full_input_dir):
                 txt_files = [f for f in files if f.endswith(".txt")]
+                print(colored(f"Found text files: {txt_files}", "cyan"))  # Debug line
 
                 if not txt_files:
                     continue
@@ -102,8 +114,9 @@ class LightRAGManager:
                                 self.rag.insert(content)
                                 loaded_files.append(file)
                                 total_size += size
+                                print(colored(f"Successfully loaded: {file_path}", "green"))  # Debug line
                     except Exception as e:
-                        print(colored(f"Error loading file {file}: {str(e)}", "red"))
+                        print(colored(f"Error loading file {file_path}: {str(e)}", "red"))
 
             # Provide feedback about loaded documents
             if loaded_files:
@@ -118,7 +131,7 @@ class LightRAGManager:
                     raise Exception("Document verification failed")
             else:
                 warning_msg = (
-                    f"No text files found in {self.input_dir}. "
+                    f"No text files found in {full_input_dir}. "  # Updated to show full path
                     "Please make sure your documents are in .txt format."
                 )
                 print(colored(warning_msg, "yellow"))
@@ -145,51 +158,66 @@ class LightRAGManager:
 
             # Execute query with different modes
             modes = ["naive", "local", "global", "hybrid"]
-            responses = {}
-
+            
             for mode in modes:
                 try:
                     print(colored(f"Trying {mode} mode...", "cyan"))
-                    response = self.rag.query(
+                    result = self.rag.query(
                         formatted_query,
                         param=QueryParam(
                             mode=mode,
                             only_need_context=False,
                         ),
                     )
-                    if response and not response.startswith("Sorry"):
-                        # Format successful response
-                        formatted_response = {
-                            "response": response,
+                    
+                    # Check if we got a valid response
+                    if isinstance(result, dict) and result.get('response'):
+                        print(colored(f"{mode} mode successful!", "green"))
+                        return {
+                            "response": result['response'],
                             "mode": mode,
-                            "sources": self.rag.get_context(),  # Get context/sources
+                            "sources": result.get('sources', []),  # Sources are in the result
                             "time": None,
                             "token_usage": None,
                         }
+                    elif isinstance(result, str) and not result.startswith("Sorry"):
                         print(colored(f"{mode} mode successful!", "green"))
-                        return formatted_response
+                        return {
+                            "response": result,
+                            "mode": mode,
+                            "sources": [],  # No sources available for string response
+                            "time": None,
+                            "token_usage": None,
+                        }
 
                 except Exception as mode_error:
                     print(colored(f"Error in {mode} mode: {str(mode_error)}", "yellow"))
                     continue
 
-            # If no mode was successful, return the hybrid mode response
+            # If no mode was successful, try hybrid mode one last time
             print(colored("Falling back to hybrid mode...", "yellow"))
-            response = self.rag.query(
+            result = self.rag.query(
                 formatted_query,
                 param=QueryParam(mode="hybrid"),
             )
 
-            formatted_response = {
-                "response": response,
-                "mode": "hybrid",
-                "sources": self.rag.get_context(),
-                "time": None,
-                "token_usage": None,
-            }
-
-            print(colored("Query processed successfully!", "green"))
-            return formatted_response
+            # Format the final response
+            if isinstance(result, dict):
+                return {
+                    "response": result.get('response', ''),
+                    "mode": "hybrid",
+                    "sources": result.get('sources', []),
+                    "time": None,
+                    "token_usage": None,
+                }
+            else:
+                return {
+                    "response": str(result),
+                    "mode": "hybrid",
+                    "sources": [],
+                    "time": None,
+                    "token_usage": None,
+                }
 
         except Exception as e:
             error_msg = f"Error processing query: {str(e)}"
