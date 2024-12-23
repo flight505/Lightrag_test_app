@@ -1,28 +1,74 @@
-from termcolor import colored
 import os
+from pathlib import Path
+from typing import Optional
+import logging
+import shutil
 
-def create_document_directory(parent_dir: str, sub_dir_name: str) -> str:
-    """Create a new document directory under the parent directory."""
-    # Ensure the parent directory exists
-    if not os.path.exists(parent_dir):
-        os.makedirs(parent_dir)
+# Constants
+DB_ROOT = "DB"
+GITIGNORE_PATH = ".gitignore"
+
+def create_store_directory(store_name: str) -> Optional[str]:
+    """
+    Create a store directory directly in DB folder.
     
-    # Create the subdirectory within the parent directory
-    sub_dir_path = os.path.join(parent_dir, sub_dir_name)
-    if not os.path.exists(sub_dir_path):
-        os.makedirs(sub_dir_path)
-        print(f"Created new document directory: {sub_dir_path}")
-    else:
-        print(f"Document directory already exists: {sub_dir_path}")
+    Args:
+        store_name: Name of the store to create
+    
+    Returns:
+        str: Path to created directory or None if failed
+    """
+    try:
+        # Ensure DB root exists
+        if not os.path.exists(DB_ROOT):
+            os.makedirs(DB_ROOT)
+            
+        # Create store path directly in DB
+        store_path = os.path.join(DB_ROOT, store_name)
+        
+        # If store exists outside DB, move it into DB
+        if os.path.exists(store_name):
+            if not os.path.exists(store_path):
+                shutil.move(store_name, store_path)
+                logging.info(f"Moved existing store into DB: {store_path}")
+            else:
+                shutil.rmtree(store_name)  # Remove duplicate outside DB
+                logging.warning(f"Removed duplicate store outside DB: {store_name}")
+            return store_path
+            
+        # Create new store in DB
+        if not os.path.exists(store_path):
+            os.makedirs(store_path)
+            update_gitignore(store_path)
+            logging.info(f"Created store directory: {store_path}")
+            return store_path
+        else:
+            logging.warning(f"Store directory already exists: {store_path}")
+            return store_path
+        
+    except Exception as e:
+        logging.error(f"Failed to create store directory: {str(e)}")
+        return None
 
-    return sub_dir_path
-
-def update_gitignore_for_parent(parent_dir: str):
-    """Add the parent directory to .gitignore if it's not already listed."""
-    gitignore_path = ".gitignore"
-    with open(gitignore_path, "r+", encoding="utf-8") as f:
-        lines = f.readlines()
-        # Check if the parent directory is already in .gitignore
-        if f"{parent_dir}/\n" not in lines:
-            f.write(f"{parent_dir}/\n")
-            print(f"Added {parent_dir}/ to .gitignore")
+def update_gitignore(store_path: str) -> None:
+    """
+    Update .gitignore with store directory path.
+    
+    Args:
+        store_path: Path to store directory
+    """
+    try:
+        # Convert to relative path if absolute
+        rel_path = os.path.relpath(store_path)
+        
+        with open(GITIGNORE_PATH, "a+", encoding="utf-8") as f:
+            f.seek(0)
+            content = f.read()
+            if rel_path not in content:
+                if content and not content.endswith("\n"):
+                    f.write("\n")
+                f.write(f"{rel_path}/\n")
+                logging.info(f"Added {rel_path}/ to .gitignore")
+                
+    except Exception as e:
+        logging.error(f"Failed to update .gitignore: {str(e)}")
