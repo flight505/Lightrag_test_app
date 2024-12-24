@@ -9,7 +9,7 @@ generated_responses/
 input/
 output/
 prompts/
-
+*.log
 lightrag.log
 .DS_Store
 DB/*
