@@ -53,10 +53,15 @@ class LightRAGManager:
 
             # Initialize LightRAG with full path
             full_working_dir = os.path.join(DB_ROOT, self.input_dir)
+            logger.info(f"Working directory: {full_working_dir}")
             
             # Create directory if it doesn't exist
             os.makedirs(full_working_dir, exist_ok=True)
 
+            # Initialize validator (working_dir doesn't matter since we use DB_ROOT directly)
+            self.validator = DocumentValidator(working_dir=full_working_dir)
+
+            # Initialize LightRAG after validator
             self.rag = LightRAG(
                 working_dir=full_working_dir,
                 llm_model_func=llm_func,
@@ -72,9 +77,6 @@ class LightRAGManager:
                     ),
                 ),
             )
-
-            # Add validator
-            self.validator = DocumentValidator(working_dir=full_working_dir)
 
             print(colored("LightRAG initialization successful!", "green"))
 
@@ -156,98 +158,41 @@ class LightRAGManager:
             logger.error(error_msg)
             raise
 
-    def query(self, query_text: str, response_type: Optional[str] = None) -> dict:
+    def query(self, query_text: str, mode: str = "hybrid", **kwargs) -> dict:
         """Execute query using LightRAG"""
         try:
-            logger.info(f"Processing query: {query_text}")
-            print(colored("Processing query...", "cyan"))
-
-            # Add response type to query if specified
-            if response_type:
-                formatted_query = f"Please provide a response in {response_type} format: {query_text}"
-            else:
-                formatted_query = query_text
+            logger.info(f"Processing query in {mode} mode: {query_text}")
             
-            logger.debug(f"Formatted query: {formatted_query}")
-
-            # Execute query with different modes
-            modes = ["naive", "local", "global", "hybrid"]
+            # Create QueryParam with only supported parameters
+            param_kwargs = {
+                "mode": mode,
+                "only_need_context": kwargs.get("only_need_context", False)
+            }
             
-            for mode in modes:
-                try:
-                    logger.info(f"Trying {mode} mode...")
-                    print(colored(f"Trying {mode} mode...", "cyan"))
-                    
-                    result = self.rag.query(
-                        formatted_query,
-                        param=QueryParam(
-                            mode=mode,
-                            only_need_context=False,
-                        ),
-                    )
-                    
-                    logger.debug(f"Raw result from {mode} mode: {result}")
-                    
-                    # Check if we got a valid response
-                    if isinstance(result, dict) and result.get('response'):
-                        logger.info(f"{mode} mode successful")
-                        print(colored(f"{mode} mode successful!", "green"))
-                        return {
-                            "response": result['response'],
-                            "mode": mode,
-                            "sources": result.get('sources', []),
-                            "time": datetime.now().isoformat(),
-                            "token_usage": None,
-                        }
-                    elif isinstance(result, str) and not result.startswith("Sorry"):
-                        logger.info(f"{mode} mode successful (string response)")
-                        print(colored(f"{mode} mode successful!", "green"))
-                        return {
-                            "response": result,
-                            "mode": mode,
-                            "sources": [],
-                            "time": datetime.now().isoformat(),
-                            "token_usage": None,
-                        }
-
-                except Exception as mode_error:
-                    logger.warning(f"Error in {mode} mode: {str(mode_error)}")
-                    print(colored(f"Error in {mode} mode: {str(mode_error)}", "yellow"))
-                    continue
-
-            # If no mode was successful, try hybrid mode one last time
-            logger.info("Falling back to hybrid mode...")
-            print(colored("Falling back to hybrid mode...", "yellow"))
+            # Add mode-specific parameters
+            if mode == "global":
+                param_kwargs["top_k"] = kwargs.get("top_k", 60)
+            elif mode == "local":
+                param_kwargs["max_token_for_local_context"] = kwargs.get("max_token_for_local_context", 4000)
             
-            result = self.rag.query(
-                formatted_query,
-                param=QueryParam(mode="hybrid"),
-            )
+            # Create QueryParam
+            param = QueryParam(**param_kwargs)
+            logger.debug(f"Query parameters: {param_kwargs}")
             
-            logger.debug(f"Final hybrid mode result: {result}")
-
-            # Format the final response
-            if isinstance(result, dict):
-                return {
-                    "response": result.get('response', ''),
-                    "mode": "hybrid",
-                    "sources": result.get('sources', []),
-                    "time": datetime.now().isoformat(),
-                    "token_usage": None,
-                }
-            else:
-                return {
-                    "response": str(result),
-                    "mode": "hybrid",
-                    "sources": [],
-                    "time": datetime.now().isoformat(),
-                    "token_usage": None,
-                }
+            # Execute query
+            result = self.rag.query(query_text, param=param)
+            logger.info(f"Query completed in {mode} mode")
+            
+            return {
+                "response": result.get('response', str(result)),
+                "mode": mode,
+                "sources": result.get('sources', []),
+                "time": datetime.now().isoformat(),
+                "token_usage": None,
+            }
 
         except Exception as e:
-            error_msg = f"Error processing query: {str(e)}"
-            logger.error(error_msg, exc_info=True)
-            print(colored(error_msg, "red"))
+            logger.error(f"Query failed in {mode} mode: {str(e)}")
             raise
 
     def get_relevant_sources(self, query_result: dict) -> list:
@@ -287,3 +232,61 @@ class LightRAGManager:
             print(colored(error_msg, "red"))
             logger.error(error_msg)
             return False
+
+    def _query_with_fallback(self, query_text: str, param: QueryParam) -> dict:
+        """Fallback logic for query execution"""
+        logger.info("Starting fallback query process")
+        
+        modes = ["naive", "local", "global", "hybrid"]
+        for mode in modes:
+            try:
+                logger.info(f"Attempting {mode} mode for query: {query_text}")
+                param.mode = mode
+                result = self.rag.query(query_text, param=param)
+                logger.debug(f"Raw result from {mode} mode: {result}")
+                
+                if isinstance(result, dict) and result.get('response'):
+                    logger.info(f"Successful response from {mode} mode")
+                    return self._format_response(result, mode)
+                else:
+                    logger.warning(f"{mode} mode returned invalid response format")
+                    
+            except Exception as e:
+                logger.error(f"Error in {mode} mode: {str(e)}", exc_info=True)
+                continue
+        
+        # If all modes fail, try hybrid one last time
+        logger.warning("All modes failed, final hybrid attempt")
+        try:
+            param.mode = "hybrid"
+            result = self.rag.query(query_text, param=param)
+            return self._format_response(result, "hybrid")
+        except Exception as e:
+            logger.error("Final hybrid attempt failed", exc_info=True)
+            raise
+
+    def _format_response(self, result: any, mode: str) -> dict:
+        """Format query result into standard response"""
+        logger.debug(f"Formatting response for mode {mode}")
+        try:
+            if isinstance(result, dict):
+                formatted = {
+                    "response": result.get('response', ''),
+                    "mode": mode,
+                    "sources": result.get('sources', []),
+                    "time": datetime.now().isoformat(),
+                    "token_usage": None,
+                }
+            else:
+                formatted = {
+                    "response": str(result),
+                    "mode": mode,
+                    "sources": [],
+                    "time": datetime.now().isoformat(),
+                    "token_usage": None,
+                }
+            logger.debug(f"Formatted response: {formatted}")
+            return formatted
+        except Exception as e:
+            logger.error(f"Error formatting response: {str(e)}", exc_info=True)
+            raise
