@@ -403,26 +403,40 @@ with st.sidebar:
                     else:
                         st.info("Not enough conversation history to summarize.")
 
-    # Mode selection without rerun
+# Main interface
+st.write(f"## 🔍 LightRAG {st.session_state['current_mode']}")
+st.write("👈 Configure your search settings in the sidebar to get started.")
+
+# Create two columns for the main interface
+col1, col2 = st.columns([2, 1])
+
+with col1:
+    # Mode selection above query container
+    st.markdown("### Search Mode")
     AVAILABLE_MODES = ["Hybrid", "Naive", "Local", "Global"]
     selected_mode = st.radio(
-        "Select search mode:",
+        "Select mode:",
         AVAILABLE_MODES,
+        horizontal=True,
         index=AVAILABLE_MODES.index(st.session_state["current_search_mode"]),
-        key="mode_selector",
+        key="main_mode_selector",
         help="""
         - **Hybrid**: Best for most queries - combines local and global search
         - **Naive**: Direct LLM query with full context - best for simple questions
         - **Local**: Uses nearby context - best for specific details
         - **Global**: Searches entire knowledge base - best for broad themes
-        """,
-        on_change=lambda: setattr(st.session_state, "current_search_mode", st.session_state.mode_selector)
+        """
     )
 
-    # Simplified mode-specific configurations
+    # Update session state when mode changes
+    if selected_mode != st.session_state["current_search_mode"]:
+        st.session_state["current_search_mode"] = selected_mode
+
+    # Initialize mode parameters
     mode_params = {}
-    with st.expander("Advanced Settings"):
-        # Only show relevant parameters for each mode
+    
+    # Mode-specific settings in small expander
+    with st.expander("Mode Settings", expanded=False):
         if selected_mode == "Global":
             mode_params["top_k"] = st.slider(
                 "Number of documents to retrieve",
@@ -447,7 +461,7 @@ with st.sidebar:
                 value=2000,
                 help="Maximum tokens to consider per text unit"
             )
-
+        
         # Common parameters for all modes
         mode_params["only_need_context"] = st.checkbox(
             "Return only context",
@@ -455,17 +469,10 @@ with st.sidebar:
             help="Return raw context without LLM processing"
         )
 
+    # Save mode parameters to session state
     st.session_state["mode_params"] = mode_params
 
-# Main interface
-st.write(f"## 🔍 LightRAG {st.session_state['current_mode']}")
-st.write("👈 Configure your search settings in the sidebar to get started.")
-
-# Create two columns for the main interface
-col1, col2 = st.columns([2, 1])
-
-with col1:
-    # Main query interface
+    # Query container below mode selection
     query_container = st.container()
     response_expander = st.expander("🔽 Response and Sources", expanded=True)
     key_points_expander = st.expander("🔑 Key Points")
