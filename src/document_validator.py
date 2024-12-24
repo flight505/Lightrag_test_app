@@ -2,6 +2,7 @@ import os
 import logging
 from typing import List, Dict, Optional, Tuple
 from pathlib import Path
+from src.file_manager import DB_ROOT
 
 logger = logging.getLogger(__name__)
 
@@ -10,6 +11,7 @@ class DocumentValidator:
     
     def __init__(self, working_dir: str):
         self.working_dir = working_dir
+        logger.info(f"Validator initialized with working dir: {working_dir}")
         
     def validate_file(self, file_path: str) -> Tuple[bool, Optional[str]]:
         """
@@ -55,7 +57,9 @@ class DocumentValidator:
             'errors': [...]
         }
         """
-        store_path = os.path.join(self.working_dir, store_name)
+        store_path = os.path.join(DB_ROOT, store_name)
+        logger.info(f"Validating store at path: {store_path}")
+        
         results = {
             'valid_files': [],
             'invalid_files': [],
@@ -63,22 +67,42 @@ class DocumentValidator:
         }
         
         if not os.path.exists(store_path):
-            results['errors'].append(f"Store not found: {store_name}")
+            error_msg = f"Store not found at: {store_path}"
+            logger.error(error_msg)
+            results['errors'].append(error_msg)
             return results
             
+        # Debug: List all files in directory
+        all_files = []
         for root, _, files in os.walk(store_path):
             for file in files:
-                if file.endswith('.txt'):
-                    file_path = os.path.join(root, file)
-                    is_valid, error = self.validate_file(file_path)
-                    
-                    if is_valid:
-                        results['valid_files'].append(file_path)
-                    else:
-                        results['invalid_files'].append(file_path)
-                        if error:
-                            results['errors'].append(f"{file}: {error}")
-                            
+                file_path = os.path.join(root, file)
+                all_files.append(file_path)
+        logger.info(f"All files found in store: {all_files}")
+        
+        # Check if any .txt files exist
+        txt_files = [f for f in all_files if f.endswith('.txt')]
+        if not txt_files:
+            error_msg = f"No .txt files found in {store_path}"
+            logger.error(error_msg)
+            results['errors'].append(error_msg)
+            return results
+            
+        # Validate each .txt file
+        for file_path in txt_files:
+            logger.info(f"Validating file: {file_path}")
+            is_valid, error = self.validate_file(file_path)
+            
+            if is_valid:
+                results['valid_files'].append(file_path)
+                logger.info(f"Valid file found: {file_path}")
+            else:
+                results['invalid_files'].append(file_path)
+                if error:
+                    results['errors'].append(f"{os.path.basename(file_path)}: {error}")
+                    logger.warning(f"Invalid file: {file_path} - {error}")
+        
+        logger.info(f"Validation results: {results}")
         return results
 
     def validate_content(self, content: str) -> Tuple[bool, Optional[str]]:
