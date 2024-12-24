@@ -12,6 +12,7 @@ import streamlit as st
 from docx import Document
 from termcolor import colored
 
+from lightrag import QueryParam
 from src.lightrag_helpers import ResponseProcessor
 from src.lightrag_init import DEFAULT_MODEL, SUPPORTED_MODELS, LightRAGManager
 from src.file_manager import create_store_directory, DB_ROOT
@@ -58,6 +59,12 @@ if "active_store" not in st.session_state:
     st.session_state["active_store"] = None
 if "api_key_shown" not in st.session_state:
     st.session_state["api_key_shown"] = False
+if "search_mode" not in st.session_state:
+    st.session_state["search_mode"] = "Auto (Fallback)"
+if "mode_params" not in st.session_state:
+    st.session_state["mode_params"] = {}
+if "current_search_mode" not in st.session_state:
+    st.session_state["current_search_mode"] = "Hybrid"
 
 
 # Helper functions
@@ -396,6 +403,60 @@ with st.sidebar:
                     else:
                         st.info("Not enough conversation history to summarize.")
 
+    # Mode selection without rerun
+    AVAILABLE_MODES = ["Hybrid", "Naive", "Local", "Global"]
+    selected_mode = st.radio(
+        "Select search mode:",
+        AVAILABLE_MODES,
+        index=AVAILABLE_MODES.index(st.session_state["current_search_mode"]),
+        key="mode_selector",
+        help="""
+        - **Hybrid**: Best for most queries - combines local and global search
+        - **Naive**: Direct LLM query with full context - best for simple questions
+        - **Local**: Uses nearby context - best for specific details
+        - **Global**: Searches entire knowledge base - best for broad themes
+        """,
+        on_change=lambda: setattr(st.session_state, "current_search_mode", st.session_state.mode_selector)
+    )
+
+    # Simplified mode-specific configurations
+    mode_params = {}
+    with st.expander("Advanced Settings"):
+        # Only show relevant parameters for each mode
+        if selected_mode == "Global":
+            mode_params["top_k"] = st.slider(
+                "Number of documents to retrieve",
+                min_value=3,
+                max_value=60,
+                value=10,
+                help="Higher values search more documents but take longer"
+            )
+        elif selected_mode == "Local":
+            mode_params["max_token_for_local_context"] = st.slider(
+                "Maximum context tokens",
+                min_value=1000,
+                max_value=4000,
+                value=2000,
+                help="Maximum tokens to consider from local context"
+            )
+        elif selected_mode == "Naive":
+            mode_params["max_token_for_text_unit"] = st.slider(
+                "Maximum tokens per text unit",
+                min_value=1000,
+                max_value=4000,
+                value=2000,
+                help="Maximum tokens to consider per text unit"
+            )
+
+        # Common parameters for all modes
+        mode_params["only_need_context"] = st.checkbox(
+            "Return only context",
+            value=False,
+            help="Return raw context without LLM processing"
+        )
+
+    st.session_state["mode_params"] = mode_params
+
 # Main interface
 st.write(f"## 🔍 LightRAG {st.session_state['current_mode']}")
 st.write("👈 Configure your search settings in the sidebar to get started.")
@@ -535,31 +596,37 @@ if "query_submitted" in st.session_state and st.session_state["query_submitted"]
                     update_conversation_with_summary(summary)
                     st.success("Conversation summarized!")
 
-            # Process query
-            result = asyncio.run(process_query_with_progress(query, progress_bar))
+            # Process query with selected mode
+            try:
+                mode = selected_mode.lower()  # Convert UI mode to LightRAG mode
+                logger.info(f"Processing query with mode: {mode}")
+                
+                # Create query parameters
+                query_params = {
+                    "mode": mode,
+                    **mode_params
+                }
+                
+                with st.status(f"Processing query in {selected_mode} mode..."):
+                    result = st.session_state["rag_manager"].query(
+                        query,
+                        **query_params  # Pass parameters directly to query method
+                    )
+                    logger.info(f"Query completed in {mode} mode")
+                
+                # Process and display result
+                if result:
+                    st.session_state["query_results"].append({query: result})
+                    formatted_response = st.session_state["response_processor"].format_full_response(
+                        query, result
+                    )
+                    st.session_state["responses"].append(formatted_response)
+                else:
+                    st.error("No response received")
 
-            # Store results
-            st.session_state["query_results"].append({query: result})
-
-            # Format and store response using ResponseProcessor
-            formatted_response = st.session_state[
-                "response_processor"
-            ].format_full_response(query, result)
-            st.session_state["responses"].append(formatted_response)
-
-            if st.session_state["current_mode"] == "Chat":
-                # Update conversation context
-                manage_conversation_context(query, result["response"])
-
-                # Add assistant response to chat history with enhanced formatting
-                formatted_chat_response = (
-                    f"{result['response']}\n\n"
-                    f"*Sources:*\n"
-                    f"{st.session_state['response_processor'].format_sources(result.get('sources', []))}"
-                )
-                st.session_state["chat_history"].append(
-                    {"role": "assistant", "content": formatted_chat_response}
-                )
+            except Exception as e:
+                logger.error(f"Query failed: {str(e)}", exc_info=True)
+                st.error(f"Error processing query: {str(e)}")
 
             # Extract key points
             response_text, _ = st.session_state["response_processor"].process_response(
@@ -631,3 +698,25 @@ with debug_expander:
             data=pickle.dumps(st.session_state["query_results"][-1]),
             file_name=f"LightRAG_Search_Debug_{current_time}.pickle",
         )
+
+# Update query processing to handle the mode correctly
+def get_query_mode(selected_mode: str) -> str:
+    """Convert UI mode selection to query mode"""
+    mode_mapping = {
+        "Auto (Fallback)": "auto",
+        "Naive": "naive",
+        "Local": "local",
+        "Global": "global",
+        "Hybrid": "hybrid"
+    }
+    return mode_mapping.get(selected_mode, "auto")
+
+# When processing the query
+mode = get_query_mode(selected_mode)
+logger.info(f"Processing query with mode: {mode}, params: {st.session_state['mode_params']}")
+
+result = st.session_state["rag_manager"].query(
+    query,
+    mode=mode,
+    **st.session_state["mode_params"]
+)
