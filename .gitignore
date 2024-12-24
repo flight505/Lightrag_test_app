@@ -11,6 +11,7 @@ output/
 prompts/
 
 lightrag.log
-DB/
 .DS_Store
-DB/dickens/
+DB/*
+responses/*
+chat.log
