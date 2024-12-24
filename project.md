@@ -36,9 +36,22 @@ The LightRAG application is designed to serve as a comprehensive tool for academ
 
 6. `src/Graph_query.py`: Sets up the Streamlit page configuration for querying the knowledge base using LightRAG.
 
-7. `src/lightrag_init.py`: Manages the initialization and configuration of LightRAG, including document loading and query execution.
+7. `src/lightrag_init.py`: Manages the initialization and configuration of LightRAG, including document loading, validation, and query execution. Integrates with DocumentValidator for file and content validation.
 
 8. `src/local_helper_functions.py`: Provides functions for local search post-processing, mapping responses to source documents, and creating traceability tables.
+
+9. `src/document_validator.py`: Implements comprehensive document validation including:
+   - File validation (existence, format, encoding)
+   - Content validation (emptiness, minimum length)
+   - Store validation (structure, file collection)
+   - Error reporting and logging
+
+The document validation system ensures data quality by:
+- Validating files before processing
+- Checking content integrity
+- Providing detailed error feedback
+- Maintaining validation logs
+- Supporting the LightRAG initialization process
 
 ## Helper Functions
 
