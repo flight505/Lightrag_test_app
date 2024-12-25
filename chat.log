@@ -6419,3 +6419,1144 @@ Current query: who is the Cratchit family?
 2024-12-24 02:51:33,737 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
 2024-12-24 02:51:33,737 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
 2024-12-24 02:51:33,737 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:20:25,581 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:38,866 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:46,793 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:52,348 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:54,778 - __main__ - INFO - Processing query with mode: local, params: {'max_token_for_local_context': 2000, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:56,473 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:57,989 - __main__ - INFO - Processing query with mode: global, params: {'top_k': 10, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:25:59,202 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:01,291 - __main__ - INFO - Processing query with mode: naive, params: {'max_token_for_text_unit': 2000, 'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:02,203 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 15:26:44,174 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 20:36:05,852 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 20:36:05,852 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 21:16:06,213 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 21:16:06,213 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 21:16:06,213 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 21:16:30,069 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 21:16:30,069 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 21:16:30,069 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 21:16:30,069 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 21:22:06,898 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 21:22:06,898 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 21:22:06,898 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 21:22:06,898 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 21:22:06,898 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-25 21:22:32,299 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
