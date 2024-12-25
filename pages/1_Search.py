@@ -219,6 +219,23 @@ def update_conversation_with_summary(summary: str):
         st.error(f"Error updating conversation with summary: {str(e)}")
 
 
+def check_lightrag_ready() -> tuple[bool, str]:
+    """
+    Check if LightRAG is properly initialized and ready for queries
+    Returns: (is_ready, message)
+    """
+    if st.session_state["rag_manager"] is None:
+        return False, "LightRAG not initialized. Click 'Initialize and Index Documents'"
+        
+    if not st.session_state["status_ready"]:
+        return False, "Documents not indexed. Click 'Initialize and Index Documents'"
+        
+    if not st.session_state["active_store"]:
+        return False, "No store selected. Please select a store in the sidebar"
+        
+    return True, "Ready"
+
+
 # Sidebar configuration
 with st.sidebar:
     # Mode selection
@@ -493,176 +510,186 @@ with col2:
 
 # Query input
 with query_container:
-    if st.session_state["current_mode"] == "Chat":
-        # Add chat controls
-        chat_controls_col1, chat_controls_col2 = st.columns([2, 1])
-        with chat_controls_col1:
-            if st.session_state["chat_history"]:
-                if st.button("Export Chat"):
-                    chat_export = export_chat_history(st.session_state["chat_history"])
-                    current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-                    st.download_button(
-                        "Download Chat History",
-                        chat_export,
-                        file_name=f"LightRAG_Chat_{current_time}.txt",
-                    )
-        with chat_controls_col2:
-            if st.session_state["chat_history"]:
-                if st.button("Clear Chat"):
-                    clear_chat_history()
-                    st.rerun()
-
-        # Display chat history with enhanced formatting
-        for i, message in enumerate(st.session_state["chat_history"]):
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
-
-        # Chat input
-        if prompt := st.chat_input("Type your message here...", key="chat_input"):
-            logger.info(f"Chat input received: {prompt}")
-            
-            # Add user message to chat history
-            st.session_state["chat_history"].append({"role": "user", "content": prompt})
-
-            try:
-                # Get conversation context
-                context = get_conversation_context()
-                logger.debug(f"Context retrieved: {context}")
-
-                # Prepare query with context
-                query = f"{context}\nCurrent query: {prompt}" if context else prompt
-                logger.info(f"Prepared query: {query}")
-
-                # Process query with progress indicator
-                with st.status("Processing query...") as status:
-                    result = st.session_state["rag_manager"].query(query)
-                    logger.info(f"Query result: {result}")
-
-                    if result and result.get("response"):
-                        # Format response with sources
-                        formatted_response = (
-                            f"{result['response']}\n\n"
-                            f"*Mode: {result.get('mode', 'unknown')}*\n"
-                            f"*Sources:*\n"
-                            f"{st.session_state['response_processor'].format_sources(result.get('sources', []))}"
-                        )
-                        
-                        # Add assistant response to chat history
-                        st.session_state["chat_history"].append({
-                            "role": "assistant",
-                            "content": formatted_response
-                        })
-                        logger.info("Response added to chat history")
-                        
-                        # Update conversation context
-                        manage_conversation_context(query, result["response"])
-                        
-                        # Force streamlit to rerun and show the new message
-                        st.rerun()
-                    else:
-                        logger.error("No valid response received")
-                        st.error("Failed to get a response. Please try again.")
-
-            except Exception as e:
-                logger.error(f"Error processing chat: {str(e)}", exc_info=True)
-                st.error(f"Error processing chat: {str(e)}")
+    is_ready, status_msg = check_lightrag_ready()
+    
+    if not is_ready:
+        st.warning(status_msg)
     else:
-        # Standard search input
-        with st.form("query_form", clear_on_submit=True):
-            query = st.text_area(
-                "Enter your query:",
-                label_visibility="collapsed",
-                placeholder="Type your query here...",
-                key="query_input",
-            )
-            submitted = st.form_submit_button("Submit Query")
+        if st.session_state["current_mode"] == "Chat":
+            # Add chat controls
+            chat_controls_col1, chat_controls_col2 = st.columns([2, 1])
+            with chat_controls_col1:
+                if st.session_state["chat_history"]:
+                    if st.button("Export Chat"):
+                        chat_export = export_chat_history(st.session_state["chat_history"])
+                        current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                        st.download_button(
+                            "Download Chat History",
+                            chat_export,
+                            file_name=f"LightRAG_Chat_{current_time}.txt",
+                        )
+            with chat_controls_col2:
+                if st.session_state["chat_history"]:
+                    if st.button("Clear Chat"):
+                        clear_chat_history()
+                        st.rerun()
 
-            if submitted and query:
-                logger.info(f"Query submitted: {query}")
-                st.session_state["query_submitted"] = True
-                st.session_state["current_query"] = query
+            # Display chat history with enhanced formatting
+            for i, message in enumerate(st.session_state["chat_history"]):
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
 
-# Move the query processing outside the form
-if "query_submitted" in st.session_state and st.session_state["query_submitted"]:
-    query = st.session_state["current_query"]
-    if st.session_state["query_history"][-1] != query:
-        st.session_state["query_history"].append(query)
-
-        # Initialize progress bar
-        progress_bar = query_container.progress(0)
-
-        try:
-            # Check if conversation needs summarization
-            if (
-                st.session_state["current_mode"] == "Chat"
-                and should_summarize_conversation()
-            ):
-                with st.status("Summarizing conversation..."):
-                    # Use asyncio.run for summarization
-                    summary = asyncio.run(summarize_conversation())
-                    update_conversation_with_summary(summary)
-                    st.success("Conversation summarized!")
-
-            # Process query with selected mode
-            try:
-                mode = selected_mode.lower()  # Convert UI mode to LightRAG mode
-                logger.info(f"Processing query with mode: {mode}")
+            # Chat input
+            if prompt := st.chat_input("Type your message here...", key="chat_input"):
+                logger.info(f"Chat input received: {prompt}")
                 
-                # Create query parameters
-                query_params = {
-                    "mode": mode,
-                    **mode_params
-                }
-                
-                with st.status(f"Processing query in {selected_mode} mode..."):
-                    result = st.session_state["rag_manager"].query(
-                        query,
-                        **query_params  # Pass parameters directly to query method
-                    )
-                    logger.info(f"Query completed in {mode} mode")
-                
-                # Process and display result
-                if result:
-                    st.session_state["query_results"].append({query: result})
-                    formatted_response = st.session_state["response_processor"].format_full_response(
-                        query, result
-                    )
-                    st.session_state["responses"].append(formatted_response)
-                else:
-                    st.error("No response received")
+                # Add user message to chat history
+                st.session_state["chat_history"].append({"role": "user", "content": prompt})
 
-            except Exception as e:
-                logger.error(f"Query failed: {str(e)}", exc_info=True)
-                st.error(f"Error processing query: {str(e)}")
+                try:
+                    # Get conversation context
+                    context = get_conversation_context()
+                    logger.debug(f"Context retrieved: {context}")
 
-            # Extract key points
-            response_text, _ = st.session_state["response_processor"].process_response(
-                result
-            )
-            key_points = st.session_state["response_processor"].extract_key_points(
-                response_text
-            )
+                    # Prepare query with context
+                    query = f"{context}\nCurrent query: {prompt}" if context else prompt
+                    logger.info(f"Prepared query: {query}")
 
-            # Clear progress bar
-            progress_bar.empty()
+                    # Process query with progress indicator
+                    with st.status("Processing query...") as status:
+                        result = st.session_state["rag_manager"].query(query)
+                        logger.info(f"Query result: {result}")
 
-            # Save response history
-            try:
-                st.session_state["response_processor"].save_response_history(
-                    query, result, "responses"
+                        if result and result.get("response"):
+                            # Format response with sources
+                            formatted_response = (
+                                f"{result['response']}\n\n"
+                                f"*Mode: {result.get('mode', 'unknown')}*\n"
+                                f"*Sources:*\n"
+                                f"{st.session_state['response_processor'].format_sources(result.get('sources', []))}"
+                            )
+                            
+                            # Add assistant response to chat history
+                            st.session_state["chat_history"].append({
+                                "role": "assistant",
+                                "content": formatted_response
+                            })
+                            logger.info("Response added to chat history")
+                            
+                            # Update conversation context
+                            manage_conversation_context(query, result["response"])
+                            
+                            # Force streamlit to rerun and show the new message
+                            st.rerun()
+                        else:
+                            logger.error("No valid response received")
+                            st.error("Failed to get a response. Please try again.")
+
+                except Exception as e:
+                    logger.error(f"Error processing chat: {str(e)}", exc_info=True)
+                    st.error(f"Error processing chat: {str(e)}")
+        else:
+            # Standard search input
+            with st.form("query_form", clear_on_submit=True):
+                query = st.text_area(
+                    "Enter your query:",
+                    label_visibility="collapsed",
+                    placeholder="Type your query here...",
+                    key="query_input",
                 )
+                submitted = st.form_submit_button("Submit Query")
+
+                if submitted and query:
+                    logger.info(f"Query submitted: {query}")
+                    st.session_state["query_submitted"] = True
+                    st.session_state["current_query"] = query
+
+# The query processing should only happen when:
+# 1. rag_manager is initialized
+# 2. User submits a query
+if "query_submitted" in st.session_state and st.session_state["query_submitted"]:
+    if st.session_state["rag_manager"] is None:
+        st.error("Please initialize LightRAG first by clicking 'Initialize and Index Documents'")
+    else:
+        query = st.session_state["current_query"]
+        if st.session_state["query_history"][-1] != query:
+            st.session_state["query_history"].append(query)
+
+            # Initialize progress bar
+            progress_bar = query_container.progress(0)
+
+            try:
+                # Check if conversation needs summarization
+                if (
+                    st.session_state["current_mode"] == "Chat"
+                    and should_summarize_conversation()
+                ):
+                    with st.status("Summarizing conversation..."):
+                        # Use asyncio.run for summarization
+                        summary = asyncio.run(summarize_conversation())
+                        update_conversation_with_summary(summary)
+                        st.success("Conversation summarized!")
+
+                # Process query with selected mode
+                try:
+                    mode = selected_mode.lower()  # Convert UI mode to LightRAG mode
+                    logger.info(f"Processing query with mode: {mode}")
+                    
+                    # Create query parameters
+                    query_params = {
+                        "mode": mode,
+                        **mode_params
+                    }
+                    
+                    with st.status(f"Processing query in {selected_mode} mode..."):
+                        result = st.session_state["rag_manager"].query(
+                            query,
+                            **query_params  # Pass parameters directly to query method
+                        )
+                        logger.info(f"Query completed in {mode} mode")
+                    
+                    # Process and display result
+                    if result:
+                        st.session_state["query_results"].append({query: result})
+                        formatted_response = st.session_state["response_processor"].format_full_response(
+                            query, result
+                        )
+                        st.session_state["responses"].append(formatted_response)
+                    else:
+                        st.error("No response received")
+
+                except Exception as e:
+                    logger.error(f"Query failed: {str(e)}", exc_info=True)
+                    st.error(f"Error processing query: {str(e)}")
+
+                # Extract key points
+                response_text, _ = st.session_state["response_processor"].process_response(
+                    result
+                )
+                key_points = st.session_state["response_processor"].extract_key_points(
+                    response_text
+                )
+
+                # Clear progress bar
+                progress_bar.empty()
+
+                # Save response history
+                try:
+                    st.session_state["response_processor"].save_response_history(
+                        query, result, "responses"
+                    )
+                except Exception as e:
+                    st.warning(f"Could not save response history: {str(e)}")
+
+                # Trigger rerun to update display
+                st.rerun()
+
             except Exception as e:
-                st.warning(f"Could not save response history: {str(e)}")
+                st.error(f"Error processing query: {str(e)}")
+                progress_bar.empty()
 
-            # Trigger rerun to update display
-            st.rerun()
-
-        except Exception as e:
-            st.error(f"Error processing query: {str(e)}")
-            progress_bar.empty()
-
-    # Reset the submission flag
-    st.session_state["query_submitted"] = False
+        # Reset the submission flag
+        st.session_state["query_submitted"] = False
 
 # Display response
 with response_expander:
@@ -717,13 +744,3 @@ def get_query_mode(selected_mode: str) -> str:
         "Hybrid": "hybrid"
     }
     return mode_mapping.get(selected_mode, "auto")
-
-# When processing the query
-mode = get_query_mode(selected_mode)
-logger.info(f"Processing query with mode: {mode}, params: {st.session_state['mode_params']}")
-
-result = st.session_state["rag_manager"].query(
-    query,
-    mode=mode,
-    **st.session_state["mode_params"]
-)
