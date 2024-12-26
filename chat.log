@@ -7560,3 +7560,450 @@ Current query: who is the Cratchit family?
 2024-12-25 21:22:06,898 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
 2024-12-25 21:22:06,898 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
 2024-12-25 21:22:32,299 - __main__ - INFO - Processing query with mode: hybrid, params: {'only_need_context': False}
+2024-12-26 02:30:55,861 - __main__ - INFO - Query submitted: explain what is predicted and how
+2024-12-26 02:30:55,861 - __main__ - INFO - Query submitted: explain what is predicted and how
+2024-12-26 02:30:55,861 - __main__ - INFO - Query submitted: explain what is predicted and how
+2024-12-26 02:30:55,861 - __main__ - INFO - Query submitted: explain what is predicted and how
+2024-12-26 02:30:55,861 - __main__ - INFO - Query submitted: explain what is predicted and how
+2024-12-26 02:30:55,861 - __main__ - INFO - Query submitted: explain what is predicted and how
+2024-12-26 02:30:55,861 - __main__ - INFO - Query submitted: explain what is predicted and how
+2024-12-26 02:30:55,861 - __main__ - INFO - Query submitted: explain what is predicted and how
+2024-12-26 02:30:55,861 - __main__ - INFO - Query submitted: explain what is predicted and how
+2024-12-26 02:30:55,863 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 02:30:55,863 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 02:30:55,863 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 02:30:55,863 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 02:30:55,863 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 02:30:55,863 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 02:30:55,863 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 02:30:55,863 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 02:30:55,863 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 02:31:04,430 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 02:31:04,430 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 02:31:04,430 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 02:31:04,430 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 02:31:04,430 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 02:31:04,430 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 02:31:04,430 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 02:31:04,430 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 02:31:04,430 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 02:32:12,133 - __main__ - INFO - Query submitted: what is predicted and how 
+2024-12-26 02:32:12,133 - __main__ - INFO - Query submitted: what is predicted and how 
+2024-12-26 02:32:12,133 - __main__ - INFO - Query submitted: what is predicted and how 
+2024-12-26 02:32:12,133 - __main__ - INFO - Query submitted: what is predicted and how 
+2024-12-26 02:32:12,133 - __main__ - INFO - Query submitted: what is predicted and how 
+2024-12-26 02:32:12,133 - __main__ - INFO - Query submitted: what is predicted and how 
+2024-12-26 02:32:12,133 - __main__ - INFO - Query submitted: what is predicted and how 
+2024-12-26 02:32:12,133 - __main__ - INFO - Query submitted: what is predicted and how 
+2024-12-26 02:32:12,133 - __main__ - INFO - Query submitted: what is predicted and how 
+2024-12-26 02:32:12,133 - __main__ - INFO - Query submitted: what is predicted and how 
+2024-12-26 02:32:12,133 - __main__ - INFO - Query submitted: what is predicted and how 
+2024-12-26 02:32:12,135 - __main__ - INFO - Processing query with mode: naive
+2024-12-26 02:32:12,135 - __main__ - INFO - Processing query with mode: naive
+2024-12-26 02:32:12,135 - __main__ - INFO - Processing query with mode: naive
+2024-12-26 02:32:12,135 - __main__ - INFO - Processing query with mode: naive
+2024-12-26 02:32:12,135 - __main__ - INFO - Processing query with mode: naive
+2024-12-26 02:32:12,135 - __main__ - INFO - Processing query with mode: naive
+2024-12-26 02:32:12,135 - __main__ - INFO - Processing query with mode: naive
+2024-12-26 02:32:12,135 - __main__ - INFO - Processing query with mode: naive
+2024-12-26 02:32:12,135 - __main__ - INFO - Processing query with mode: naive
+2024-12-26 02:32:12,135 - __main__ - INFO - Processing query with mode: naive
+2024-12-26 02:32:12,135 - __main__ - INFO - Processing query with mode: naive
+2024-12-26 02:32:25,466 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 02:32:25,466 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 02:32:25,466 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 02:32:25,466 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 02:32:25,466 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 02:32:25,466 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 02:32:25,466 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 02:32:25,466 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 02:32:25,466 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 02:32:25,466 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 02:32:25,466 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 16:05:01,186 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:05:01,186 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:05:01,186 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:05:01,186 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:05:01,186 - __main__ - ERROR - Query failed: 'NoneType' object has no attribute 'lower'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 690, in <module>
+    mode = selected_mode.lower()  # Convert UI mode to LightRAG mode
+AttributeError: 'NoneType' object has no attribute 'lower'
+2024-12-26 16:05:01,186 - __main__ - ERROR - Query failed: 'NoneType' object has no attribute 'lower'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 690, in <module>
+    mode = selected_mode.lower()  # Convert UI mode to LightRAG mode
+AttributeError: 'NoneType' object has no attribute 'lower'
+2024-12-26 16:05:01,186 - __main__ - ERROR - Query failed: 'NoneType' object has no attribute 'lower'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 690, in <module>
+    mode = selected_mode.lower()  # Convert UI mode to LightRAG mode
+AttributeError: 'NoneType' object has no attribute 'lower'
+2024-12-26 16:05:01,186 - __main__ - ERROR - Query failed: 'NoneType' object has no attribute 'lower'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 690, in <module>
+    mode = selected_mode.lower()  # Convert UI mode to LightRAG mode
+AttributeError: 'NoneType' object has no attribute 'lower'
+2024-12-26 16:06:46,136 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:06:46,136 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:06:46,136 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:06:46,136 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:06:46,136 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:06:46,136 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:06:54,108 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:06:54,108 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:06:54,108 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:06:54,108 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:06:54,108 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:06:54,108 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:06:54,108 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:09:48,280 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:09:48,280 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:09:48,280 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:09:48,280 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:09:48,280 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:09:48,281 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:09:48,281 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:09:48,281 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:09:48,281 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:09:48,281 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:10:06,902 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 16:10:06,902 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 16:10:06,902 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 16:10:06,902 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 16:10:06,902 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 16:12:53,952 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:12:53,952 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:12:53,952 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:12:53,952 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:12:53,953 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:12:53,953 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:12:53,953 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:12:53,953 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:12:54,063 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 16:12:54,063 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 16:12:54,063 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 16:12:54,063 - __main__ - ERROR - Query failed: 'str' object has no attribute 'get'
+Traceback (most recent call last):
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/pages/1_Search.py", line 700, in <module>
+    result = st.session_state["rag_manager"].query(
+  File "/Users/jesper/Projects/Dev_projects/KG_and_RAGs/Lightrag_test_app/src/lightrag_init.py", line 187, in query
+    "response": result.get('response', str(result)),
+AttributeError: 'str' object has no attribute 'get'
+2024-12-26 16:15:07,614 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:15:07,614 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:15:07,614 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:15:07,614 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:15:07,614 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:15:07,614 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:15:47,230 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:15:47,230 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:15:47,230 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:15:47,230 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:15:47,230 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:15:47,230 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:15:47,230 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:15:47,230 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:24:28,531 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:24:28,531 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:24:28,531 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:24:28,531 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:24:28,532 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:24:28,532 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:24:28,532 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:24:28,532 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:24:28,589 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 16:24:28,589 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 16:24:28,589 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 16:24:28,589 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 16:34:55,946 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:34:55,946 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:34:55,946 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:34:55,946 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:34:55,947 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:34:55,947 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:34:55,947 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:34:55,947 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:34:56,003 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 16:34:56,003 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 16:34:56,003 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 16:34:56,003 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 16:41:29,021 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:41:29,021 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:41:29,021 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:41:29,021 - __main__ - INFO - Query submitted: How did A Christmas Carol reflect the societal issues of Dickens’ time?
+2024-12-26 16:41:29,023 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:41:29,023 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:41:29,023 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:41:29,023 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 16:41:29,027 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 16:41:29,027 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 16:41:29,027 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 16:41:29,027 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 16:42:11,134 - __main__ - INFO - Chat input received: What are the main themes explored in A Christmas Carol?
+2024-12-26 16:42:11,134 - __main__ - INFO - Chat input received: What are the main themes explored in A Christmas Carol?
+2024-12-26 16:42:11,134 - __main__ - INFO - Chat input received: What are the main themes explored in A Christmas Carol?
+2024-12-26 16:42:11,134 - __main__ - INFO - Chat input received: What are the main themes explored in A Christmas Carol?
+2024-12-26 16:42:11,134 - __main__ - INFO - Chat input received: What are the main themes explored in A Christmas Carol?
+2024-12-26 16:42:11,134 - __main__ - INFO - Chat input received: What are the main themes explored in A Christmas Carol?
+2024-12-26 16:42:11,135 - __main__ - INFO - Prepared query: Previous conversation:
+
+Current query: What are the main themes explored in A Christmas Carol?
+2024-12-26 16:42:11,135 - __main__ - INFO - Prepared query: Previous conversation:
+
+Current query: What are the main themes explored in A Christmas Carol?
+2024-12-26 16:42:11,135 - __main__ - INFO - Prepared query: Previous conversation:
+
+Current query: What are the main themes explored in A Christmas Carol?
+2024-12-26 16:42:11,135 - __main__ - INFO - Prepared query: Previous conversation:
+
+Current query: What are the main themes explored in A Christmas Carol?
+2024-12-26 16:42:11,135 - __main__ - INFO - Prepared query: Previous conversation:
+
+Current query: What are the main themes explored in A Christmas Carol?
+2024-12-26 16:42:11,135 - __main__ - INFO - Prepared query: Previous conversation:
+
+Current query: What are the main themes explored in A Christmas Carol?
+2024-12-26 16:42:26,403 - __main__ - INFO - Query result: {'response': "**Exploration of Main Themes in *A Christmas Carol***\n\n*A Christmas Carol* by Charles Dickens encompasses a multitude of profound themes that resonate with readers and provide critical commentary on society and human behavior. One of the most prominent themes is **redemption**. The character of Ebenezer Scrooge epitomizes the potential for personal transformation; initially a miser and cynic, he undergoes a profound change prompted by supernatural visitations, illustrating that it is never too late to embrace kindness and alter one's life path. Scrooge's evolution serves as a powerful reminder of the importance of self-reflection, moral accountability, and the capacity for change.\n\nConnected to this theme of redemption is the idea of **social responsibility**. The narrative highlights the stark contrasts between different social classes, particularly through characters like Bob Cratchit and Tiny Tim, who represent the struggles of the underprivileged. Scrooge's initial indifference towards the plight of the poor, as he dismisses the gentlemen soliciting donations, reflects a broader societal disregard for the marginalized. However, through his journey, Dickens advocates for compassion and a sense of duty towards those who are less fortunate, suggesting that individual wealth should be paired with responsibility to uplift the community.\n\nAnother central theme is the significance of **Christmas** as a time for **joy, generosity, and familial love**. For many characters, especially the Cratchits, Christmas symbolizes a time of togetherness, warmth, and celebration amidst hardship. Conversely, Scrooge's initial rejection of Christmas encapsulates his loneliness and disconnection from these values. The transformative power of the Christmas spirit ultimately serves as the catalyst for Scrooge's change, reinforcing the notion that this festive season is significant for both personal and communal rejuvenation.\n\nThe theme of **memory and regret** also plays a crucial role in the narrative. Scrooge's interactions with the spirits—particularly the Ghost of Christmas Past—prompt him to reflect on his life choices and missed opportunities. In this way, Dickens underscores that our past experiences shape who we are and can inform our choices moving forward. The emotional impact of these reflections leads Scrooge to confront his fears about death and legacy, emphasizing the importance of living a life filled with kindness and understanding rather than one rooted in greed and isolation.\n\nLastly, the **contrast between wealth and poverty** presents a critical social critique. Dickens illustrates how excessive wealth can lead to emotional coldness and alienation, represented by Scrooge's initially hoarding demeanor as he prioritizes financial gain over human connection. This theme invites readers to contemplate the moral implications of wealth distribution and encourages fostering empathy and kindness in one's interactions.\n\nIn summary, *A Christmas Carol* thoughtfully examines themes such as redemption, social responsibility, the essence of Christmas, memory and regret, and the dichotomy of wealth and poverty, creating a rich tapestry that encourages readers to reconsider their values and behaviors towards themselves and others. Through the character of Scrooge and his transformative journey, Dickens conveys a timeless message about the power of compassion, joy, and the potential for change that exists within all individuals.", 'mode': 'hybrid', 'sources': [], 'time': '2024-12-26T16:42:26.403025', 'token_usage': None}
+2024-12-26 16:42:26,403 - __main__ - INFO - Query result: {'response': "**Exploration of Main Themes in *A Christmas Carol***\n\n*A Christmas Carol* by Charles Dickens encompasses a multitude of profound themes that resonate with readers and provide critical commentary on society and human behavior. One of the most prominent themes is **redemption**. The character of Ebenezer Scrooge epitomizes the potential for personal transformation; initially a miser and cynic, he undergoes a profound change prompted by supernatural visitations, illustrating that it is never too late to embrace kindness and alter one's life path. Scrooge's evolution serves as a powerful reminder of the importance of self-reflection, moral accountability, and the capacity for change.\n\nConnected to this theme of redemption is the idea of **social responsibility**. The narrative highlights the stark contrasts between different social classes, particularly through characters like Bob Cratchit and Tiny Tim, who represent the struggles of the underprivileged. Scrooge's initial indifference towards the plight of the poor, as he dismisses the gentlemen soliciting donations, reflects a broader societal disregard for the marginalized. However, through his journey, Dickens advocates for compassion and a sense of duty towards those who are less fortunate, suggesting that individual wealth should be paired with responsibility to uplift the community.\n\nAnother central theme is the significance of **Christmas** as a time for **joy, generosity, and familial love**. For many characters, especially the Cratchits, Christmas symbolizes a time of togetherness, warmth, and celebration amidst hardship. Conversely, Scrooge's initial rejection of Christmas encapsulates his loneliness and disconnection from these values. The transformative power of the Christmas spirit ultimately serves as the catalyst for Scrooge's change, reinforcing the notion that this festive season is significant for both personal and communal rejuvenation.\n\nThe theme of **memory and regret** also plays a crucial role in the narrative. Scrooge's interactions with the spirits—particularly the Ghost of Christmas Past—prompt him to reflect on his life choices and missed opportunities. In this way, Dickens underscores that our past experiences shape who we are and can inform our choices moving forward. The emotional impact of these reflections leads Scrooge to confront his fears about death and legacy, emphasizing the importance of living a life filled with kindness and understanding rather than one rooted in greed and isolation.\n\nLastly, the **contrast between wealth and poverty** presents a critical social critique. Dickens illustrates how excessive wealth can lead to emotional coldness and alienation, represented by Scrooge's initially hoarding demeanor as he prioritizes financial gain over human connection. This theme invites readers to contemplate the moral implications of wealth distribution and encourages fostering empathy and kindness in one's interactions.\n\nIn summary, *A Christmas Carol* thoughtfully examines themes such as redemption, social responsibility, the essence of Christmas, memory and regret, and the dichotomy of wealth and poverty, creating a rich tapestry that encourages readers to reconsider their values and behaviors towards themselves and others. Through the character of Scrooge and his transformative journey, Dickens conveys a timeless message about the power of compassion, joy, and the potential for change that exists within all individuals.", 'mode': 'hybrid', 'sources': [], 'time': '2024-12-26T16:42:26.403025', 'token_usage': None}
+2024-12-26 16:42:26,403 - __main__ - INFO - Query result: {'response': "**Exploration of Main Themes in *A Christmas Carol***\n\n*A Christmas Carol* by Charles Dickens encompasses a multitude of profound themes that resonate with readers and provide critical commentary on society and human behavior. One of the most prominent themes is **redemption**. The character of Ebenezer Scrooge epitomizes the potential for personal transformation; initially a miser and cynic, he undergoes a profound change prompted by supernatural visitations, illustrating that it is never too late to embrace kindness and alter one's life path. Scrooge's evolution serves as a powerful reminder of the importance of self-reflection, moral accountability, and the capacity for change.\n\nConnected to this theme of redemption is the idea of **social responsibility**. The narrative highlights the stark contrasts between different social classes, particularly through characters like Bob Cratchit and Tiny Tim, who represent the struggles of the underprivileged. Scrooge's initial indifference towards the plight of the poor, as he dismisses the gentlemen soliciting donations, reflects a broader societal disregard for the marginalized. However, through his journey, Dickens advocates for compassion and a sense of duty towards those who are less fortunate, suggesting that individual wealth should be paired with responsibility to uplift the community.\n\nAnother central theme is the significance of **Christmas** as a time for **joy, generosity, and familial love**. For many characters, especially the Cratchits, Christmas symbolizes a time of togetherness, warmth, and celebration amidst hardship. Conversely, Scrooge's initial rejection of Christmas encapsulates his loneliness and disconnection from these values. The transformative power of the Christmas spirit ultimately serves as the catalyst for Scrooge's change, reinforcing the notion that this festive season is significant for both personal and communal rejuvenation.\n\nThe theme of **memory and regret** also plays a crucial role in the narrative. Scrooge's interactions with the spirits—particularly the Ghost of Christmas Past—prompt him to reflect on his life choices and missed opportunities. In this way, Dickens underscores that our past experiences shape who we are and can inform our choices moving forward. The emotional impact of these reflections leads Scrooge to confront his fears about death and legacy, emphasizing the importance of living a life filled with kindness and understanding rather than one rooted in greed and isolation.\n\nLastly, the **contrast between wealth and poverty** presents a critical social critique. Dickens illustrates how excessive wealth can lead to emotional coldness and alienation, represented by Scrooge's initially hoarding demeanor as he prioritizes financial gain over human connection. This theme invites readers to contemplate the moral implications of wealth distribution and encourages fostering empathy and kindness in one's interactions.\n\nIn summary, *A Christmas Carol* thoughtfully examines themes such as redemption, social responsibility, the essence of Christmas, memory and regret, and the dichotomy of wealth and poverty, creating a rich tapestry that encourages readers to reconsider their values and behaviors towards themselves and others. Through the character of Scrooge and his transformative journey, Dickens conveys a timeless message about the power of compassion, joy, and the potential for change that exists within all individuals.", 'mode': 'hybrid', 'sources': [], 'time': '2024-12-26T16:42:26.403025', 'token_usage': None}
+2024-12-26 16:42:26,403 - __main__ - INFO - Query result: {'response': "**Exploration of Main Themes in *A Christmas Carol***\n\n*A Christmas Carol* by Charles Dickens encompasses a multitude of profound themes that resonate with readers and provide critical commentary on society and human behavior. One of the most prominent themes is **redemption**. The character of Ebenezer Scrooge epitomizes the potential for personal transformation; initially a miser and cynic, he undergoes a profound change prompted by supernatural visitations, illustrating that it is never too late to embrace kindness and alter one's life path. Scrooge's evolution serves as a powerful reminder of the importance of self-reflection, moral accountability, and the capacity for change.\n\nConnected to this theme of redemption is the idea of **social responsibility**. The narrative highlights the stark contrasts between different social classes, particularly through characters like Bob Cratchit and Tiny Tim, who represent the struggles of the underprivileged. Scrooge's initial indifference towards the plight of the poor, as he dismisses the gentlemen soliciting donations, reflects a broader societal disregard for the marginalized. However, through his journey, Dickens advocates for compassion and a sense of duty towards those who are less fortunate, suggesting that individual wealth should be paired with responsibility to uplift the community.\n\nAnother central theme is the significance of **Christmas** as a time for **joy, generosity, and familial love**. For many characters, especially the Cratchits, Christmas symbolizes a time of togetherness, warmth, and celebration amidst hardship. Conversely, Scrooge's initial rejection of Christmas encapsulates his loneliness and disconnection from these values. The transformative power of the Christmas spirit ultimately serves as the catalyst for Scrooge's change, reinforcing the notion that this festive season is significant for both personal and communal rejuvenation.\n\nThe theme of **memory and regret** also plays a crucial role in the narrative. Scrooge's interactions with the spirits—particularly the Ghost of Christmas Past—prompt him to reflect on his life choices and missed opportunities. In this way, Dickens underscores that our past experiences shape who we are and can inform our choices moving forward. The emotional impact of these reflections leads Scrooge to confront his fears about death and legacy, emphasizing the importance of living a life filled with kindness and understanding rather than one rooted in greed and isolation.\n\nLastly, the **contrast between wealth and poverty** presents a critical social critique. Dickens illustrates how excessive wealth can lead to emotional coldness and alienation, represented by Scrooge's initially hoarding demeanor as he prioritizes financial gain over human connection. This theme invites readers to contemplate the moral implications of wealth distribution and encourages fostering empathy and kindness in one's interactions.\n\nIn summary, *A Christmas Carol* thoughtfully examines themes such as redemption, social responsibility, the essence of Christmas, memory and regret, and the dichotomy of wealth and poverty, creating a rich tapestry that encourages readers to reconsider their values and behaviors towards themselves and others. Through the character of Scrooge and his transformative journey, Dickens conveys a timeless message about the power of compassion, joy, and the potential for change that exists within all individuals.", 'mode': 'hybrid', 'sources': [], 'time': '2024-12-26T16:42:26.403025', 'token_usage': None}
+2024-12-26 16:42:26,403 - __main__ - INFO - Query result: {'response': "**Exploration of Main Themes in *A Christmas Carol***\n\n*A Christmas Carol* by Charles Dickens encompasses a multitude of profound themes that resonate with readers and provide critical commentary on society and human behavior. One of the most prominent themes is **redemption**. The character of Ebenezer Scrooge epitomizes the potential for personal transformation; initially a miser and cynic, he undergoes a profound change prompted by supernatural visitations, illustrating that it is never too late to embrace kindness and alter one's life path. Scrooge's evolution serves as a powerful reminder of the importance of self-reflection, moral accountability, and the capacity for change.\n\nConnected to this theme of redemption is the idea of **social responsibility**. The narrative highlights the stark contrasts between different social classes, particularly through characters like Bob Cratchit and Tiny Tim, who represent the struggles of the underprivileged. Scrooge's initial indifference towards the plight of the poor, as he dismisses the gentlemen soliciting donations, reflects a broader societal disregard for the marginalized. However, through his journey, Dickens advocates for compassion and a sense of duty towards those who are less fortunate, suggesting that individual wealth should be paired with responsibility to uplift the community.\n\nAnother central theme is the significance of **Christmas** as a time for **joy, generosity, and familial love**. For many characters, especially the Cratchits, Christmas symbolizes a time of togetherness, warmth, and celebration amidst hardship. Conversely, Scrooge's initial rejection of Christmas encapsulates his loneliness and disconnection from these values. The transformative power of the Christmas spirit ultimately serves as the catalyst for Scrooge's change, reinforcing the notion that this festive season is significant for both personal and communal rejuvenation.\n\nThe theme of **memory and regret** also plays a crucial role in the narrative. Scrooge's interactions with the spirits—particularly the Ghost of Christmas Past—prompt him to reflect on his life choices and missed opportunities. In this way, Dickens underscores that our past experiences shape who we are and can inform our choices moving forward. The emotional impact of these reflections leads Scrooge to confront his fears about death and legacy, emphasizing the importance of living a life filled with kindness and understanding rather than one rooted in greed and isolation.\n\nLastly, the **contrast between wealth and poverty** presents a critical social critique. Dickens illustrates how excessive wealth can lead to emotional coldness and alienation, represented by Scrooge's initially hoarding demeanor as he prioritizes financial gain over human connection. This theme invites readers to contemplate the moral implications of wealth distribution and encourages fostering empathy and kindness in one's interactions.\n\nIn summary, *A Christmas Carol* thoughtfully examines themes such as redemption, social responsibility, the essence of Christmas, memory and regret, and the dichotomy of wealth and poverty, creating a rich tapestry that encourages readers to reconsider their values and behaviors towards themselves and others. Through the character of Scrooge and his transformative journey, Dickens conveys a timeless message about the power of compassion, joy, and the potential for change that exists within all individuals.", 'mode': 'hybrid', 'sources': [], 'time': '2024-12-26T16:42:26.403025', 'token_usage': None}
+2024-12-26 16:42:26,403 - __main__ - INFO - Query result: {'response': "**Exploration of Main Themes in *A Christmas Carol***\n\n*A Christmas Carol* by Charles Dickens encompasses a multitude of profound themes that resonate with readers and provide critical commentary on society and human behavior. One of the most prominent themes is **redemption**. The character of Ebenezer Scrooge epitomizes the potential for personal transformation; initially a miser and cynic, he undergoes a profound change prompted by supernatural visitations, illustrating that it is never too late to embrace kindness and alter one's life path. Scrooge's evolution serves as a powerful reminder of the importance of self-reflection, moral accountability, and the capacity for change.\n\nConnected to this theme of redemption is the idea of **social responsibility**. The narrative highlights the stark contrasts between different social classes, particularly through characters like Bob Cratchit and Tiny Tim, who represent the struggles of the underprivileged. Scrooge's initial indifference towards the plight of the poor, as he dismisses the gentlemen soliciting donations, reflects a broader societal disregard for the marginalized. However, through his journey, Dickens advocates for compassion and a sense of duty towards those who are less fortunate, suggesting that individual wealth should be paired with responsibility to uplift the community.\n\nAnother central theme is the significance of **Christmas** as a time for **joy, generosity, and familial love**. For many characters, especially the Cratchits, Christmas symbolizes a time of togetherness, warmth, and celebration amidst hardship. Conversely, Scrooge's initial rejection of Christmas encapsulates his loneliness and disconnection from these values. The transformative power of the Christmas spirit ultimately serves as the catalyst for Scrooge's change, reinforcing the notion that this festive season is significant for both personal and communal rejuvenation.\n\nThe theme of **memory and regret** also plays a crucial role in the narrative. Scrooge's interactions with the spirits—particularly the Ghost of Christmas Past—prompt him to reflect on his life choices and missed opportunities. In this way, Dickens underscores that our past experiences shape who we are and can inform our choices moving forward. The emotional impact of these reflections leads Scrooge to confront his fears about death and legacy, emphasizing the importance of living a life filled with kindness and understanding rather than one rooted in greed and isolation.\n\nLastly, the **contrast between wealth and poverty** presents a critical social critique. Dickens illustrates how excessive wealth can lead to emotional coldness and alienation, represented by Scrooge's initially hoarding demeanor as he prioritizes financial gain over human connection. This theme invites readers to contemplate the moral implications of wealth distribution and encourages fostering empathy and kindness in one's interactions.\n\nIn summary, *A Christmas Carol* thoughtfully examines themes such as redemption, social responsibility, the essence of Christmas, memory and regret, and the dichotomy of wealth and poverty, creating a rich tapestry that encourages readers to reconsider their values and behaviors towards themselves and others. Through the character of Scrooge and his transformative journey, Dickens conveys a timeless message about the power of compassion, joy, and the potential for change that exists within all individuals.", 'mode': 'hybrid', 'sources': [], 'time': '2024-12-26T16:42:26.403025', 'token_usage': None}
+2024-12-26 16:42:26,404 - __main__ - INFO - Response added to chat history
+2024-12-26 16:42:26,404 - __main__ - INFO - Response added to chat history
+2024-12-26 16:42:26,404 - __main__ - INFO - Response added to chat history
+2024-12-26 16:42:26,404 - __main__ - INFO - Response added to chat history
+2024-12-26 16:42:26,404 - __main__ - INFO - Response added to chat history
+2024-12-26 16:42:26,404 - __main__ - INFO - Response added to chat history
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,301 - __main__ - INFO - Query submitted: What are the main themes explored in A Christmas Carol?
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:09,303 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-26 17:18:28,149 - __main__ - INFO - Query completed in Hybrid mode
