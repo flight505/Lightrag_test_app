@@ -7,6 +7,7 @@ import time
 from datetime import datetime
 from io import BytesIO
 from typing import Dict, List
+from pathlib import Path
 
 import streamlit as st
 from docx import Document
@@ -15,6 +16,7 @@ from lightrag import QueryParam
 from src.lightrag_helpers import ResponseProcessor
 from src.lightrag_init import DEFAULT_MODEL, SUPPORTED_MODELS, LightRAGManager
 from src.file_manager import create_store_directory, DB_ROOT
+from src.file_processor import FileProcessor
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -249,44 +251,94 @@ with st.sidebar:
     with st.form("directory_form"):
         st.markdown("**Create and Manage Document Store:**")
         
-        # List existing stores from DB directory
-        if not os.path.exists(DB_ROOT):
-            os.makedirs(DB_ROOT)
-            st.info(f"Created root directory: {DB_ROOT}")
+        # List existing stores
+        stores = [d for d in os.listdir(DB_ROOT) if os.path.isdir(os.path.join(DB_ROOT, d))]
+        
+        # File processor status
+        if "file_processor" not in st.session_state:
+            st.session_state["file_processor"] = None
             
-        existing_stores = [
-            d for d in os.listdir(DB_ROOT) 
-            if os.path.isdir(os.path.join(DB_ROOT, d))
-        ]
-
-        # Handle store selection
-        if existing_stores:
-            selected_store = st.selectbox("Select existing store", options=existing_stores)
-            if selected_store != st.session_state["active_store"]:
-                st.session_state["active_store"] = selected_store
-                st.toast(f"Using store: {selected_store}")
+        # Store selection
+        selected_store = st.selectbox(
+            "Select Store",
+            ["Create New..."] + stores,
+            index=0 if st.session_state["active_store"] is None else 
+                  stores.index(st.session_state["active_store"]) + 1
+        )
+        
+        if selected_store == "Create New...":
+            new_store = st.text_input("Store Name")
+            if st.form_submit_button("Create Store"):
+                if new_store:
+                    store_path = create_store_directory(new_store)
+                    if store_path:
+                        st.session_state["active_store"] = new_store
+                        st.session_state["file_processor"] = FileProcessor(store_path)
+                        
+                        # Scan for PDFs and convert
+                        with st.status("Converting PDFs to text...", expanded=True):
+                            results = st.session_state["file_processor"].scan_and_convert_store()
+                            if results:
+                                st.write("Conversion Results:")
+                                for filename, status in results.items():
+                                    if status == "converted":
+                                        st.success(f"✅ {filename}: Converted to text")
+                                    elif status == "skipped":
+                                        st.info(f"ℹ️ {filename}: Already processed")
+                                    else:
+                                        st.error(f"❌ {filename}: {status}")
+                        
+                        st.success(f"Created store: {new_store}")
+                        st.rerun()
         else:
-            st.warning("No existing stores found. Please create a new store.")
-            selected_store = None
-
-        # Input for new store name
-        new_store_name = st.text_input("New store name", value="")
-
-        # Button to create or manage store
-        create_store = st.form_submit_button("Create and Manage Store")
-        if create_store:
-            if new_store_name:
-                store_path = create_store_directory(new_store_name)
-                if store_path:
-                    if os.path.exists(os.path.join(DB_ROOT, new_store_name)):
-                        st.session_state["active_store"] = new_store_name
-                        st.toast(f"Created new store: {new_store_name}")
-                    else:
-                        st.error("Failed to create store in DB directory")
-                else:
-                    st.error("Failed to create store")
-            elif not selected_store:
-                st.warning("Please enter a new store name or select an existing store.")
+            store_path = os.path.join(DB_ROOT, selected_store)
+            
+            # Always reinitialize file processor when store changes
+            if st.session_state["active_store"] != selected_store:
+                st.session_state["file_processor"] = None  # Clear old instance
+                st.session_state["active_store"] = selected_store
+            
+            # Initialize file processor if needed
+            if st.session_state["file_processor"] is None:
+                st.session_state["file_processor"] = FileProcessor(store_path)
+            
+            # Show store info
+            files_in_store = list(Path(store_path).glob("*.pdf"))
+            if files_in_store:
+                st.write(f"📁 PDFs in store: {len(files_in_store)}")
+                with st.expander("View Files"):
+                    for file in files_in_store:
+                        st.write(f"- {file.name}")
+            
+            # Add form submit buttons
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.form_submit_button("Scan for New Files"):
+                    if st.session_state["file_processor"]:
+                        # Reinitialize processor to ensure latest methods
+                        st.session_state["file_processor"] = FileProcessor(store_path)
+                        with st.status("Scanning for new files...", expanded=True):
+                            results = st.session_state["file_processor"].scan_and_convert_store()
+                            if results:
+                                st.write("Processing Results:")
+                                for filename, status in results.items():
+                                    if status == "converted":
+                                        st.success(f"✅ {filename}: Converted to text")
+                                    elif status == "skipped":
+                                        st.info(f"ℹ️ {filename}: Already processed")
+                                    else:
+                                        st.error(f"❌ {filename}: {status}")
+                            else:
+                                st.info("No new files found to process")
+            
+            with col2:
+                if st.form_submit_button("Cleanup Unused Files"):
+                    if st.session_state["file_processor"]:
+                        removed = st.session_state["file_processor"].cleanup_unused()
+                        if removed:
+                            st.info(f"Removed {len(removed)} unused files")
+                        else:
+                            st.info("No unused files found")
 
     # Configuration form
     with st.form("configuration_form"):
@@ -438,14 +490,13 @@ with col1:
         help="* Hybrid: Best for most queries - combines local and global search\n"
              "* Naive: Direct LLM query with full context - best for simple questions\n"
              "* Local: Uses nearby context - best for specific details\n"
-             "* Global: Searches entire knowledge base - best for broad themes\n"
-
+             "* Global: Searches entire knowledge base - best for broad themes\n",
+        default="Hybrid"
     )
     
     # Update session state when mode changes
     if selected_mode != st.session_state.get("current_search_mode"):
         st.session_state["current_search_mode"] = selected_mode
-        # Add visual feedback for mode change
         st.toast(f"Switched to {selected_mode} mode", icon="🔄")
 
     # Initialize mode parameters
@@ -618,78 +669,44 @@ if "query_submitted" in st.session_state and st.session_state["query_submitted"]
         if st.session_state["query_history"][-1] != query:
             st.session_state["query_history"].append(query)
 
-            # Initialize progress bar
-            progress_bar = query_container.progress(0)
-
             try:
-                # Check if conversation needs summarization
-                if (
-                    st.session_state["current_mode"] == "Chat"
-                    and should_summarize_conversation()
-                ):
-                    with st.status("Summarizing conversation..."):
-                        # Use asyncio.run for summarization
-                        summary = asyncio.run(summarize_conversation())
-                        update_conversation_with_summary(summary)
-                        st.success("Conversation summarized!")
+                # Get mode with fallback
+                mode = (selected_mode or "Hybrid").lower()
+                logger.info(f"Processing query with mode: {mode}")
+                
+                # Create query parameters using QueryParam
+                query_params = QueryParam(
+                    mode=mode,
+                    **st.session_state.get("mode_params", {})
+                )
 
-                # Process query with selected mode
-                try:
-                    mode = selected_mode.lower()  # Convert UI mode to LightRAG mode
-                    logger.info(f"Processing query with mode: {mode}")
-                    
-                    # Create query parameters
-                    query_params = {
-                        "mode": mode,
-                        **mode_params
+                with st.status(f"Processing query in {selected_mode} mode..."):
+                    # Pass QueryParam object directly
+                    result = st.session_state["rag_manager"].query(
+                        query,
+                        param=query_params  # Use param= to match the documentation
+                    )
+                    logger.info(f"Query completed in {selected_mode} mode")
+                
+                # Process and display result
+                if result:
+                    # Handle string response (which is the documented behavior)
+                    formatted_result = {
+                        "response": result,  # Result is a string
+                        "mode": selected_mode,
+                        "sources": []  # Sources not provided in basic response
                     }
                     
-                    with st.status(f"Processing query in {selected_mode} mode..."):
-                        result = st.session_state["rag_manager"].query(
-                            query,
-                            **query_params  # Pass parameters directly to query method
-                        )
-                        logger.info(f"Query completed in {mode} mode")
-                    
-                    # Process and display result
-                    if result:
-                        st.session_state["query_results"].append({query: result})
-                        formatted_response = st.session_state["response_processor"].format_full_response(
-                            query, result
-                        )
-                        st.session_state["responses"].append(formatted_response)
-                    else:
-                        st.error("No response received")
-
-                except Exception as e:
-                    logger.error(f"Query failed: {str(e)}", exc_info=True)
-                    st.error(f"Error processing query: {str(e)}")
-
-                # Extract key points
-                response_text, _ = st.session_state["response_processor"].process_response(
-                    result
-                )
-                key_points = st.session_state["response_processor"].extract_key_points(
-                    response_text
-                )
-
-                # Clear progress bar
-                progress_bar.empty()
-
-                # Save response history
-                try:
-                    st.session_state["response_processor"].save_response_history(
-                        query, result, "responses"
+                    st.session_state["query_results"].append({query: formatted_result})
+                    formatted_response = st.session_state["response_processor"].format_full_response(
+                        query, formatted_result
                     )
-                except Exception as e:
-                    st.warning(f"Could not save response history: {str(e)}")
-
-                # Trigger rerun to update display
-                st.rerun()
+                    st.session_state["responses"].append(formatted_response)
+                else:
+                    st.error("No response received")
 
             except Exception as e:
                 st.error(f"Error processing query: {str(e)}")
-                progress_bar.empty()
 
         # Reset the submission flag
         st.session_state["query_submitted"] = False
