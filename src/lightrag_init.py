@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Optional
+from typing import Optional, Dict, Any
 from datetime import datetime
 
 from lightrag import LightRAG, QueryParam
@@ -184,9 +184,9 @@ class LightRAGManager:
             logger.info(f"Query completed in {mode} mode")
             
             return {
-                "response": result.get('response', str(result)),
+                "response": result,  # Direct string response
                 "mode": mode,
-                "sources": result.get('sources', []),
+                "sources": [],  # Populate if available
                 "time": datetime.now().isoformat(),
                 "token_usage": None,
             }
@@ -265,7 +265,7 @@ class LightRAGManager:
             logger.error("Final hybrid attempt failed", exc_info=True)
             raise
 
-    def _format_response(self, result: any, mode: str) -> dict:
+    def _format_response(self, result: Any, mode: str) -> dict:
         """Format query result into standard response"""
         logger.debug(f"Formatting response for mode {mode}")
         try:
