@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 
 import pandas as pd
 from termcolor import colored
@@ -21,7 +21,7 @@ class ResponseProcessor:
         """Initialize the response processor"""
         self.source_cache = {}
 
-    def process_response(self, result: Dict) -> Tuple[str, List[str]]:
+    def process_response(self, result: Dict[str, Any]) -> tuple[str, Any]:
         """Process the raw LightRAG response and extract key components
 
         Args:
@@ -33,15 +33,9 @@ class ResponseProcessor:
             - List of source references
         """
         try:
-            # Handle both string and dictionary responses
-            if isinstance(result, str):
-                response_text = result
-                sources = []
-            else:
-                response_text = result.get("response", "No response generated")
-                sources = result.get("sources", [])
-
-            return response_text, sources
+            response = result.get("response", "")
+            logger.debug(f"Processed response: {response} (type: {type(response)})")
+            return response, None
 
         except Exception as e:
             error_msg = f"Error processing response: {str(e)}"
@@ -99,37 +93,38 @@ class ResponseProcessor:
             raise
 
     def format_full_response(
-        self, query: str, result: Dict, include_metadata: bool = True
+        self, query: str, result: Dict[str, Any]
     ) -> str:
         """Create a fully formatted response with all components
 
         Args:
             query: Original query text
             result: Raw response dictionary from LightRAG
-            include_metadata: Whether to include processing metadata
 
         Returns:
             Formatted response string
         """
         try:
-            # Process response components
-            response_text, sources = self.process_response(result)
-            formatted_sources = self.format_sources(sources)
+            response = result.get("response", "No response available.")
+            mode = result.get("mode", "Unknown")
+            sources = result.get("sources", [])
 
-            # Build response string
-            formatted_response = [
-                f"**Query:**\n{query}\n",
-                f"**Response:**\n{response_text}\n",
-                f"**Sources:**\n{formatted_sources}\n",
-            ]
+            logger.debug(f"Formatting full response for query: {query}")
+            formatted_sources = "\n".join([f"- {source}" for source in sources]) if sources else "No sources provided."
 
-            # Add metadata if requested and available
-            if include_metadata and isinstance(result, dict):
-                metadata = self.create_response_metadata(result)
-                metadata_str = "\n".join(f"- {k}: {v}" for k, v in metadata.items())
-                formatted_response.append(f"**Metadata:**\n{metadata_str}")
+            return f"""
+            ### Query:
+            {query}
 
-            return "\n".join(formatted_response)
+            ### Response:
+            {response}
+
+            ### Mode:
+            {mode}
+
+            ### Sources:
+            {formatted_sources}
+            """
 
         except Exception as e:
             error_msg = f"Error formatting full response: {str(e)}"
@@ -183,19 +178,12 @@ class ResponseProcessor:
             List of key points
         """
         try:
-            # Split text into sentences and filter for key points
+            logger.debug("Extracting key points from response.")
             sentences = [s.strip() for s in response_text.split(".") if s.strip()]
-            key_points = []
-
-            for sentence in sentences:
-                # Add logic to identify key points (can be customized)
-                if len(sentence.split()) > 5:  # Simple length-based filter
-                    key_points.append(f"- {sentence}")
-
-            return key_points if key_points else ["No key points identified"]
-
+            # Example: Extract the first 3 key points
+            key_points = sentences[:3]
+            logger.debug(f"Extracted key points: {key_points}")
+            return key_points
         except Exception as e:
-            error_msg = f"Error extracting key points: {str(e)}"
-            print(colored(error_msg, "red"))
-            logger.error(error_msg)
-            raise
+            logger.error(f"Error extracting key points: {e}")
+            return []
