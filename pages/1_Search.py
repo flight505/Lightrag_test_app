@@ -310,35 +310,37 @@ with st.sidebar:
                     for file in files_in_store:
                         st.write(f"- {file.name}")
             
-            # Add form submit buttons
+            # Add form submit buttons in columns
             col1, col2 = st.columns(2)
             with col1:
-                if st.form_submit_button("Scan for New Files"):
-                    if st.session_state["file_processor"]:
-                        # Reinitialize processor to ensure latest methods
-                        st.session_state["file_processor"] = FileProcessor(store_path)
-                        with st.status("Scanning for new files...", expanded=True):
-                            results = st.session_state["file_processor"].scan_and_convert_store()
-                            if results:
-                                st.write("Processing Results:")
-                                for filename, status in results.items():
-                                    if status == "converted":
-                                        st.success(f"✅ {filename}: Converted to text")
-                                    elif status == "skipped":
-                                        st.info(f"ℹ️ {filename}: Already processed")
-                                    else:
-                                        st.error(f"❌ {filename}: {status}")
-                            else:
-                                st.info("No new files found to process")
-            
+                scan_clicked = st.form_submit_button("Scan for New Files")
             with col2:
-                if st.form_submit_button("Cleanup Unused Files"):
-                    if st.session_state["file_processor"]:
-                        removed = st.session_state["file_processor"].cleanup_unused()
-                        if removed:
-                            st.info(f"Removed {len(removed)} unused files")
-                        else:
-                            st.info("No unused files found")
+                cleanup_clicked = st.form_submit_button("Cleanup Unused Files")
+
+            # Status messages below the columns
+            if scan_clicked and st.session_state["file_processor"]:
+                # Reinitialize processor to ensure latest methods
+                st.session_state["file_processor"] = FileProcessor(store_path)
+                with st.status("Scanning for new files...", expanded=True):
+                    results = st.session_state["file_processor"].scan_and_convert_store()
+                    if results:
+                        st.write("Processing Results:")
+                        for filename, status in results.items():
+                            if status == "converted":
+                                st.success(f"✅ {filename}: Converted to text")
+                            elif status == "skipped":
+                                st.info(f"ℹ️ {filename}: Already processed")
+                            else:
+                                st.error(f"❌ {filename}: {status}")
+                    else:
+                        st.info("No new files found to process")
+
+            if cleanup_clicked and st.session_state["file_processor"]:
+                removed = st.session_state["file_processor"].cleanup_unused()
+                if removed:
+                    st.info(f"Removed {len(removed)} unused files")
+                else:
+                    st.info("No unused files found")
 
     # Configuration form
     with st.form("configuration_form"):
@@ -658,9 +660,7 @@ with query_container:
                     st.session_state["query_submitted"] = True
                     st.session_state["current_query"] = query
 
-# The query processing should only happen when:
-# 1. rag_manager is initialized
-# 2. User submits a query
+# Query processing
 if "query_submitted" in st.session_state and st.session_state["query_submitted"]:
     if st.session_state["rag_manager"] is None:
         st.error("Please initialize LightRAG first by clicking 'Initialize and Index Documents'")
@@ -669,66 +669,61 @@ if "query_submitted" in st.session_state and st.session_state["query_submitted"]
         if st.session_state["query_history"][-1] != query:
             st.session_state["query_history"].append(query)
 
-            try:
-                # Get mode with fallback
-                mode = (selected_mode or "Hybrid").lower()
-                logger.info(f"Processing query with mode: {mode}")
-                
-                # Create query parameters using QueryParam
-                query_params = QueryParam(
-                    mode=mode,
-                    **st.session_state.get("mode_params", {})
-                )
+            async def handle_query():
+                try:
+                    # Get mode with fallback
+                    mode = (st.session_state["current_search_mode"] or "Hybrid").lower()
+                    logger.info(f"Processing query with mode: {mode}")
 
-                with st.status(f"Processing query in {selected_mode} mode..."):
-                    # Pass QueryParam object directly
-                    result = st.session_state["rag_manager"].query(
-                        query,
-                        param=query_params  # Use param= to match the documentation
+                    # Create query parameters using QueryParam
+                    query_params = QueryParam(
+                        mode=mode,
+                        **st.session_state.get("mode_params", {})
                     )
-                    logger.info(f"Query completed in {selected_mode} mode")
-                
-                # Process and display result
-                if result:
-                    # Handle string response (which is the documented behavior)
-                    formatted_result = {
-                        "response": result,  # Result is a string
-                        "mode": selected_mode,
-                        "sources": []  # Sources not provided in basic response
-                    }
-                    
-                    st.session_state["query_results"].append({query: formatted_result})
-                    formatted_response = st.session_state["response_processor"].format_full_response(
-                        query, formatted_result
-                    )
-                    st.session_state["responses"].append(formatted_response)
-                else:
-                    st.error("No response received")
 
-            except Exception as e:
-                st.error(f"Error processing query: {str(e)}")
+                    # Display progress bar
+                    with st.spinner(f"Processing query in {st.session_state['current_search_mode']} mode..."):
+                        # Asynchronously execute the query
+                        result = await asyncio.to_thread(
+                            st.session_state["rag_manager"].query,
+                            query,
+                            param=query_params
+                        )
+                        logger.info(f"Query completed in {st.session_state['current_search_mode']} mode")
 
-        # Reset the submission flag
-        st.session_state["query_submitted"] = False
+                    # Process and display result
+                    if result:
+                        # 'result' is already a dict with 'response', 'mode', 'sources', etc.
+                        st.session_state["query_results"].append({query: result})
+                        
+                        # Extract the 'response' string
+                        response_text, _ = st.session_state["response_processor"].process_response(result)
+                        
+                        # Extract key points from the 'response' string
+                        key_points = st.session_state["response_processor"].extract_key_points(response_text)
+                        
+                        # Format the full response for display
+                        formatted_response = st.session_state["response_processor"].format_full_response(
+                            query, result
+                        )
+                        st.session_state["responses"].append(formatted_response)
+                    else:
+                        st.error("No response received")
+
+                except Exception as e:
+                    logger.error(f"Error processing query: {str(e)}")
+                    st.error(f"Error processing query: {str(e)}")
+
+                finally:
+                    st.session_state["query_submitted"] = False
+
+            asyncio.run(handle_query())
 
 # Display response
 with response_expander:
-    st.markdown(st.session_state["responses"][-1])
-
-    if st.session_state["responses"][-1] != "...":
-        current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        col1, col2 = st.columns(2)
-        with col1:
-            st.download_button(
-                "Download Response",
-                data=get_docx(st.session_state["responses"][-1]),
-                file_name=f"LightRAG_Search_Response_{current_time}.docx",
-                mime="docx",
-            )
-        with col2:
-            if st.button("Copy to Clipboard"):
-                st.write("Response copied! (Use Ctrl+V to paste)")
-                st.session_state["responses"][-1]
+    if st.session_state["responses"] and st.session_state["responses"][-1] != "...":
+        st.markdown(st.session_state["responses"][-1], unsafe_allow_html=True)
+        logger.debug("Displayed formatted response to the user.")
 
 # Display key points
 with key_points_expander:
@@ -742,6 +737,7 @@ with key_points_expander:
             response_text
         )
         st.markdown("\n".join(key_points))
+        logger.debug(f"Displayed key points: {key_points}")
 
 # Debug information
 with debug_expander:
