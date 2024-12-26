@@ -15,3 +15,6 @@ lightrag.log
 DB/*
 responses/*
 chat.log
+DB/pdf/
+DB/deep/
+DB/dickens/
