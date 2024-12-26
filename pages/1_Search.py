@@ -10,7 +10,6 @@ from typing import Dict, List
 
 import streamlit as st
 from docx import Document
-from termcolor import colored
 
 from lightrag import QueryParam
 from src.lightrag_helpers import ResponseProcessor
@@ -421,33 +420,33 @@ with st.sidebar:
                         st.info("Not enough conversation history to summarize.")
 
 # Main interface
-st.write(f"## 🔍 LightRAG {st.session_state['current_mode']}")
-st.write("👈 Configure your search settings in the sidebar to get started.")
+st.write(f"## :material/search: LightRAG {st.session_state['current_mode']}")
+st.write(":material/subdirectory_arrow_left: Configure your search settings in the sidebar to get started.")
 
 # Create two columns for the main interface
-col1, col2 = st.columns([2, 1])
+col1, col2 = st.columns([2, 1], vertical_alignment="bottom",)
 
 with col1:
     # Mode selection above query container
     st.markdown("### Search Mode")
-    AVAILABLE_MODES = ["Hybrid", "Naive", "Local", "Global"]
-    selected_mode = st.radio(
-        "Select mode:",
-        AVAILABLE_MODES,
-        horizontal=True,
-        index=AVAILABLE_MODES.index(st.session_state["current_search_mode"]),
-        key="main_mode_selector",
-        help="""
-        - **Hybrid**: Best for most queries - combines local and global search
-        - **Naive**: Direct LLM query with full context - best for simple questions
-        - **Local**: Uses nearby context - best for specific details
-        - **Global**: Searches entire knowledge base - best for broad themes
-        """
-    )
+    
+    # Replace radio with segmented control
+    selected_mode = st.segmented_control(
+        "Select mode",
+        options=["Hybrid", "Naive", "Local", "Global"],
+        key="mode_selector",
+        help="* Hybrid: Best for most queries - combines local and global search\n"
+             "* Naive: Direct LLM query with full context - best for simple questions\n"
+             "* Local: Uses nearby context - best for specific details\n"
+             "* Global: Searches entire knowledge base - best for broad themes\n"
 
+    )
+    
     # Update session state when mode changes
-    if selected_mode != st.session_state["current_search_mode"]:
+    if selected_mode != st.session_state.get("current_search_mode"):
         st.session_state["current_search_mode"] = selected_mode
+        # Add visual feedback for mode change
+        st.toast(f"Switched to {selected_mode} mode", icon="🔄")
 
     # Initialize mode parameters
     mode_params = {}
@@ -493,20 +492,24 @@ with col1:
     query_container = st.container()
     response_expander = st.expander("🔽 Response and Sources", expanded=True)
     key_points_expander = st.expander("🔑 Key Points")
-    st.session_state
 
 with col2:
     # Sidebar information
-    with st.expander("ℹ️ Session Info", expanded=True):
+    with st.expander(":material/info: **Session Info**", expanded=True):
+        # Status with color and icon
         if st.session_state["status_ready"]:
-            st.write("**Status:** Ready")
+            st.write("🟢 **System Status:** Ready and operational")
+        else:
+            st.write("🔴 **System Status:** Not initialized")
+            
+        st.divider()
+        # System info with icons
         st.write("**Query Count:**", len(st.session_state["query_history"]) - 1)
         if st.session_state["rag_manager"]:
             st.write("**Model:**", st.session_state["rag_manager"].model_name)
             st.write("**Store:**", st.session_state["rag_manager"].input_dir)
 
-
-    debug_expander = st.expander("⚠️ Debug Information")
+    debug_expander = st.expander(":material/bug_report: Debug Information")
 
 # Query input
 with query_container:
