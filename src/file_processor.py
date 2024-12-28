@@ -5,9 +5,6 @@ from pathlib import Path
 from datetime import datetime
 import hashlib
 import json
-from marker.converters.pdf import PdfConverter
-from marker.models import create_model_dict
-from marker.config.parser import ConfigParser
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +12,7 @@ logger = logging.getLogger(__name__)
 MARKER_CONFIG = {
     "output_format": "markdown",
     "force_ocr": True,
-    "num_workers": 8  # Using Marker's built-in parallelization
+    "num_workers": 8
 }
 
 class FileProcessor:
@@ -25,21 +22,36 @@ class FileProcessor:
         self.store_path = Path(store_path)
         self.metadata_file = self.store_path / "metadata.json"
         self.metadata = self._load_metadata()
-        
-        # Initialize Marker converter
-        self.config_parser = ConfigParser(MARKER_CONFIG)
-        self.pdf_converter = PdfConverter(
-            config=self.config_parser.generate_config_dict(),
-            artifact_dict=create_model_dict(),
-        )
-        logger.info("Marker PDF converter initialized")
+        self.pdf_converter = None  # Initialize converter only when needed
+        logger.info(f"FileProcessor initialized for store: {store_path}")
+
+    def _initialize_marker(self):
+        """Lazy initialization of Marker converter"""
+        if self.pdf_converter is None:
+            try:
+                from marker.converters.pdf import PdfConverter
+                from marker.models import create_model_dict
+                from marker.config.parser import ConfigParser
+                
+                logger.info("Initializing Marker PDF converter...")
+                self.config_parser = ConfigParser(MARKER_CONFIG)
+                self.pdf_converter = PdfConverter(
+                    config=self.config_parser.generate_config_dict(),
+                    artifact_dict=create_model_dict(),
+                )
+                logger.info("Marker PDF converter initialized successfully")
+            except Exception as e:
+                logger.error(f"Error initializing Marker: {e}")
+                raise
 
     def _pdf_to_text(self, pdf_path: Path) -> str:
         """Convert PDF to text using Marker"""
         try:
-            logger.info(f"Converting {pdf_path} to text using Marker...")
+            # Initialize Marker only when needed
+            if self.pdf_converter is None:
+                self._initialize_marker()
             
-            # Convert PDF using Marker
+            logger.info(f"Converting {pdf_path} to text using Marker...")
             rendered = self.pdf_converter(str(pdf_path))
             text = rendered.markdown
             
@@ -86,6 +98,17 @@ class FileProcessor:
             return results
         
         logger.info(f"Found {len(pdf_files)} PDF files to check")
+        
+        # Check for new or modified PDFs before initializing Marker
+        new_files_exist = any(
+            str(pdf) not in self.metadata["files"] or 
+            self.metadata["files"][str(pdf)]["hash"] != self._calculate_hash(pdf)
+            for pdf in pdf_files
+        )
+        
+        if not new_files_exist:
+            logger.info("No new or modified PDFs found")
+            return {pdf.name: "skipped" for pdf in pdf_files}
         
         # Process each PDF file
         for pdf_path in pdf_files:
