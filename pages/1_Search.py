@@ -268,7 +268,7 @@ with st.sidebar:
         
         if selected_store == "Create New...":
             new_store = st.text_input("Store Name")
-            if st.form_submit_button("Create Store"):
+            if st.form_submit_button("Select / Create a Store"):
                 if new_store:
                     store_path = create_store_directory(new_store)
                     if store_path:
