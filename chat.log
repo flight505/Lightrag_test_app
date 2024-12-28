@@ -8347,3 +8347,30 @@ Current query: What are the main themes explored in A Christmas Carol?
 2024-12-28 21:12:50,795 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
 2024-12-28 21:12:50,795 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
 2024-12-28 21:12:50,795 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 21:14:51,421 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:14:51,421 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:14:51,421 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:14:51,421 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:14:51,421 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:14:51,423 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:14:51,423 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:14:51,423 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:14:51,423 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:14:51,423 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:15:01,314 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-28 21:15:01,314 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-28 21:15:01,314 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-28 21:15:01,314 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-28 21:15:01,314 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-28 21:19:57,330 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:19:57,330 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:19:57,330 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:19:57,330 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:19:57,331 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:19:57,331 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:19:57,331 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:19:57,331 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:19:57,333 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-28 21:19:57,333 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-28 21:19:57,333 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-28 21:19:57,333 - __main__ - INFO - Query completed in Hybrid mode

@@ -1,7 +1,6 @@
 import logging
 import os
 from typing import Dict, List, Optional, Tuple, Any
-import re
 
 import pandas as pd
 from termcolor import colored
@@ -93,25 +92,6 @@ class ResponseProcessor:
             logger.error(error_msg)
             raise
 
-    def format_equation(self, latex: str) -> str:
-        """Format LaTeX equation for better readability"""
-        # Clean up LaTeX notation
-        formatted = latex.replace(r'\mathit{', '')
-        formatted = formatted.replace('}', '')
-        
-        # Add spacing for readability
-        formatted = formatted.replace('+', ' + ')
-        formatted = formatted.replace('-', ' - ')
-        formatted = formatted.replace('*', ' × ')
-        formatted = formatted.replace('=', ' = ')
-        
-        # Format fractions
-        if r'\frac' in formatted:
-            # Add line breaks for fractions
-            formatted = formatted.replace(r'\frac', '\n\\frac')
-        
-        return formatted
-
     def format_full_response(
         self, query: str, result: Dict[str, Any]
     ) -> str:
@@ -129,23 +109,7 @@ class ResponseProcessor:
             mode = result.get("mode", "Unknown")
             sources = result.get("sources", [])
 
-            # Format equations in response
-            equation_pattern = r'\$\$(.*?)\$\$'
-            def replace_with_formatted(match):
-                eq = match.group(1)
-                formatted_eq = self.format_equation(eq)
-                return f"""
-                ### Equation:
-                ```math
-                {formatted_eq}
-                ```
-                
-                ### Human-Readable Form:
-                {self.explain_equation(formatted_eq)}
-                """
-
-            response = re.sub(equation_pattern, replace_with_formatted, response)
-
+            logger.debug(f"Formatting full response for query: {query}")
             formatted_sources = "\n".join([f"- {source}" for source in sources]) if sources else "No sources provided."
 
             return f"""
@@ -163,7 +127,9 @@ class ResponseProcessor:
             """
 
         except Exception as e:
-            logger.error(f"Error formatting response: {e}")
+            error_msg = f"Error formatting full response: {str(e)}"
+            print(colored(error_msg, "red"))
+            logger.error(error_msg)
             raise
 
     def save_response_history(
@@ -221,19 +187,3 @@ class ResponseProcessor:
         except Exception as e:
             logger.error(f"Error extracting key points: {e}")
             return []
-
-    def explain_equation(self, latex: str) -> str:
-        """Generate human-readable explanation of equation"""
-        explanations = {
-            'sum': 'Sum of',
-            'frac': 'divided by',
-            '|': 'absolute value of',
-            '_in act': 'actual value',
-            '_pr ad': 'predicted value',
-        }
-        
-        explanation = latex
-        for term, meaning in explanations.items():
-            explanation = explanation.replace(term, meaning)
-            
-        return explanation
