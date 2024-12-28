@@ -6,6 +6,13 @@ Tone and Communication
 	•	Avoid high-level overviews; focus on practical code or precise details when explaining or fixing.
 	•	Format code according to my Prettier preferences when providing solutions.
 
+Documentation
+	•	Always insure we check the @LightRAG_examples and @Lightrag_pypi when creating new code. 
+	•	Use the `project.md` file for the project plan.
+	•	Always use the @Streamlit_144 for streamlit code, this contains the current options for streamlit. 
+	•	The @Streamlit documentation is the best place to find the current methods and functions for streamlit. 
+
+
 Content Approach
 	•	Ensure responses are accurate, complete, and well-documented.
 	•	Suggest ideas or solutions that I may not have considered, anticipating my needs.
