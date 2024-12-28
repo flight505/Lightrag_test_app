@@ -1,0 +1,441 @@
+# scientific reports
+
+![](_page_0_Picture_3.jpeg)
+
+## OPEN Pharmacokineticpharmacodynamic modeling of maintenance therapy for childhood acute lymphoblastic leukemia
+
+Anna Gebhard10, Patrick Lilienthal1, Markus Metzler2, Manfred Rauh², Sebastian Sager², Kjeld Schmiegelow3/4, Linea Natalie Toksvang3,5 & Jakob Zierk2,5
+
+ln the treatment of childhood acute lymphoblastic leukemia (ALL), current protocols combine initial high-dose multiagent chemotherapy with prolonged oral therapy with 6-mercaptopurine (6MP) and low-dose methotrexate (MTX) maintenance therapy. Decades of research on ALL treatment have resulted in survival rates of approximately 90%. However, dose-response relationships vary widely between patients and insight into the influencing factors, that would allow for improved personalized treatment management, is insufficient. We use a detailed data set with measurements of thioquanine nucleotides and MTX in red blood cells and absolute neutrophil count (ANC) to develop pharmacokinetic models for 6MP and MTX, as well as a pharmacokinetic-pharmacodynamic (PKPD) model capable of predicting individual ANC levels and thus contributing to the development of personalized treatment strateqies. Here, we show that integrating metabolite measurements in red blood cells into the full PKPD model improves results when less data is available, but that model predictions are comparable to those of a fixed pharmacokinetic model when data availability is not limited, providing further evidence of the quality of existing models. With this comprehensive model development leading to dynamics similar to simpler models, we validate the suitability of this model structure and provide a foundation for further exploration of maintenance therapy strategies through simulation and optimization.
+
+Acute lymphoblastic leukemia (ALL) is the most common pediatric malignancy and is characterized by the pathological proliferation of malignant lymphoblasts with consecutive displacement of the normal hematopoiesis^2. Combination chemotherapy is the mainstay of treatment, and consists of induction, consolidation, and reinduction cycles, which are followed by oral maintenance therapy with low-dose methotrexate (MTX) and 6-mercaptopurine (6MP) until two years after start of treatment. During maintenance therapy, the doses of MTX and 6MP are adjusted according to patients' blood counts, including the white blood cell count (WBC) or the absolute neutrophil count (ANC)34. Even though survival rates of ALL have reached about 90%12, understanding the pharmacokinetics (PK) and pharmacodynamics (PD) during maintenance therapy remains an unmet challenge. One promising approach is deriving a comprehensive mathematical model and predicting the effect of MTX and 6MP on individual patients as well as personalizing treatment schedules during maintenance therapy. This is especially important as WBC shows natural variation between patients, indicating a need for individualized target ranges for maintenance therapy3,4.
+
+Developing models for treatment personalization in oncology by using mathematical modeling is an increasingly important approach5-7, and in the field of leukemia treatment, several models have already been
+
+1MathOpt group, Institute of Mathematical Optimization, Faculty of Mathematics, Otto von Guericke University Magdeburg, Magdeburg, Germany. ²Department of Pediatrics and Adolescent Medicine, University Hospital Erlangen, Erlangen, Germany. 3Department of Pediatrics and Adolescent Medicine, University Hospital Rigshospitalet, Copenhagen, Denmark. "Institute of Clinical Medicine, Faculty of Medicine, University of Copenhagen, Copenhagen, Denmark. *These authors contributed equally: Linea Natalie Toksvang and Jakob Zierk. email: anna.gebhard@ovgu.de
+
+constructed®, including the models in Le et al., Jost et al. and Jayachandran et al. in terms of ALL treatmentº¹¹. But the literature still lacks a model that is able to adjust the pharmacokinetics to individual patient measurements, which is extremely relevant as both MTX and 6MP display large interindividual pharmacokinetic variability3-12-14, resulting in widely different concentrations. We build on the model of Jost et al.1º to fill this gap by using a data set that does not only include observations of the ANC. but also of thioguanine nucleotides (E-TGN) and methotrexate (E-MTX) in the red blood cells. While the model of Jost et al.10 builds on ANC observations only and therefore does not estimate the pharmacokinetic parameters, but fixes them population wide, the more detailed data set used here allows for the additional estimation of individual pharmacokinetic parameters describing the drug concentration in the red blood cells. Our aim is to investigate if this can provide more accurate predictions for individual patients and to what extent the treatment dynamics are already modeled in sufficient detail.
+
+Using the aforementioned data set, we first develop and analyze solely pharmacokinetic models for MTX and 6MP which are able to predict the concentrations of E-MTX and E-TGN for individual patients. Following Jost et al.10, these models are then used in combination with the Friberg et al.15 model to construct a full pharmacokinetic-pharmacodynamic (PKPD) model replicating the effect of low-dose MTX and 6MP on ANC during maintenance therapy. This model is then compared to an estimation with the model by Jost et al.10, identifying scenarios where differences in model prediction accuracy occur.
+
+### Patients and methods
+
+The data used for modeling is a subset of the data set described in Schmiegelow et al.16, which was part Data. of the Nordic Society for Paediatric Haematology and Oncology (NOPHO) ALL-92 study"?. The protocol was approved by the ethical committee of Copenhagen (no. V.200.2080/91) as well as by the local ethical committees, and participants gave informed consent. All methods were performed in accordance with the relevant guidelines and regulations. Patients with precursor-B-cell childhood ALL were treated according to the NOPHO ALL-92 protocol with a combination of daily oral 6MP, weekly low-dose oral MTX, oral Prednisone, intravenous Vincristine, high-dose intravenous MTX and intrathecal MTX during maintenance therapy. Observations include regular measurements of the concentration of E-TGN and E-MTX in the red blood cells (both approximately monthly), and the ANC (approximately every other week). The 6MP and low-dose MTX treatment started with dosages of 75 mg/m²/day (6MP) and 20 mg /m²/week (MTX), which were reduced (increased) in the control group if the WBC count was below (above) the target range of 1.5 to 3.5 G/L, and suspended if either the WBC was less than 1.0 G/L or the thrombocyte count was below 100 G/L. The pharmacology group's treatment was additionally adjusted according to the product of E-TGN and E-MTX measurements, with an increase in dosage if the product of E-TGN and E-MTX fell below 1,350 (nmol/mmol hemoglobin [Hb])2. Our model focuses similar to Jost et al. on the ANC, leading to a target range of 0.5 to 2.0 G/L, although different ANC targets are used in other studies10.
+
+Since 6MP and low-dose MTX constitute the foundation for current protocols for maintenance therapy>4, we focused on modeling the effect of both and therefore excluded the time period with high-dose intravenous MTX. Additionally, our model depends on observations of E-TGN and E-MTX as initial values. The data set of each patient thus begins with the first measurement of E-TGN and E-MTX 28 days after the last high-dose intravenous MTX treatment. Further exclusion of data occurred in the following three cases in which parameter estimation would not have been possible: i) patients with less than two E-TGN or E-MTX observations, ii) patients with no 6MP or MTX dose, and iii) patients with no height, weight, or ANC observation. After these adjustments, the data set consisted of 452 patients with 4624 E-TGN, 4192 E-MTX, and 9808 ANC observations (Table 1). In the original data, both E-MTX and E-TGN were measured in nmol/mmol Hb. For unit consistency in our model, we converted both observations to umol/L by assuming a molecular weight for hemoglobin of 64458 g/mol and a concentration of hemoglobin in erythrocytes of 330 g/L18.
+
+Population pharmacokinetic-pharmacodynamic modeling. The overall aim of our approach is to develop a model that is able to replicate the effects of low-dose MTX and 6MP on the individual patient's ANC. We build two PK models for MTX and 6MP that predict the concentrations of E-TGN and E-MTX in the red blood cells, which are then used as input for the effect function that models a decreasing renewal rate of proliferating cells in response to an increase in E-TGN or E-MTX. The full PKPD model is then able to predict the
+
+| Characteristic | Median | Range (min-max) |
+| --- | --- | --- |
+| Age (years) | 5.9 | 2.4-16.9 |
+| Weight (kg) | 21.5 | 10.3-105.5 |
+| Height (cm) | 114.0 | 81.5-180.0 |
+| 6MP daily dose (mg/m2) | 57.1 | 5.4-175.0 |
+| MTX weekly dose (mg/m2) | 15.0 | 1.3-45.0 |
+| E-TGN (µmol/L) | 0.83 | 0-7.6 |
+| E-MTX (umol/L) | 0.026 | 0-0.10 |
+| ANC (G/L) | 1.6 | 0-22.5 |
+
+Table 1. Demographic and clinical characteristics of the patient population.
+
+. . . . . . . . . . . . . . . .
+
+![](_page_2_Figure_1.jpeg)
+
+#### Conclusion:
+
+Usually mathematical myelosuppression models are trained with absolute neutrophil count (ANC) data. For the first time we evaluated the impact of additional measurements of drug concentration in the red blood cells. The results are better model-data fits for sparse intracellular and ANC data.
+
+..
+
+![](_page_2_Figure_4.jpeg)
+
+Figure 1. Visual abstract displaying an overview of the modeling process, the resulting model and simulated trajectories.
+
+ANC devending on the MTX and 6MP dose. Along the lines of Schmiegelow et al.19 we derive the MTX and 6MP PK models to replicate the metabolism and interaction of MTX and 6MP (cf. Supplementary Figures S1 – 3 online for a comparison to Figure 3 in Schmiegelow et al.19 and Figure 1 in Toksvang et al.3). An overview of all investigated model variants can be found in Supplementary Table S3 online.
+
+Methotrexate pharmacokinetics. In line with previously published models9 20-22, our PK compartment model for MTX describes the concentration of MTX including plasma and intracellular concentrations.
+
+Panetta et al. use the data of MTX plasma levels and MTX and methotrexate polyglutamate (MTXPG) observations in leukemia cells of 194 patients with newly diagnosed ALL to model the concentration of MTX and MTXPG in leukemia cells during the treatment of childhood ALL with high-dose MTX infusionselv 4'. The 2-compartment model describing the plasma concentrations is complemented by two compartments modeling the intracellular kinetics with influx being described by Michaelis-Menten kinetics and the efflux by a linear elimination rate. The model by Korell et al. is based on MTXPG measurements in the red blood cells of 48 adult patients with rheumatoid arthritis treated with low-dose oral or subcutaneous MTX22. The parameters of the 2-compartment plasma PK model with first-order absorption were fixed for all patients, the parameter estimation was limited to a subset of those of the five compartments describing the intracellular kinetics with the influx from the plasma being modeled using a linear rate, and the elimination from the red blood cells being described by a clearance parameter. Le et al. build their model on the work of Panetta et al., while replacing the 2-compartment plasma PK model with a 1-compartment model with first-order absorption and fixed parameters® 20,21.
+
+With these three models as a starting point, we analyzed different model variants to find the best fit for our data. The two major components we modified were the plasma PK model and the intracellular kinetics. Since our data included no plasma levels of MTX, we followed Korell et al. and Le et al. and fixed the parameters of the plasma PK model for all patients322. The different models we tested were a 2-compartment model with firstorder absorption and the parameter values based on Panetta et al. and Le et al.8-20,21, the same plasma PK model with dose-dependent bioavailability calculated according to Ogungbenro et al.23 and a plasma PK model based on Medellin–Garibay et al. with covariate-dependent parameter values24. An overview of the parameter values (Supplementary Table S1 online) and a summary of the calculation of the parameter values can be found in the supplementary information online. The intracellular kinetics were estimated as fixed effects with interindividual variability and either modeled as linear or Michaelis-Menten influx kinetics combined with a linear elimination rate. The influx of MTX into the red blood cells is typically based on the central compartment describing the plasma concentrations? 20-22, but there is also evidence that the integration of MTX into the red blood cells occurs in the bone marrow45-20. To account for this possibility, we also included model variants with the influx of MTX into the red blood cells based on the peripheral compartment. Supplementary Figure S4 online illustrates the resulting structurally different compartment model variants with the corresponding system of ordinary differential equations (ODEs) below:
+
+$\frac{dX_{G\!I}^{MTX}}{dt}=-k_{a}^{MTX}\cdot X_{G\!I}^{MTX}$ (MTX1)
+
+$$\frac{dX_{C}^{MTX}}{dt}=k_{a}^{MTX}\cdot X_{Gl}^{MTX}-k_{e}^{MTX}\cdot X_{C}^{MTX}-k_{p}\cdot X_{C}^{MTX}+k_{pc}\cdot X_{p}^{MTX}$$ (MTX2)
+
+$\frac{dX_{p}^{MTX}}{dt}=k_{cp}\cdot X_{C}^{MTX}-k_{pc}\cdot X_{p}^{MTX}$ (MTX3)
+
+Linear kinetics, central compartment
+
+$\frac{dX_{E}^{MTX}}{dt}=K_{in}^{MTX}\cdot\frac{X_{C}^{MTX}}{V_{C}^{MTX}}-K_{\textit{eff}}^{MTX}\cdot X_{E}^{MTX}$ (MTX4a)
+
+Michaelis-Menten kinetics, central compartments
+
+$$\frac{dX_{E}^{MTX}}{dt}=\frac{V_{mm}^{MTX}\cdot X_{C}^{MTX}/V_{C}^{MTX}}{K_{mm}^{MTX}+X_{C}^{MTX}/V_{C}^{MTX}}-K_{\textit{eff}}^{MTX}\cdot X_{E}^{MTX}$$ (MTX4b)
+
+Linear kinetics, peripheral compartment:
+
+$$\frac{dX_{E}^{MTX}}{dt}=K_{in}^{MTX}\cdot\frac{X_{p}^{MTX}}{V_{p}^{MTX}}-K_{\textit{eff}}^{MTX}\cdot X_{E}^{MTX}$$ (MTX4c)
+
+Michaelis-Menten kinetics, peripheral compartment:
+
+$$\frac{dX_{E}^{MTX}}{dt}=\frac{V_{mm}^{MTX}\cdot X_{b}^{MTX}/\,V_{b}^{MTX}}{K_{mm}^{MTX}+X_{b}^{MTX}/\,V_{b}^{MTX}}-K_{\textit{off}}^{MTX}\cdot X_{E}^{MTX}$$ (MTX4d)
+
+Following previously published models, we assumed the influx and efflux of MTX into and out of the red blood cells to not have any noticeable effect on the concentration in the central compartment20-22. It was not possible to initialize all compartments with 0 as the data set for estimations includes only observations after the onset of maintenance therapy and MTX is accumulated in the red blood cells. We therefore initialized the compartments in the following way:
+
+$$X_{GI}^{MTX}(0)=0$$
+
+$$X_{C}^{MTX}(0)=0$$
+
+$$X_{P}^{MTX}(0)=0$$
+
+$$X_{E}^{MTX}(0)=\text{INITMX}$$
+
+with INIMTX being the first observation in the data set at time point 0. For the most promising MTX PK model variant, we also tested an estimation of the initial value with XMTX (0) modeled as a patientspecific parameter, and the possibility to let XMTX (0) vary according to the residual error model with X MTX (0) = (INIMTX - o2MTX . n2NIMTX ) (1 + o MTX ` . p[NIMTX )
+
+6-mercaptopurine pharmacokinetics. The starting point for constructing the 6MP pharmacokinetic model were the previously published models by Hawwa et al. and Jayachandran et al.11,29 Hawwa et al. use data from 19 children with ALL receiving 6MP during maintenance therapy to build a 3-compartment model with one compartment and first-order absorption describing the plasma levels of 6MP as well as two compartments modeling the intracellular 6MP metabolites 6-thioguanine nucleotides and 6-methylmercaptopurine nucleotides using linear kinetics 30. The parameters for the plasma PK model were fixed to values from the literature, while the parameters for the intracellular dynamics were estimated using NONMEM. Jayachandran et al. use the same structural model for their 6MP PK model as Hawwa et al., but describe the influx in the red blood cells by Michaelis-Menten kinetics 11/30. Data from the literature was used for estimation and most parameters were fixed to values from the literature, including Hawwa et al.29.
+
+We follow both models in describing the plasma kinetics of 6MP with a 1-compartment model with first-order absorption and fixed parameter values but use mainly the results of Lennard et al. for calculating the parameters®. Even though Lennard et al. perform a non-compartmental analysis of the data of 19 patients with childhood ALL during maintenance therapy30, it is possible to determine the parameters of a 1-compartment model with the resulting values. Supplementary Table S2 online shows an overview of the parameters, the calculation is detailed in the supplementary information online. Similar to the MTX PK model, the intracellular kinetics of 6MP were estimated as fixed effects with interindividual intervariability and either modeled as linear or Michaelis-Menten influx kinetics combined with a linear elimination rate, resulting in the model variants PK.MP and
+
+6/MP. Both compartment models are visualized in Supplementary Figure S5 online and are described by the following ODE system:
+
+$\frac{dX_{\mathit{GI}}^{6\mathit{MP}}}{dt}=-k_{a}^{6\mathit{MP}}\cdot X_{\mathit{GI}}^{6\mathit{MP}}$ (6MP1)
+
+$$\frac{dX_{G\bar{l}}^{6MP}}{dt}=k_{a}^{6MP}\cdot X_{G\bar{l}}^{6MP}-k_{e}^{6MP}\cdot X_{C}^{6MP}\tag{6MP2}$$
+
+Linear kinetics:
+
+$$\frac{dX_{E}^{6MP}}{dt}=K_{in}^{6MP}\cdot\frac{X_{C}^{6MP}}{V_{C}^{6MP}}-K_{\textit{eff}}^{6MP}\cdot X_{E}^{6MP}\tag{6MP3a}$$
+
+Michaelis-Menten kinetics:
+
+$$\frac{dX_{E}^{6MP}}{dt}=\frac{V_{mm}^{6MP}\cdot X_{C}^{6MP}/\,V_{C}^{6MP}}{K_{mm}^{6MP}+X_{C}^{6MP}/\,V_{C}^{6MP}}-K_{\textit{eff}}^{6MP}\cdot X_{E}^{6MP}\tag{6MP3b}$$
+
+We again assume the influx and efflux of 6MP into and out of the red blood cells to not influence plasma kinetics and initialize the compartments similar to the MTX PK model with the first observation INITGN in the following way:
+
+$$X_{G\bar{I}}^{\xi\rm M\!P}(0)=0$$
+
+$$X_{C}^{\xi\rm M\!P}(0)=0$$
+
+$$X_{E}^{\xi\rm M\!P}(0)=\mbox{INITGN}$$
+
+For the most promising 6MP PK model variant, we again also tested an estimation of the initial value with Xplur (0) modeled as a patient-specific parameter, and the possibility to let X200 (0) vary according to the residual error model with X½MP (0) = (INITGN = σ§MP . ηĮΝΙΤGΝ ) / (1 + σ.6MP . ηĮΝΙΤGΝ )
+
+The full PKPD model was then built combining the two PK models with the state-of-Pharmacodynamics. the-art myelosuppression model by Friberg et al.15 following Le et al. and Jost et al.8 10 The additional part of the model consists of five compartments with one compartment describing the proliferating cells, three transit compartments, and one compartment modeling the mature cells circulating in the blood (cf. Supplementary Figure S6 online, where this part of the PKPD model is visualized). The PK and the PD parts of the model are linked by a linear effect function which models the effect of the concentrations of MTX and TGN in the red blood cells on the proliferating rate. We tested different effect functions based on either E-TGN alone or on E-TGN and E-MTX combined. The PD part of the model is described by the ODE system below:
+
+$\frac{dX_{\mathit{prd}}}{dt}=k_{tr}\cdot X_{\mathit{prd}}\cdot\left(1-E_{\mathit{drug}}\right)\cdot\mathit{fb}-k_{tr}\cdot X_{\mathit{prd}}$ (PKPD1)
+
+$\frac{dX_{tr1}}{dt}=k_{tr}\cdot(X_{prd}-X_{tr1})$ (PKPD2)
+
+$\frac{dX_{tr2}}{dt}=k_{tr}\cdot(X_{tr1}-X_{tr2})$ (PKPD3)
+
+$\frac{dX_{tr3}}{dt}=k_{tr}\cdot(X_{tr2}-X_{tr3})$ (PKPD4)
+
+$\frac{dX_{ma}}{dt}=k_{tr}\cdot X_{tr3}-k_{circ}\cdot X_{ma}$ (PKPD5)
+
+with
+
+$b=\left(\frac{base}{X_{ma}}\right)^{\gamma}$ (PKPD6)
+
+Effect function based on E-TGN:
+
+$E_{drag}=slope^{0M^{\prime}}\cdot X_{E}^{0M^{\prime}}$ (PKPD7a)
+
+Effect function based on E-TGN and E-MTX
+
+(PKPD7b)
+
+$$E_{d r a g}=s l o p e^{6M P}\cdot X_{E}^{6M P}+s l o p e^{M T X}\cdot X_{E}^{M T X}$$
+
+Similar to Jost et al.10 we fixed both the proliferating rate of the first compartment and Kcirc, with kprol = ktr and kijir = 2.3765 1/day. Due to the data set beginning after weeks of treatment during maintenance therapy, we cannot assume Xma(0) = base as an initial state. Instead, we assume to have reached a treatment steady state with an additional parameter inieff describing the drug effect at the initial time point and X,m(0) = inieff · base, leading to the initial states below.
+
+$X_{\rm{f}r1}(0)=$ _inieff $\cdot$ base $\cdot$_$\frac{k_{\rm{f}r2}}{k_{\rm{f}r}}$
+
+$X_{\rm{f}r2}(0)=$ _inieff $\cdot$ base $\cdot$_$\frac{k_{\rm{f}r2}}{k_{\rm{f}r}}$
+
+$X_{\rm{f}r3}(0)=$ _inieff $\cdot$ base $\cdot$_$\frac{k_{\rm{f}r2}}{k_{\rm{f}r}}$
+
+$X_{\rm{f}r3}(0)=$ _inieff $\cdot$ base $\cdot$_$\frac{k_{\rm{f}r2}}{k_{\rm{f}r}}$
+
+$X_{\rm{f}r2}(0)=$ _inieff $\cdot$ base $\cdot$_
+
+Additionally to the resulting model variants, we also estimated the model of Jost et al. with our data set to be able to compare the results of integrating individual E-TGN and E-MTX measurements in the model developing process in contrast to a fully fixed pharmacokinetic submodel10.
+
+Interindividual Variability and residual error model. Using the nonlinear mixed effects (NLME) approach for parameter estimation, we assumed a log-normal distribution for the interindividual variability of all models as is conventional in the literature leading to the following description of the patient-specific parameters 0,5 with 0 = (04) as the vector of fixed effect parameters, k in {K;MTX , v;MTX , x;MTX , r>MTX , r>MP , v76MP , v76MP , v76MP , v offer , base, ktr, slope 6MP, slopeMTX, y, inieff } and i=1,...,n as the patient indices:
+
+$$\theta_{i}^{k}=\theta^{k}\cdot\exp(\eta_{i}^{k})$$
+
+with each nd following a normal distribution N(0, ως). After obtaining the first estimation results of the PK models, we added two model variants PK2MTX
+100 model variants PK2MTX 10 where K.MTX = KMTX and KMM, = KMM * and KMM, = KMM are not associated with any interindividual variability, see Section "Results" for further discussion.
+
+We tested different residual error models for both PK models with the best performing being a combined additive-proportional model:
+
+$$Y_{i j}^{P K}=X_{E}^{P K}\left(t_{i j}\right)+X_{E}^{P K}\left(t_{i j}\right)\cdot\epsilon_{i j}^{P K,1}+\epsilon_{i j}^{P K,2}$$
+
+with i=1, ... ,n as the patient indices, j=1, ... ,m as the patient-specific observations, and the error terms e PK1 ~ N(0, σρκ , ) and e PK2 ~ N(0, σβκ 2) normally distributed. We compared the results of the most promising PK model variants with changing the residual error model to a purely additive (Y ; } = X { ( ;j ) + <; a purely proportional residual error model (Y.RK = XBK (tij) + XPK (tij) · Enk ).
+
+For the PD model, we used a proportional residual error model as this gives more weight to small values of the ANC observations, which are particularly important for treatment outcome:
+
+$$Y_{i j}^{A N C}=X_{m a}{\big(}t_{i j}{\big)}+X_{m a}{\big(}t_{i j}{\big)}\cdot\epsilon_{i j}^{A N C}$$
+
+with i=1,...,n as the patient indices, j=1,...,m400 as the patient-specific observations, and the error term EANC ~ N (0, o &NC) normally distributed.
+
+The cross-validation data set was constructed by determining the time point 50% of the Cross-validation. ANC observations lie before per patient and using this as a cut off point for E-MTX, E-TGN and ANC observations. Patients were excluded from this data set for the same reasons as described in Section "Data".
+
+Sensitivity analysis. A sensitivity analysis of the final PKPD model was conducted for all fixed parameters by determining the 95% confidence intervals of the absorption rate k,600 = 21.07, the elimination rate k6001 = 15.40 and the central volume V8MP, the interval from 50% to 150% of the bioavailability F=0.12, as no information on the standard error was available, and the 95% confidence interval of to 5- 0.29 and computing the death rate of mature neutrophils kgive = ln(2)/tg.5 correspondingly. After that, 100 simulations with the disturbed parameters equally spaced in the interval were performed. One of the fixed parameters was varied in each simu-
+
+lation round, while all other fixed parameters were left at their original value and all estimated parameters were fixed to the population parameter values. The resulting ANC trajectories were then compared to the reference ANC trajectory simulated with the original values of the fixed parameters by computing the absolute distance at each time step.
+
+Software. The software used for parameter estimation was NONMEM 7.5, the PK models were estimated with first-order conditional estimation with interaction (FOCEi), the full PKPD model with a combination of Monte Carlo Importance Sampling Expectation Maximization (IMP) and Stochastic Approximation Expectation Maximization (SAEM). Perl speaks NONMEM (PsN) was used to create the visual predictive checks31. Model analysis and simulation was done with Python 3.10 using CasADI and CVODES23,33
+
+#### Results
+
+Methotrexate Pharmacokinetics. We compared 20 different MTX PK models to find the most suitable model, the overview of the parameter estimation can be found in Supplementary Table S4 online. There, the objective function value, RMSEs and MAEs of the individual predictions of all model variants are presented and evaluated in the same section of the supplementary information online. Analysing the results led to two structurally different model variants as best candidates for the MTX PK model, namely PK filio lin.per, with linear
+
+kinetics and PKMTX
+
+a Comparing the cross-validation of both, PK-MTX
+Comparing the cross-validation of both, PK-MIX, bir-p-, leads to more robust results, with not only the РКМТХ MIA
+fix,mm,cent,pop parameters shows good agreement (cf. Supplementary Figure S8 online), too. Details of the comparison can be found in the supplementary information online.
+
+Taking all results into account, even though the model PK; value, the model PK ][ to work well enough in the low-dose MTX regime. This is entirely unsurprising, as Michaelis-Menten kinetics generally behave similar to linear kinetics for low concentrations. Additionally, when comparing the individual patient traiectories of both models, almost no differences are visible (cf. Supplementary Figure S9 online).
+
+Supplementary Figure S10 online depicts the goodness-of-fit plot of the final model variant PKMTX
+
+for the cross-validation and Supplementary Figure S11 online for the estimation using the whole data set, both showing a good agreement of observed with predicted E-MTX values. Supplementary Figure S12 online displays the visual predictive check for this model with 1000 simulations with the final parameter values, both the median and the 2.5th percentile leading to similar results for the observed and predicted E-MTX values, while the 97.5th percentile of the observations lies most of the time slightly below the 95% CI of the predictions.
+
+6-mercaptopurine pharmacokinetics. We compared two structurally different models for the 6MP pharmacokinetics: Michaelis–Menten and linear influx kinetics, resulting in the model variants PK,ML,oo and
+
+| Fixed effects parameters with RSE in % |  |  |
+| --- | --- | --- |
+| KMTX[1/day] | 0.031 (5) | 0.030 (6) |
+| 11/day] | 0.018 (5) | 0.019 (5) |
+| CV with 95% CI, n-Shrinkage in % and p-values |  |  |
+| VMTX | 34 [29, 38], 29, 0.22 | 37 [32, 42], 32, 0.12 |
+|  | 31 [26,35], 32, 0.45 | 21 [14, 27], 53, 0.24 |
+| Residual unexplained variability |  |  |
+| Additive residual error | 0.000018 (7) | 0.000021 (15) |
+| Proportional residual error | 0.024 (8) | 0.0068 (56) |
+| Errors of the individual predictions |  |  |
+| Median of RMSEs | 0.0042 (0.0028) | 0.0054 (0.0045) |
+| Mean of RMSEs | 0.0047 (0.0028) | 0.0064 (0.0045) |
+| Median of MAEs | 0.0033 (0.0022) | 0.0041 (0.0035) |
+| Mean of MAEs | 0.0036 (0.0022) | 0.0049 (0.0035) |
+
+Table 2. Parameter values of the model PKMTX
+bio,lin,peri estimated with the whole and the cross-validation data set, relative standard error (RSE) of fixed effect parameters and residual unexplained variability in brackets. RMSEs and MAEs of the patient trajectories computed with the individual patient parameters are each calculated for the whole data set with the standard deviation in brackets. Coefficients of variation (CV) are exp(@2) - 1 with w2 as the variance of the interindividual variability estimated by NONMEM, calculated as and the 95% CI being calculated accordingly.
+
+| Fixed effects parameters with RSE in % |  |  |
+| --- | --- | --- |
+| [umol/L/day] | 0.096 (8) | 0.067 (29) |
+| 6MP [umol/L] | 0.016 (10) | 0.0021 (206) |
+| 1/day] | 0.041 (8) | 0.039 (10) |
+| CV with 95% CI, n-Shrinkage in % and p-values |  |  |
+| TTGMP 2777777 | 52 [44, 59], 26, 0.38 | 40 [33, 47], 36, 0.18 |
+|  | 50 [42, 57], 30, 0.63 | 40 [34, 46], 38, 0.43 |
+| Residual unexplained variability |  |  |
+| Additive residual error | 0.023 (9) | 0.021 (10) |
+| Proportional residual error | 0.064 (5) | 0.059 (7) |
+| Errors of the individual predictions |  |  |
+| Median of RMSEs | 0.21 (0.16) | 0.26 (0.26) |
+| Mean of RMSEs | 0.24 (0.16) | 0.32 (0.26) |
+| Median of MAEs | 0.17 (0.13) | 0.19 (0.21) |
+| Mean of MAEs | 0.19 (0.13) | 0.24 (0.20) |
+
+Table 3. Parameter values of the model PKSMLpop estimated with the whole and the cross-validation data set, relative standard error (RSE) of fixed effect parameters and residual unexplained variability in brackets. RMSEs and MAEs of the patient trajectories computed with the individual patient parameters are each calculated for the whole data set with the standard deviation in brackets. Coefficients of variation (CV) are calculated as 'exp(ω2) - 1 with ω as the variance of the interindividual variability estimated by NONMEM, and the 95% CI being calculated accordingly.
+
+PK2.00 as potential 6MP PK models (cf. Supplementary Table S6 online and the corresponding section in the supplementary information online for details of the evaluation).Table 3 shows the parameter values of the crossvalidation for the model PK MP., and the RMSEs and MAEs of the individual predictions of both the estimation using the whole data set and the cross-validation. The RMSEs and MAEs did increase only slightly, but K6MP changed similarly to KMITX, with its value decreasing one order of magnitude and its relative standard error reaching 206%. V ଲାଖିଂ and K [2017 showed only minor changes (cf. also Supplementary Figure S14 online, and the same section for a comparison to the cross-validation of the model variant PK;(10).
+
+Taking all results into account, the case is not as clear as for the MTX pharmacokinetics. Even though the model with linear kinetics seems to be more robust against estimating with fewer observations, the changes in the parameter values for the model with Michaelis–Menten kinetics are not as drastic. Additionally, both the mean of the η s differing significantly from 0 and the individual patient trajectories seem to suggest that Michaelis-Menten kinetics are necessary to characterize E-TGN dynamics. Furthermore, the goodness-of-fit plots of observed versus predicted values and the visual predictive checks prefer model ΡΚΩΜΩρον But even though model PK6MP 6MP led to overall better results, the decrease in K.M.P and its huge relative standard error led us to include model PKf.MP in the PKPD modeling to compare results again when estimating the full model.
+
+Pharmacodynamics. The objective function values and RMSEs and MAEs based on the individual predictions of all submodels of the five compared PKPD models can be found in Supplementary Table S8 online. Thorough evaluation of the results led to PKPD;Mm, , as the best performing model variant with Michaelis-Menten
+kinetics in the 6MP PK submodel and the eftect function based sole mation online for details of the model comparison).
+
+The results of this model variant are mostly similar to the PKPD/0st model, but distinct differences occur when computing the RSMEs and MAEs of the population predictions of the ANC. The errors of the PKPD®* model are almost twice as high (cf. Table 4 for a comparison with model PKPDMM - ), indicating that with no prior knowledge about the individual patient, the model estimated with integrating E-TGN observations performs better than the PKPD/0st model, which relies on values from the literature.
+
+The comparison of the RMSEs and MAEs of the individual predictions of the cross-validation of the model in.um - revealed similar medians and means for all three models, but differing results for the standard variant PKPDSMP deviations of the ANC errors (cf. Table 4 for the ANC errors and Supplementary Table S9 online for the E-MTX and E-TGN errors): the one of the model PKPD466 is about 2 times higher than the one of the model variant PKPD{;;;;m;, indicating more extreme deviations of the predicted ANC values from the observed ANC values. When comparing the results to those of the cross-validations of the PK submodels on their own, the RMSEs and MAEs show only negligible differences.
+
+Table 5 shows the results of the parameter estimation using the whole data set and for the cross-validation for the model PKPDMMm; The fixed effect parameter K.MM still decreases, but not as immensely as when estimating solely the 6MP PK model. The sharp increase in its relative standard error does not occur for the cross-validation of the full PKPD model. The coefficients of variation show only negligible changes for the cross-validation.
+
+|  | PKPDJos |  |
+| --- | --- | --- |
+| ANC errors of the population predictions |  |  |
+| Median of RMSEs | 2.12 (0.79) | 1.12 (0.61) |
+| Mean of RMSEs | 2.23 (0.79) | 1.27 (0.61) |
+| Median of MAEs | 1.87 (0.65) | 0.90 (0.39) |
+| Mean of MAEs | 1.91 (0.65 | 0.96 (0.39) |
+| ANC errors of the individual predictions for the cross-validation |  |  |
+| Median of RMSEs | 1.03 (2.31) | 1.07 (1.01) |
+| Mean of RMSEs | 1.38 (2.31) | 1.29 (1.01) |
+| Median of MAEs | 0.80 (1.40) | 0.79 (0.60) |
+| Mean of MAEs | 1.00 (1.40) | 0.94 (0.60) |
+
+Table 4. ANC errors of the population predictions of the estimation using the whole data set, and of the individual predictions of the cross-validation of models PKPD/0st and PKPDffff m.; RMSEs and MAEs are each calculated for the whole data set with the standard deviation in brackets.
+
+..
+
+|  | PKPDoMP |  | PKPD6MP " cross-validation |  |
+| --- | --- | --- | --- | --- |
+|  | Fixed effect parameters with RSE | CV with 95% CI, n-Shrinkage in % | Fixed effect parameters with RSE | CV with 95% CI, n-Shrinkage in % |
+|  | in % | and p-values | in % | and p-values |
+| KMTX[1/day] | 0.032 (1) | 34 [29, 38], 29, 0.75 | 0.029 (2) | 35 |30, 40 |, 34, 0.86 |
+| KMTX[1/day] | 0.019 (1) | 31 [26, 35], 30, 0.77 | 0.018 (1) | 26 [20, 31], 45, 0.72 |
+| V 6MP [umol/L/day] | 0.21 (4) | 56 [46, 65], 27, 0.97 | 0.13 (4) | 42 [34, 50], 35, 0.98 |
+| K 6MP [umol/L] | 0.14 (0.1) |  | 0.046 (7) |  |
+| K 6MP[1/day] | 0.050 (2) | 54 [45, 63], 29, 0.97 | 0.044 (2) | 44 [37, 51], 33, 0.91 |
+| base[G/L] | 2.17 (3) | 27 [24, 31], 22, 0.68 | 2.08 (4) | 29 [25, 32], 27, 0.78 |
+| ktr[1/day] | 0.15 (2) | 72 [60, 82], 35, 0.57 | 0.17 (3) | 72 [60, 84], 46, 0.65 |
+| slope6MP[L/umol] | 0.16 (4) | 81 [65, 97], 40, 0.68 | 0.15 (6) | 93 [68, 117], 45, 0.96 |
+| Y | 0.79 (5) | 11[8, 12], 49, 0.89 | 0.82 (10) | 15 [11, 18], 58, 0.54 |
+| inieff | 0.87 (22) | 54 [48, 59], 20, 0.63 | 0.88 (29) | 48 [42, 53], 27, 0.69 |
+| Residual unexplained variability |  |  |  |  |
+| Additive, MTX | 0.000018 (7) |  | 0.000022 (8) |  |
+| Proportional, MTX | 0.024 (8) |  | 0.0074 (25) |  |
+| Additive, 6MP | 0.024 (9) |  | 0.020 (10) |  |
+| Proportional, 6MP | 0.061 (5) |  | 0.051 (6) |  |
+| Proportional, ANC | 0.25 (2) |  | 0.22 (3) |  |
+
+Table 5. Parameter values of the model PKPDMB,,mm estimated with the whole and the cross-validation data set, relative standard error (RSE) of fixed effect parameters and residual unexplained variability in brackets. Coefficients of variation (CV) are calculated as √ exp(ω²) — 1 with ω² as the variance of the interindividual variability estimated by NONMEM, and the 95% CI being calculated accordingly.
+
+Comparing the results of the parameter estimation of the full PKPD model to those of the estimation of only the PK submodels (cf. Tables 2 and 3), there are no significant changes for the MTX PK submodel and for all coefficients of variation, while for the 6MP PK submodel, both VSMP and KSMP increase distinctly.
+
+e Figure 2 shows the goodness-of-fit plot of the final model variant PKPDPMM - 100s: validation and
+Supplementary Figure S20 online for the estimation using the whole dat observed and predicted E-MTX and E-TGN values, and more variation for the ANC values. Supplementary Figure S21 online displays the visual predictive check for this model with 1000 simulations with the final parameter values, both the median and the 97.5th percentile leading to similar results for the observed and predicted ANC values, while the 2.5th percentile of the observations lies most of the time slightly above the 95% CI of the predictions.
+
+Figure 3 displays the final model structure with the 6MP PK submodel, a detailed overview of the fixed parameter values and the ODE system of the final PKPD model can be found in the supplementary information online.
+
+Sensitivity analysis. The sensitivity analysis of the final PKPD model led to a maximal absolute distance to the reference ANC trajectory of 0.49 for the absorption rate k§MP, with smaller maximal absolute distances for all other fixed parameters, namely 0.12 for the bioavailability F6MP, 0.093 for the elimination rate KgMP, 0.11 for the central volume V8000 and 0.0013 for the death rate of mature neutrophils kcirc. The medians and inter-
+
+. . . . . . . . .
+
+![](_page_9_Figure_1.jpeg)
+
+![](_page_9_Figure_2.jpeg)
+
+![](_page_9_Figure_3.jpeg)
+
+![](_page_9_Figure_4.jpeg)
+
+quartile ranges of the trajectory with the maximal distance to the reference ANC trajectory can be found in Supplementary Table S12 online, plots of the results of all simulations of the sensitivity analysis in Supplementary Figures S24-28 online.
+
+### Discussion
+
+The mechanism of action of 6MP involves the sequential conversion to TGN and its subsequent incorporation into DNA (DNA-TG). Furthermore, methylated metabolites of 6MP generated by thiopurine methyltransferase (TPMT) directly inhibit purine de novo synthesis (PDNS), thereby increasing the incorporation of TGN into DNA. MTX works by depleting the cells of reduced folates as well as directly inhibiting PDNS, thereby working synergistically with methylated metabolites of 6MP to increase DNA-TG, which is considered their common downstream metabolite. (Supplementary Figures S1–S3)3 We therefore expected a rise in E-MTX and E-TGN to lead to a decrease in ANC. In the model, this is implemented by an effect function depending on either E-MTX, E-TGN or a combination of both, which reduces the proliferating rate and consequently, the number of proliferating cells, the cells in the transit compartments and ultimately, the ANC.
+
+We compared 20 different MTX PK models. For the application addressed here, the model combining fixed plasma pharmacokinetics based on Panetta et al.20.21, dose-adjusted bioavailability based on Ogungbenro et al.23 and linear kinetics modeling influx from the peripheral compartment into red blood cells proved to be the most appropriate. This model does not have the lowest objective function value but exhibits sufficiently good prediction of MTX dynamics in the low-dose MTX regime while being more robust to a reduction in the number of observations used for estimation than the models with Michaelis-Menten kinetics. This is in line with Korell et al.22 who built a model for low-dose MTX and also modeled the influx into the red blood cells by linear kinetics. While the transportation of MTX into the red blood cells is mainly a saturable process indicating the need for Michaelis–Menten kinetics13,34,35, for low concentrations, they are virtually indistinguishable from linear kinetics. Relying on linear kinetics in this case introduces the need to be especially careful though when simulating new treatment schedules to make sure to not reach MTX concentrations in the plasma where the dynamics would leave the linear phase of Michaelis–Menten kinetics, as linear kinetics are not able to describe the saturation that would occur for high MTX doses. Comparing the estimated fixed effect parameter values to those from the literature show excellent agreement for the elimination rate K MT = 0.018 1/day with Korell et al.
+
+reporting an elimination rate of 0.024 1/day22, Schalhorn et al. and Schrøder et al. reporting a half-life of 30–40 days and a mean half-life of 37 days of MTX in the red blood cells, respectively, resulting in an elimination rate of 0.017–0.023 1/day and 0.019 1/day²7/89. For the linear influx rate of our model, K;}][1X = 0.031 1/day, there are less results available in the literature with only Korell et al. reporting a much smaller rate of 0.0014 1/day². The reason for this discrepancy might be the different patient population, which consists of adults with rheumatoid arthritis in contrast to the here analyzed population of children with ALL22.
+
+The basis in the literature to draw from for the 6MP PK model was less comprehensive, leading to only one model for the plasma pharmacokinetics of 6MP based on the results of Lennard et al.30 Further comparison of the results of using linear versus Michaelis-Menten kinetics for the influx of 6MP into the red blood cells showed that for 6MP, Michaelis–Menten kinetics are necessary to adequately describe the dynamics. Still, the observations available were not sufficient to fully analyze all aspects of the Michaelis-Menten kinetics with no possibility to estimate the coefficient of variation of the parameter KS,,,,, and the reduced robustness against using less observations for the parameter estimation. There are several possible remedies for this: most obviously, increasing the number of observations available per patient, using a different timeline where it is possible to start the estimation at a point in time where the E-TGN compartment can be initialized with 0, and integrating observations for higher 6MP doses in the data set. Due to the limitations of our data set, it was not possible to include these remedies in our paper. The comparison of the estimated fixed effect parameter values to results from the literature is hindered by differences in units and structural models. Jayachandran et al. report a maximal influx into the red blood cells for Michaelis–Menten kinetics that is also integrated into the model of Le et al. and can be converted to about 0.23 µmol/L/day by assuming a mean corpuscular volume of 83 fL?-11.36, which is higher than the estimated V;;;;; = 0.096 µmol/L/day here, but similar to that estimated using the full PKPD model. Our estimated elimination rate of K.SMP = 0.041 1/day is at the same order of magnitude as that reported by Jayachandran et al. with 0.0714 1/day11.
+
+The full PKPD model was developed building on the model of Jost et al.10 by using the Friberg et al. model¹5, a linear effect function and either E-TGN or a combination of E-TGN and E-MTX as inputs. To further investigate the 6MP PK model, a variant with linear kinetics as well as a variant with Michaelis–Menten kinetics were integrated into the PKPD model and compared to each other. The final PKPD model relies only on E-TGN as input for the effect function and uses Michaelis-Menten kinetics for the 6MP PK model. The resulting fixed effect parameters for the 6MP PK submodel did differ from those stemming from estimating the PK model on its own, with V 别m² = 0.21 µmol/L/day and KSMP = 0.050 1/day now being closer to the results in Jayachandran et al.11 Additionally, the 6MP PK submodel is more robust against estimating with less data when integrated into the PKPD model with the parameters now varying not as much and the relative standard error not increasing as much compared to estimating the 6MP PK model on its own. Focusing on the PD submodel, the parameters base = 2.17 G/L, kg = 0.15 1/day and y = 0.79 are comparable to those reported in Jost et al. with base = 2.34 G/L, kg = 0.148 1/day and γ = 0.7690, which also testifies to both models replicating the same dynamics. The mean maturation time indicated by our model is comparable to that from Jost et al. with 20 days40,37. The slope of the effect function of this model differs with slope6610 = 0.16 L/umol from the Jost et al. one19, which must be converted due to unit differences in the E-TGN-compartment, resulting in a slope of 0.037 L/umol. This discrepancy might be explained by the 6MP PK dynamics in the model in Jost et al. being fixed for all patients''0, while the observations of E-TGN in our data allowed to vary parameters individually resulting in patient-wise differing E-TGN trajectories, which influences the size of the slope parameter. This might also contribute to the improved model performance compared to PKPD/081 when predicting patient trajectories by using the population parameters. The final parameter to discuss, inieff = 0.87, cannot be compared to values from the literature, as in contrast to previously published models? 10, the data used for this estimation begins in the middle of maintenance therapy and the assumption of Xma(0) = base does not hold. One limitation of our approach to estimate Xm(0) = inieff · base as a possibility to represent a steady treatment effect is that for some patients, the estimated inieff > 1, indicating a positive effect of the treatment. This could be circumvented by using a data set that allows the initialization of the first PD compartment with Xma(0) = base.
+
+All fixed effect parameter estimates of the final PKPD model - except for inieff - show relative standard errors of 5% or lower, testifying to the identifiability of the parameters. The relative standard error of inieff reaches 22%, again indicating the need for a data set with observations before the start of treatment to enable the direct estimation of base. For the coefficients of variation, all 95% CI lie closely around the parameter estimates (cf. Table 5), and the relative standard errors of the estimates for the residual unexplained variability reach a maximum of 9%, showing parameter identifiability to be unproblematic. There is no indication of over-parameterization of the model with the η-shrinkage reported in Table 5 lying mostly around 20-30% with a maximum shrinkage of 49%. Overall, even though the model requires the estimation of a relatively large number of parameters, identifiability seems to be no issue. The sensitivity analysis of this model led to a maximal distance of 0.49 to the reference ANC trajectory even in the most extreme case with the majority of the deviations of the disturbed trajectories lying well below that. This indicates that fixing these parameters does not influence the resulting ANC trajectories considerably, with the absorption rate k§MP being the most influential parameter of the fixed ones. Therefore, the model would benefit from a better data basis with the ability to determine the absorption rate with a smaller confidence interval.
+
+Compared to the results of Jost et al.10, the ANC trajectories resulting from our model display the same oscillations (cf. Figure 4 with the trajectories of one patient and Supplementary Figures S23 online). In contrast to the model of Jost et al.10 including E-TGN observations and therefore individual parameters for the intracellular pharmacokinetics, we see the RMSEs and MAEs of the individual ANC predictions resulting from the cross-validation varying less than when relying on values from the literature for the 6MP PK submodel as in Jost et al.10 indicating that individualizing this part of the model leads to more robust predictions even with fewer
+
+![](_page_11_Figure_1.jpeg)
+
+Figure 4. Treatment schedule, E-TGN and ANC trajectories resulting from the final PKPD model for one patient showing the relation between 6MP doses, E-TGN concentrations and the ANC.
+
+observations of E-TGN and ANC per patient. A similar advantage of the newly developed PKPD model holds true when comparing the results of the population predictions with the ANC observations of the individual patients: the model PKPD; predictions to the patient observations if no prior individual information is available. Overall, our model testifies to the quality (i.e., description of the so-called ground truth) of the model of Jost et al. when sufficient data is available, but performs better in circumstances with limited data availability¹9. This advantage has to be weighed against possible disadvantages of model complexification, such as estimates becoming more uncertain when increasing a model's effective dimension38.
+
+While our model seems to replicate the dynamics of ALL maintenance therapy well overall, its ability to reach the minima and maxima of the ANC is limited, in contrast to e.g., models of acute myeloid leukemia (AML) predicting especially the nadir of treatment cycles accurately33 40. The reason for this might be differences in population with the AML models using data of adult patients versus data of still developing pediatric patients, and time horizons with the treatment cycles of AML lasting around 30–50 days versus 1–2 years of maintenance therapy. With the Jost et al. model displaying the same characteristics40, this might point to general limits of this modeling approach for ALL maintenance therapy. This property of the model is especially relevant when simulating new treatment schedules or when using the model for optimization. The clinical applicability of PKPD models also depend on the models' ability to predict the timing of samples and the expected effect on ANC. It is important to note that the trajectories of the ANC are not only influenced by the linear effect function but also by the nonlinear feedback mechanism, which necessitates more involved numerical studies to explore this relationship. We plan to address this in a subsequent paper.
+
+One possible extension of the here developed PKPD model could be inspired by the results of Korell et al.14 In their study, they compare the intracellular pharmacokinetics of MTX in the red blood cells and other cell lines and come to the conclusion that the dynamics of MTX in the red blood cells differ significantly from those in the white blood cells. While our final PKPD model does not include a MTX PK submodel, the same might hold for 6MP and would require further research into the intracellular pharmacokinetics of TGN in the white blood cells to integrate this into the PKPD model. DNA-TG in leukocytes is associated with E-TGN, E-MTX
+
+and E-MMP42 Furthermore, DNA-TG has been associated with the risk of relapse in patients with positive measurable residual disease at the end of induction therapy14 43. However, the impact of DNA-TG on ANC has not yet been reliably modelled, and an optimal level of DNA-TG remains to be determined before DNA-TG can be used as a target for TDM3, 44.
+
+#### Conclusion
+
+We developed a full pharmacokinetic-pharmacodynamic model that relies on observations of E-TGN and ANC to predict the effect maintenance therapy has on the patient-specific dynamics of the ANC. The results of the parameters estimation of this model are mostly comparable to those of Jost et al.10 with a structurally similar model replicating the same dynamics and indicating that at this point, this model structure is the most promising for ALL maintenance therapy. The newly developed model shows a better fit to the patient-wise observations in situations where less data is available as is often the case in clinical practice. This model now allows comprehensive analysis of the effects resulting from the modeled dynamics to generate hypotheses for the optimization of adapted treatment regimens through systematic simulation studies.
+
+### Data availability
+
+The estimated patient parameters of this study are included in the Supplementary Information. The original data analysed in this study is not publicly available to preserve patient confidentiality.
+
+### Code availability
+
+All relevant Python and NONMEM code for the model analysis and simulation are available from the authors upon reasonable request.
+
+Received: 21 March 2023; Accepted: 7 July 2023 Published online: 20 July 2023
+
+#### References
+
+- 1. Inaba, H. & Mullighan, C. G. Pediatric acute lymphoblastic leukemia. Haematologica 105(11), 2524–2539 (2020).
+- 2. Hunger, S. P. & Mullighan, C. G. Acute lymphoblastic leukemia in children. N. Engl. J. Med. 373, 1541–1552 (2015).
+- 3. Toksvang, L. N., Lee, S. H., Yang, J. J. & Schmiegelow, K. Maintenance therapy for acute lymphoblastic leukemia: Basic science and clinical translations. Leukemia 36, 1749-1758 (2022).
+- 4. Schmiegelow, K. et al. Maintenance therapy of childhood acute lymphoblastic leukemia revisited: Should drug doses be adjusted by white blood cell, neutrophil, or lymphocyte counts?. Pediatr. Blood Cancer 63(12), 2104-2111 (2016).
+- 5. Michor, F. & Beal, K. Improving cancer treatment via mathematical modeling: Surmounting the challenges is worth the effort. Cell 163(5), 1059-1063 (2015).
+- 6. Brady, R. & Enderling, H. Mathematical models of cancer: When to predict novel therapies, and when not to. Bull. Math. Biol. 81, 3722–3731 (2019).
+- 7. Malinzi, J., Basita, K. B., Padidar, S. & Adeola, H. A. Prospect for application of mathematical models in combination cancer treatments. Inform. Med. Unlocked 23, 100534 (2021).
+- 8. Chulián, S., Martnez-Rubio, A., Rosa, M. & Pérez-Garcá, V. M. Mathematical models of leukaemia and its treatment: A review. SeMA J. 79, 441-486 (2022).
+- 9. Le, T. T. et al. A mathematical model of white blood cell dynamics during maintenance therapy of childhood acute lymphoblastic leukemia. Math. Med. Biol. A J. IMA 36(4), 471-488 (2019).
+- 10. Jost, F. et al. Model-based simulation of maintenance therapy of childhood acute lymphoblastic leukemia. Front. Physiol. 11, 217 (2020).
+- 11. Jayachandran, D., Rundell, A. E., Hannemann, R. E., Vik, T. A. & Ramkrishna, D. Optimal chemotherapy for leukemia: A modelbased strategy for individualized treatment. PLOS ONE 9(10), 1-18 (2014).
+- 12. Dervieux, T., Hancock, M., Evans, W., Pui, C.-H. & Relling, M. Effect of methotrexate polyglutamates on thioguanine mucleotide concentrations during continuation therapy of acute lymphoblastic leukemia with mercaptopurine. Leukemia 16(2), 209-212 (2002).
+- 13. Schmiegelow, K. Advances in individual prediction of methotrexate toxicity: A review. Br. J. Haematol. 146(5), 489–503 (2009).
+- 14. Lönnerholm, G., Kreuger, A., Lindström, B., Ludvigsson, J. & Myrdal, U. Plasma and erythrocyte concentrations of mercaptopurine after oral administration in children. Pediatr. Hematol. Oncol. 3(1), 27-35 (1986).
+- 15. Friberg, L. E., Henningsson, A., Maas, H., Nguyen, L. & Karlsson, M. O. Model of chemotherapy-induced myelosuppression with parameter consistency across drugs. J. Clin. Oncol. 20(24), 4713-4721 (2002).
+- 16. Schmiegelow, K. et al. Intensification of mercaptopurine/methotrexate maintenance chemotherapy may increase the risk of relapse for some children with acute lymphoblastic leukemia. J. Clin. Oncol. 21(7), 1332-1339 (2003).
+- 17. Gustafsson, G. et al. Improving outcome through two decades in childhood all in the nordic countries: The impact of high-dose methotrexate in the reduction of CNS irradiation. Leukemia 14(12), 2267-2275 (2000).
+- 18. Longeville, S. & Stingaciu, L.-R. Hemoglobin diffusion and the dynamics of oxygen capture by red blood cells. Sci. Rep. 7, 1–10 (2017).
+- 19. Schmiegelow, K., Nielsen, S. N., Frandsen, T. L. & Nersting, J. Mercaptopurine/methotrexate maintenance therapy of childhood acute lymphoblastic leukemia: clinical facts and fiction. J. Pediatr. Hematol. /Oncol. 36(7), 503-517 (2014).
+- 20. Panetta, J. C., Wall, A., Pui, C .- H., Relling, M. V. & Evans, W. E. Methotrexate intracellular disposition in acute lymphoblastic leukemia: A mathematical model of y-glutamyl hydrolase activity. Clin. Cancer Res. 8(7), 2423–2429 (2002).
+- 21. Panetta, J. C., Sparreboom, A., Pui, C .- H., Relling, M. V. & Evans, W. E. Modeling mechanisms of in vivo variability in methotrexate accumulation and folate pathway inhibition in acute lymphoblastic leukemia cells. PLOS Comput. Biol. 6(12), 1–13 (2010).
+- 22. Korell, J. et al. A population pharmacokinetic model for low-dose methotrexate and its polyglutamated metabolites in red blood cells. Clin. Pharmacokinet. 52(6), 475-485 (2013).
+- 23. Ogungbenro, K., Aarons, L., CRESim Epi-CRESim Project Groups. Physiologically based pharmacokinetic modelling of methotrexate and 6-mercaptopurine in adults and children. Part 1: methotrexate. J. Pharmacokinet. Pharmacodyn. 41(2), 159–171 (2014).
+- 24. Medellin-Garibay, S. E. et al. Population pharmacokinetics of methotrexate in mexican pediatric patients with acute lymphoblastic leukemia. Cancer Chemother. Pharmacol. 85(1), 21-31 (2020).
+- 25. Costa, M. D. & Iqbal, M. P. The transport and accumulation of methotrexate in human erythrocytes. Cancer 48, 2427–2432 (1981).
+- 26. Lena, N., Imbert, A., Brunet, P., Cano, J. & Carcassonne, Y. Kinetics of methotrexate and its metabolites in red blood cells. Cancer Drug Deliv. 4(2), 119-127 (1987).
+- 27. Schalhorn, A., Sauer, H., Wilmanns, W. & Stupp-Poutot, G. Pharmacokinetics of erythrocyte methotrexate after high-dose methotrexate. Cancer Chemother. Pharmacol. 9, 65-69 (1982).
+- Schrøder, H., Fogh, K. & Herlin, T. In vivo decline of methotrexate and methotrexate polyglutamates in age-fractionated eryth-28. rocytes. Cancer Chemother. Pharmacol. 21, 150-155 (1988).
+- 29. Hawwa, A. F. et al. Pharmacogenomic studies of the anticancer and immunosuppressive thiopurines mercaptopurine and azathio prine. Br. J. Clin. Pharmacol. 66. 517–528 (2008).
+- 30. Lennard, L., Keen, D. & Lilleyman, J. Oral 6-mercaptopurine in childhood leukemia: Parent drug pharmacokinetics and active metabolite concentrations. Clin. Pharmacol. Therapeutics 40(3), 287–292 (1986).
+- 31. Lindbom, L., Pihlgren, P. & Jonsson, N. Psn-toolkit: A collection of computer intensive statistical methods for non-linear mixed effect modeling using NONMEM. Comput. Methods Progr. Biomed. 79(3), 241–257 (2005).
+- 32. Andersson, J. A., Gillis, J., Horn, G., Rawlings, J. B. & Diehl, M. CasADi: A software framework for nonlinear optimization and optimal control. Math. Progr. Comput. 11, 1–36 (2019).
+- 33. Hindmarsh. A. C. et al. SUNDIALS: Suite of nonlinear and differential/algebraic equation solvers, ACM Trans, Math, Softw. (TOMS) 31(3), 363-396 (2005).
+- 34. Cowan, D. S. & Tannock, I. F. Factors that influence the penetration of methotrexate through solid tissue. Int. J. Cancer 91(1), 120-125 (2001).
+- 35. White, J. C. & Mikulecky, D. C. Application of network thermodynamics to the computer modeling of the pharmacology of anticancer agents: A network model for methotrexate action as a comprehensive example. Pharmacol. Therapeutics 15(2), 251-291 (1981)
+- 36. Small, T. & Oski, F. A. The mean corpuscular volume (MCV) in children with acute lymphoblastic leukemia. Clin. Pediatr. 18(11), 687–691 (1979).
+- 37. De Câmara Souza, D. et al. Transit and lifespan in neutrophil production: Implications for drug intervention. J. Pharmacokinet. Pharmacodyn. 45(1), 59-77 (2018).
+- 38. Puy, A. et al. Models with higher effective dimensions tend to produce more uncertain estimates. Sci. Adv. 8(42), 9450 (2022)
+- 39. Jost, F. Schalk, E., Rinke, K., Fischer, T. & Sager, S. Mathematical models for cytarabine-derived myelosuporession in acute myeloid leukaemia. PLOS ONE 14(7), e0204540 (2019).
+- 40. Jost, F. et al. Model-based optimal AML consolidation treatment. IEEE Trans. Biomed. Eng. 67(12), 3296-3306 (2020).
+- 41. Korell, J. et al. Comparison of intracellular methotrexate kinetics in red blood cells with the kinetics in other cell types. Br. J. Clin. Pharmacol. 77(3), 493-497 (2014).
+- 42. Nielsen, S. N. et al. DNA-thioguanine nucleotide concentration and relapse-free survival during maintenance therapy of childhood acute lymphoblastic leukaemia (NOPHO ALL2008): A prospective substudy of a phase 3 trial. Lancet Oncol. 18(4), 515–524 (2017).
+- 43. Toksvang, L. N. et al. DNA-thioguanine concentration and relapse risk in children and young adults with acute lymphoblastic leukemia: An IPD meta-analysis. Leukemia 36, 33-41 (2022).
+- 44. Nielsen, S. N. et al. Measures of 6-mercaptopurine and methotrexate maintenance therapy intensity in childhood acute lymphoblastic leukemia. Cancer Chemother. Pharmacol. 78(5), 983–994 (2016).
+- 45. Mosteller, R. Simplified calculation of body surface area. N. Engl. J. Med. 317(17), 1098 (1987).
+- 46. Brunton, L. L., Lazo, J. S. & Parker, K. Goodman & Gilmaris The Pharmacological Basis of Therapeutics. 11 edn (McGraw-Hill, New York, 2005).
+
+#### Author contributions
+
+A.G. worked on the modeling and simulation of all models and wrote the manuscript. P.L. worked on the modeling of the 6MP submodel and on the derivation of the model structure. M.M., M.R. and J.Z. provided their medical expertise and supported the modeling process. S.S. supervised and provided his expertise in mathematical modeling and simulation. K.S. and L.N.T. provided the data and advised on the modeling process. All authors reviewed and revised the manuscript.
+
+#### Funding
+
+Open Access funding enabled and organized by Projekt DEAL. The Carl and Ellen Hertz Foundation. The Children's Cancer Foundation of Sweden by Grant Nos. 53/91, 62/94, 72/96 and 98/59, The Danish Cancer Society by Grant Nos. 91-048, 92-017, 93-017 and 95-100-28, The JPC Foundation, The Lundbeck Foundation by Grant No. 38/99, The Minister Erna Hamilton Foundation, The Nordic Cancer Union by Grant Nos. 56-9257 and 56-100-03–9102, United States National Institutes of Health by Grant Nos. RO1-GM28157 and RO1-GM35720, Deutsche Forschungsgemeinschaft by Grant No. 462065145.
+
+#### Competing interests
+
+K.S. declares the following competing interests: Speaker and/or Advisory Board Honoraria from Illumina (2021), Jazz Pharmaceuticals (2020, 2021, 2023) and Servier (2020, 2021); Speaker fee from Amgen (2020, 2021) and Medscape (2020, 2021); Educational grants from Servier (2020, 2021, 2023); Research grant from Novo Nordisk Foundation (2020, 2022). All other authors declare no competing interests.
+
+### Additional information
+
+Supplementary Information The online version contains supplementary material available at https://doi.org/ 10.1038/s41598-023-38414-0.
+
+Correspondence and requests for materials should be addressed to A.G.
+
+Reprints and permissions information is available at www.nature.com/reprints.
+
+Publisher's note Springer Nature remains neutral with regard to jurisdictional claims in published maps and institutional affiliations.
+
+![](_page_14_Picture_1.jpeg)
+
+Open Access This article is licensed under a Creative Commons Attribution 4.0 International (cc) License, which permits use, sharing, adaptation, distribution and reproduction in any medium or format, as long as you give appropriate credit to the original author(s) and the source, provide a link to the Creative Commons licence, and indicate if changes were made. The images or other third party material in this article are included in the article's Creative Commons licence, unless indicated otherwise in a credit line to the material. If material is not included in the article's Creative Commons licence and your intended use is not permitted by statutory regulation or exceeds the permitted use, you will need to obtain permission directly from the copyright holder. To view a copy of this licence, visit http://creativecommons.org/licenses/by/4.0/.
+
+© The Author(s) 2023
+

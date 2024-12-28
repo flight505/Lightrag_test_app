@@ -1,0 +1,275 @@
+DOI: 10.1111/ejh.12979
+
+# ORIGINAL ARTICLE
+
+# Individualized 6-mercaptopurine increments in consolidation treatment of childhood acute lymphoblastic leukemia: A NOPHO randomized controlled trial
+
+Morten Tulstrup¹☺ | Thomas L. Frandsen² | Jonas Abrahamsson² | Bendik Lund34 | Kim Vettenranta5 | Olafur Gisli Jonsson6 | Hanne Vibeke Hansen Marquart' Birgitte Klug Albertsen° | Mats Heyman? | Kjeld Schmiegelow410 | On behalf of the Nordic Society of Paediatric Haematology and Oncology (NOPHO)
+
+1Department of Pediatrics and Adolescent Medicine, University Hospital Rigshospitalet, Copenhagen, Denmark
+
+² Department of Pediatrics, Institution for Clinical Sciences, Sahlgrenska Academy, University of Gothenburg, Sweden
+
+3Department of Pediatrics, St. Olavs Hospital, Trondheim University Hospital, Trondheim, Norway
+
+"Department of Laboratory Medicine, Faculty of Medicine and Health sciences, Children's and Women's Health, Norwegian University of Science and Technology, Trondheim. Norway
+
+5Department of Paediatrics, University of Tampere, Tampere, Finland
+
+ÓDepartment of Pediatrics, Landspitali University Hospital, Reykjavík, Iceland
+
+7 Department of Clinical Immunology, Section 7631, University Hospital Rigshospitalet, Copenhagen, Denmark
+
+8 Department of Pediatric Oncology, Skejby Hospital, Aarhus, Denmark
+
+'Department of Pediatrics, Astrid Lindgrens Hospital, Stockholm, Sweden
+
+1º Institute of Clinical Medicine, University of Copenhagen, Copenhagen, Denmark
+
+### Correspondence
+
+Kjeld Schmiegelow, Department of Pediatrics and Adolescent Medicine, The Juliane Marie Center, JMC-5704, University Hospital Rigshospitalet. Copenhagen. Denmark. Email: kjeld.schmiegelow@regionh.dk
+
+### Funding information
+
+Swedish Childhood Cancer Foundation; Danish Cancer Society; Danish Childhood Cancer Foundation; the Nordic Cancer Union; Otto Christensen Foundation; University Hospital Rigshospitalet; Novo Nordic Foundation.
+
+### Abstract
+
+Objectives: This randomized controlled trial tested the hypothesis that children with non-high-risk acute lymphoblastic leukemia could benefit from individualized 6-mercaptopurine increments during consolidation therapy (NCT00816049). Primary and secondary end points were end of consolidation minimal residual disease (MRD) positivity and event-free survival.
+
+Methods: 392 patients were randomized to experimental and 396 to standard therapy. Patients allocated to standard therapy received oral 6-mercaptopurine (25 mg/ m²/day) from days 30 to 85, while the experimental arm received stepwise increments of additional 25 mg/m²/day beginning on days 50 and/or 71 unless dose-limiting myelosuppression had occurred.
+
+Results: In the experimental arm, 166 patients (42%) received one dose increment, and 62 (16%) received two. Fifty-seven of 387 (15%) patients in the experimental arm were MRD positive at end of consolidation vs 77 of 389 (20%) in the control arm (P = .08). Five-year probability of event-free survival was 0.89 (95% Cl: 0.85-0.93) in the experimental arm vs 0.93 (0.90-0.96) in the control arm (P = .13). The median
+
+Morten Tulstrup and Thomas L. Frandsen contributed equally to this work.
+
+accumulated length of 6-mercaptopurine treatment interruptions was 7 (IQR 2-12) in the experimental arm vs 4 (IQR 0-10) in the control arm (P = .002).
+
+Conclusion: This study found no benefit from individualized 6-mercaptopurine increments compared to standard therapy.
+
+### KEYWORDS
+
+6-mercaptopurine, acute lymphoblastic leukemia, children, consolidation therapy, randomized controlled trial
+
+#### 1 | INTRODUCTION
+
+In contemporary treatment protocols for childhood acute lymphoblastic leukemia (ALL), most chemotherapeutic agents are prescribed as a fixed dose per m2. However, interindividual differences in drug sensitivity and pharmacokinetics cause some individuals to experience toxic side effects at standard doses, while others are treated at suboptimal intensity; 6-mercaptopurine (6-MP) is an essential part of ALL therapy, and known determinants of 6-MP metabolism include TPMT and NUDT15¹-2 genotypes, with heterozygous individuals having a higher propensity to convert 6-MP into the pharmacologically active DNA-6-thioguanine (DNA-TGN).3 as well as a higher risk of myelosuppression during 6-MP treatment.4 A study by the Berlin-Frankfurt-Münster (BFM) group, in which patients received 6-MP together with cytarabine and cyclophosphamide during consolidation therapy, found that TPMT heterozygous patients were more likely to be minimal residual disease (MRD) negative at the end of consolidation therapy compared to TPMT wild-type patients.5 On the basis of these observations, we hypothesized that patients with less myelosuppression might benefit from intensified 6-MP treatment.
+
+The Nordic Society for Paediatric Haematology and Oncology (NOPHO) ALL2008 protocol contains a consolidation phase with oral fixed dose 6-MP at 25 mg/m²/day along with high-dose methotrexate (HDM) every third week, which enhances 6-MP cytotoxicity.67 A 2008 pilot study found that dose increments of 100%-200% were possible in 26 patients of 38 (68%) who had not experienced post-HDM myelotoxicity. 9 The aim of this randomized controlled trial was to explore whether individualized, toxicity-titrated 6-MP increments could reduce MRD at end of consolidation and improve event-free survival in standard and intermediate risk patients treated according to the NOPHO ALL2008 protocol.
+
+#### 2 | PATIENTS AND METHODS
+
+All patients were children (age 1.0-17.9 years) with non-high-risk ALL treated according to the NOPHO ALL2008 protocol in Sweden, Denmark, Norway, Finland and Iceland. Patients were included for randomization from January 1, 2009, in Sweden and Denmark, February 11, 2009, in Norway, June 1, 2009, in Finland, and January 7, 2010, in Iceland. The study was closed for inclusion on March 1, 2016. Inclusion criteria for the ALL2008 protocol are non-Philadelphia
+
+chromosome-positive B-cell precursor (BCP) or T-cell ALL. The randomized study only included patients stratified to standard (SR) or intermediate risk (IR) therapy and excluded patients with ALL predisposition syndromes, chemotherapy intolerance, previous cancer, incomplete registration of risk-stratifying cytogenetic aberrations, or who had received more than a week of treatment with antileukemic agents including glucocorticosteroids before diagnosis of ALL. In November 2009, the protocol was amended to exclude patients with B-lineage ALL with t(12;21)[ETV6-RUNX1] and white blood cell count (WBC) at diagnosis above 100 × 10°/L from randomization.
+
+The ALL2008 protocol was approved by the National Medicines Agencies (EudraCT no. 2008-003235-20) and all relevant national and local ethical committees, and informed consent was obtained in accordance with the Declaration of Helsinki. The randomized trial is registered at clinicaltrials.gov (NCT00816049).
+
+# 2.1 | Risk stratification
+
+At the end of induction therapy (day 29), patients were stratified to either SR, IR, or high-risk (HR) therapy. The SR group comprised patients with B-lineage ALL and WBC at diagnosis < 100 × 10°/L and MRD day 29 < 0.1%. IR patients had either a) B-lineage ALL with WBC at diagnosis < 100 × 10°/L and MRD day 29 ≥ 10-3, b) B-lineage ALL with WBC at diagnosis ≥ 100 × 10°/L and MRD day 29 < 10-3. c) T-lineage ALL with MRD day 29 < 10-3, or d) one of the following cytogenetic aberrations: dic(9;20)(p13;q11), iAMP21, or t(1;19) [TCF3-PBX1] and no HR criteria. HR stratifying criteria were: MRD day 29 ≥ 5%, B-lineage ALL with WBC at diagnosis > 100 × 10°/L or T-lineage ALL and MRD day 29 ≥ 10-3, and hypodiploidy or MLLrearrangements. The final risk stratification on day 79 was based on MRD measurements, and all patients with MRD ≥ 10-3 were stratified to HR therapy and hematopoietic stem cell transplantation (hSCT). For more details on risk assignment, see Ref.9. Patients with HR-ALL were excluded from randomization.
+
+# 2.2 | Protocol treatment and intervention
+
+For a detailed overview of induction and consolidation therapy, see Figure 1. During consolidation, the standard 6-MP dose, given to non-randomized patients and patients allocated to the control arm, was 25 mg/m2/day. In case of toxicity (absolute neutrophil count [ANC] ≤ 0.2 × 10°/L, thrombocyte count < 20 × 10°/L,
+
+![](_page_2_Figure_1.jpeg)
+
+FIGURE 1 Treatment protocol for ALL2008 non-high-risk induction and consolidation therapy, ti.t. methotrexate dose adjusted by age: 8 mg (1 year), 10 mg (2 years), 12 mg (≥3 years). *6-MP dose increments given as described in the text
+
+S-aminotransferases > 20 × upper normal limit [UNL]. bilirubin > 2 × UNL, and/or prothrombin time > 1.5 [international normalized ratio INR]), 6-MP was recommended to be interrupted until normalization of hematological and liver parameters. For patients allocated to dose increments, the 6-MP dose was increased to 50 mg/m2/day on protocol day 50, unless they had experienced ANC ≤ 0.5 × 10°/L or thrombocytes < 50 × 10'/L since the first HDM treatment on day 36. On day 71, the dose was increased to 75 (or 50, depending on prior dose) mg/m²/day, unless the above limits had been reached since the second HDM on day 57. If ANC fell below 0.5 × 10'/L or thrombocytes fell below 50 × 10'/L after the dose increments, 6-MP treatment was interrupted and restarted at 25 mg/ m²/day when hematological parameters were normalized.
+
+At the end of consolidation treatment, eligible patients were offered randomization in a second trial (not part of this publication) to 2 different regimens of PEG-asparaginase (clinicaltrials.gov: NCT00819351).
+
+# 2.3 | Randomization procedure
+
+Randomization was assigned by computer through an online registration system in blocks of 6 (3 patients to each arm for every 6 patients randomized) with stratification by risk group (SR and IR) and TPMT status.
+
+### 2.4 | Outcome measures
+
+The predefined primary and secondary end points were the proportion of end of consolidation (EOC) MRD-negative patients and event-free survival (EFS), respectively. For B-lineage patients, MRD was analyzed by flow cytometry. If flow cytometry was not
+
+technically possible, real-time PCR for IGH rearrangements was used instead. T-lineage patients were analyzed using PCR for Tcell receptor gene rearrangements. When using flow cytometry, MRD negativity was defined as less than 10 leukemia-associated immunophenotype (LAIP, cluster of cells with aberrant marker expression) events. PCR analyses were conducted and interpreted according to consensus guidelines.10 The prespecified definition of EOC MRD as registered on clinicaltrials.gov was MRD day 85, ie the day of discontinuation of 6-MP, whereas MRD measurements were performed on days 79 and 92. Since the day 79 result is used for the final risk stratification, we used this measurement whenever possible. In the event of missing day 79 MRD, we used the day 92 result instead. To investigate the impact of the different outcome definitions, we carried out sensitivity analyses with EOC MRD defined instead as 1) day 92 whenever possible and day 79 in remaining cases, 2) day 79 MRD only, and 3) day 92 MRD only. EFS was defined as time from randomization to last date of follow-up or first occurrence of relapse, secondary malignancy, or death in remission. The study was closed for follow-up on January 20, 2017.
+
+Other measures of treatment efficacy were log, MRD reduction from day 29 to EOC in patients positive at both time points and the proportion of patients eligible for hSCT based on their day 79 MRD. Measures of adverse effects were 6-MP interruptions defined as number of days without 6-MP during consolidation and duration of consolidation therapy (protocol day 30 to 85) as a measure of treatment delays. Because 6-MP dose increments could, in theory, influence risk of PEG-asparaginase-associated toxicities leading to asparaginase truncation, we also analyzed asparaginase truncation as a potential adverse effect of the intervention.
+
+As a measure of treatment intensity and physician and patient compliance, we analyzed concentrations of DNA-TGN and methylated 6-MP metabolites (MeMP) in blood samples routinely sent from treating centers to University Hospital Rigshospitalet, Copenhagen. MeMP concentrations were measured in erythrocytes using ultraperformance liquid chromatography, and leukocyte DNA-TGN was quantified as the thioguanine/guanine ratio in isolated DNA using liguid chromatography-tandem mass spectrometry. 11,12
+
+## 2.5 | Statistical analyses
+
+Power calculations were based on the previous NOPHO ALL2000 protocol in which 52% of patients were MRD positive on day 29. Among these, 16% were MRD positive on day 106. Assuming a similar reduction from day 29 to EOC, a total of 1014 randomized patients were required to detect a reduction from 16% to 8% MRD-positive patients in the experimental arm with 80% power at a 5% significance level. The projected period for recruitment of this number of patients was 6 years.
+
+The original power calculation was based on only analyzing EOC MRD in day 29 MRD-negative patients, but because some of these were EOC positive, we decided to include all patients in the primary analysis regardless of day 29 MRD. The outcome for day 29 negative patients alone was investigated in a sensitivity analysis. We analyzed the predefined outcomes using both an intention-to-treat and a modified intention-to-treat approach. In the latter, we excluded 10 patients who were retrospectively found ineligible for randomization and 3 patients who left the study before treatment day 50. We used only the modified intention-to-treat approach for stratified and retrospective analyses. The reported analyses of MRD and survival are unadjusted, but we also carried out sensitivity analyses with adjustment for WBC and molecular subtype. We compared categorical variables using chi-squared test or Fisher's exact test as appropriate. We analyzed EFS using the Kaplan-Meier estimator and univariate Cox proportional hazards regression. We analyzed cumulative risk of relapse using the Aalen-Johansen estimate and Gray's test, treating secondary malignancy and death in remission as competing risks, and we tested for interaction using relapsespecific Cox regression. Continuous variables were compared using Student's t test, Welch two sample t test, or one-way ANOVA as appropriate. MRD analyses were stratified by risk group, sex, TPMT genotype, age (1-9 vs 10-17), and WBC at diagnosis (above/below 50 × 10°/L), and we also investigated EOC MRD by TPMT genotype regardless of treatment arm. We carried out stratified EFS analyses by sex and risk group. Due to the increased number of relapses in the experimental arm, we compared the cumulative risk of relapse between patients receiving zero, one or two dose increments, and we compared 6-MP interruptions and treatment delays between patients with and without relapse. We also investigated the overall impact of EOC MRD on EFS regardless of treatment arm. DNA-TGN and MeMP concentrations at EOC (defined as the time period from 7 days before to 7 days after protocol day 79) were compared between patients who received zero, 1 or 2 dose increments (with control patients included in the zero increments group). All statistical tests were two-sided with a significance threshold of P < .05. We did all analyses using R version 3.3.2 (R Foundation for Statistical Computing, Vienna, Austria). 13
+
+#### 3 | RESULTS
+
+Of 1908 children diagnosed with ALL and treated according to ALL2008 between January 1, 2009, and March 1, 2016, 998 were eligible for randomization, and 788 (80%) were randomized, 392 to the experimental arm and 396 to the control arm (Figure 2, Table 1). The main reason for non-randomization was parent or patient refusal, with 935 families approached for randomization and 147 (16%) refusing to participate. Ten patients were randomized, but retrospectively excluded due to ineligibility. Two patients were randomized, but withdrew consent before day 50 and 1 patient died before day 50. In the experimental arm, 62 patients (16%) received 6-MP dose increments both day 50 and day 71, 166 (42%) received only 1 dose increment, and 155 (40%) did not receive any dose increments. Nine patients (2%) had missing registration of dose increments.
+
+# 3.1 | Minimal residual disease
+
+Of the 788 randomized patients, 2 died before EOC, 10 did not have a valid EOC MRD, and thus, 776 patients were included in the intentionto-treat analysis of the primary endpoint. Day 79 results were available in 770 cases, and day 92 results were used instead in 6 cases (2 in the experimental arm and 4 in the control arm). Among B-lineage patients analyzed with flow cytometry day 79, the median number of living cells analyzed was 519 400 with no difference between randomization arms (P = .24), corresponding to a detection limit of 2 × 10-3. The proportion of EOC MRD-positive patients was 57/387 (15%) in the experimental arm vs 77/389 (20%) in the control arm (P = .08, Figure 3). When restricting the analysis to the modified intention-totreat cohort, the proportion of MRD-positive patients in the experimental arm was 53/380 (14%) vs 77/386 (20%) in the control arm (P = .03). Sensitivity analyses using only day 29 positive patients and/ or selecting day 92 results over day 79 produced similar results with P values ranging from 0.03 to 0.11 (Table S1). Sensitivity analyses adjusting for WBC at diagnosis and molecular subtype produced similar results (data not shown). Subgroup analysis based on sex revealed a significant difference for girls (22/166 [13%] in the experimental arm vs 43/185 [23%] in the control arm, P = .02), but not in boys (P = .59). Among EOC-positive patients, the mean log o reduction in MRD during consolidation was 0.91 (95% Cl 0.70-1.13) in the experimental arm compared to 0.93 (95% Cl 0.67-1.19) in the control arm (P = .93).
+
+At the final risk stratification on day 79, one patient in the experimental arm was stratified to HR treatment and hSCT due to day 79 MRD ≥ 0.1% compared to seven patients in the control arm (P = .07). 118 of 694 (17%) TPMT wild-type patients were MRD positive at
+
+EOC vs 12 of 72 (17%) TPMT heterozygous patients (P = 1.00).
+
+Haematology
+
+57
+
+![](_page_4_Figure_4.jpeg)
+
+FIGURE 2 Study profile. Abbreviations: WBC, white blood cell count at diagnosis (x 10°/L)
+
+### 3.2 | Event-free survival
+
+The median follow-up was 4.2 years (IQR 2.7-6.1). Of 392 patients in the experimental arm, 34 (9%) experienced an event vs 23 of 391 (6%) in the control arm. Of 23 relapses in the experimental arm, 18 involved the bone marrow, 10 the central nervous system, and one the testes. The control arm had 15 relapses (10 bone marrow, eight central nervous system, and three testicular). The estimated five-year probability of EFS was 0.89 (95% Cl: 0.85-0.93) in the experimental arm vs 0.93 (0.90-0.96) in the control arm (Figure 4). The overall hazard ratio in the experimental arm was 1.50 (95% Cl: 0.88-2.55, P = .13). These
+
+results were almost identical when restricting analyses to the modified intention-to-treat group (data not shown). The relapse-specific hazard ratio in the experimental arm was 1.56 (95% Cl: 0.81-2.98, P = .18). Sensitivity analyses adjusting for WBC at diagnosis and molecular subtype produced similar results (data not shown). Stratification by risk group and sex revealed no significant difference in EFS for SR (P = .58) or IR (P = .12) patients or for boys (P = .06) or girls (P = .98); (Fig. S1).
+
+Patients who received 6-MP dose increments zero, one, or two times during consolidation in the experimental arm had 5-year cumulative risks of relapse of 7.3% (95% Cl 1.6%-12.6%), 6.7% (95% Cl 2.0%-11.1%), and 10.1% (95% Cl 1.0-18.4), respectively, P = .40 (Fig. S2). The 5-year cumulative risk of relapse in the control arm was 4.8% (95% Cl: 2.2%-7.2%).
+
+TABLE 1 Baseline characteristics. N (%) for categorical variables and N (IQR) for continuous variables
+
+| Variable | Group | Increments | Fixed | P |
+| --- | --- | --- | --- | --- |
+| Sex | Male | 221 (56%) | 209 (53%) |  |
+|  | Female | 171 (44%) | 187 (47%) | .35 |
+| Age |  | 4 (2-7) | 3.5 (2-6) | .26 |
+| IR aberrations | dic(9:20) | 7 (5%) | 14 (9%) |  |
+|  | iAMP21 | 8 (5%) | 6 (4%) |  |
+|  | t(11;9) | 17 (11%) | 11 (7%) |  |
+|  | No aberration | 119 (79%) | 123 (80%) | .27 |
+| MRD day 29 | Missing | 6 (2%) | 5 (1%) |  |
+|  | Negative | 163 (42%) | 157 (40%) |  |
+|  | Positive | 223 (57%) | 234 (59%) | .80 |
+| Risk group | HR | 3 (1%) | 2 (1%) |  |
+|  | IR | 151 (39%) | 154 (39%) |  |
+|  | SR | 238 (61%) | 240 (61%) | .93 |
+| WBC at |  | 10.5 | 9.1 | .26 |
+| diagnosis |  | (4.7-34.4) | (4.4-28.8) |  |
+| TPMT | Wild type | 355 (91%) | 360 (91%) |  |
+| genotype |  |  |  |  |
+|  | Heterozygote | 37 (9%) | 36 (9%) | .96 |
+
+MRD, minimal residual disease; HR, high risk; IR, intermediate risk; SR, standard risk; WBC, white blood cell count.
+
+|  | Increments | Fixed |
+| --- | --- | --- |
+| All patients, ITT | 57/387 | 77/389 |
+| All patients, mITT | 53/380 | 77/386 |
+| SR | 27/236 | 39/237 |
+| IR | 26/144 | 38/149 |
+| Boys | 31/214 | 34/201 |
+| Girls | 22/166 | 43/185 |
+| T-ALL | 4/25 | 7/24 |
+| TPMT wildtype | 47/344 | 71/350 |
+| TPMT heterozygote | 6/36 | 6/36 |
+| Age 1-9 | 43/321 | 64/330 |
+| Age 10-17 | 10/59 | 13/56 |
+| WBC < 50 | 41/317 | 64/320 |
+| WBC > 50 | 12/63 | 13/66 |
+
+The overall hazard ratio for any event among EOC-positive patients compared to EOC-negative patients was 2.67 (95% Cl: 1.54-4.63, P = . 001).
+
+# 3.3 | Adverse effects
+
+There were seven treatment-related deaths in the experimental arm vs three in the control arm. Among the seven patients who died in the experimental arm, four had not received any dose increments. The three patients who had received dose increments died 31, 86, and 93 days after the EOC treatment with 6-MP.
+
+![](_page_5_Figure_9.jpeg)
+
+FIGURE 4 Probability of EFS (top) and cumulative incidence of relapse (bottom) in intention-to-treat cohort
+
+|  | OR | P |
+| --- | --- | --- |
+|  | 0.70 (0.48-1.02) | .08 |
+|  | 0.65 (0.44-0.95) | .03 |
+|  | 0.66 (0.39-1.11) | .15 |
+|  | 0.64 (0.37-1.13) | .16 |
+|  | 0.83 (0.49-1.41) | .59 |
+|  | 0.50 (0.29-0.89) | .02 |
+|  | 0.46 (0.12-1.85) | .45 |
+|  | 0.62 (0.42-0.93) | .03 |
+|  | 1.00 (0.29-3.45) | 1.00 |
+|  | 0.64 (0.42-0.98) | .05 |
+|  | 0.68 (0.27-1.69) | .54 |
+|  | 0.59 (0.39-0.91) | .02 |
+|  | 0.96 (0.40-2.30) | 1.00 |
+| 0.5 | 1 1.5 2 2.5 |  |
+
+FIGURE 3 Proportions of MRD-positive patients (N positive/N total) and odds ratio of being MRD positive in the experimental arm (95% Cl). Abbreviations: ITT, intention-to-treat; mlTT, modified intention-to-treat; SR, standard risk; IR, intermediate risk; BCP; WBC, white blood cell count at diagnosis (x10 /L)
+
+(
+
+Patients in the experimental arm had a median of 7 (IQR 2-12) days without 6-MP compared to 4 (IQR 0-10) in the control arm (P = .002, Fig. S3). The median consolidation length was 66 days (IQR: 62-70) in the experimental arm vs 65 days (62-69) in the control arm (P = .30). PEG-asparaginase therapy was truncated for 74 (19%) patients in the experimental arm compared to 80 (21%) in the control arm (P = .72). Patients who later relapsed did not experience longer 6-MP treatment delays during consolidation therapy than those without events (median: 6 days [IQR 2-9] vs 6 [IQR 0-11], P = .99). The same was found for consolidation duration (median: 66 days [IQR 62-73] vs 66 [IQR 62-69], P = .80).
+
+There was no difference between TPMT genotype groups with re gard to days without 6-MP (P = .60) or consolidation duration (P = .94). Of 35 TPMT heterozygote patients in the experimental arm, 20 (57%) received one or two dose increments compared to 205 of 342 (60%) in the experimental arm.
+
+# 3.4 | Metabolite analyses
+
+A total of 358 samples from 336 unique patients were taken at EOC (in this analysis defined as 7 days before or after protocol day 79). The mean EOC DNA-TGN levels in patients given zero, one, or two dose increments were 162 (95% CI 144-179). 237 (194-280), and 293 (156-430), respectively, P < . 0001 (Fig. S4). The corresponding MMP values were 1879 (1 397-2 360), 5 930 (4 368-7 492), and 12 173 (7 625-16 721), P < .0001. TPMT heterozygote patients had significantly higher levels of DNA-TGN compared to wild-type patients (means 204 vs 123, respectively, P = 8 × 10 ~) and significantly lower MMP levels (means 883 vs 2 321, P = 2 × 10-12).
+
+#### DISCUSSION ব
+
+Despite 6-MP dose intensifications in 58% of patients in the experimental arm, we did not find an overall improvement in EOC treatment response or in EFS. When restricting analyses to patients who fulfilled all inclusion criteria and did not leave the study prematurely, the MRD reduction in the experimental arm reached statistical significance. However, EFS and cumulative risk of relapse were still non-significantly poorer, and thus, our findings do not support giving individualized 6-MP increments during consolidation therapy. An important limitation of this study is the lack of power, as the trial did not reach the prespecified sample size due to a higher-than-expected parent/patient refusal rate.14 The premature termination of the study reflected an interim analysis for the Data and Safety Monitoring Committee which indicated that inclusion of the remaining 226 patients to reach the prespecified target was very unlikely to yield a significant difference in EFS.
+
+The observation that the experimental arm had a higher risk of relapse and that the highest risk was observed among those patients who received both dose intensifications may be a chance finding, but it is nonetheless concerning. We also found that only one patient in the experimental arm was stratified to hSCT based on day 79 MRD
+
+ ૨૭ - WILEY Haematology
+
+compared to seven patients in the control arm. It is possible that in patients with a relapse-prone leukemia, the intensified regimen reduced their MRD without changing their relapse risk, such that HR patients who would have benefited from hSCT were never discovered and instead treated as IR patients.
+
+This study is not the first to describe divergent effects of an intervention on MRD and long-term prognosis. A 2010 study by Parker et al15 testing mitoxantrone vs idarubicin in relapsed ALL found a significant improvement in progression-free and overall survival in the experimental arm despite virtually unchanged MRD values, highlighting that MRD is not always a useful surrogate marker of outcome in randomized trials. Importantly, in our study EOC MRD was still highly predictive of EFS when analyzing outcome across treatment arms, and thus, low-level MRD is still a useful stratifying marker at EOC.
+
+Another possible explanation that the improved EOC MRD in the experimental arm was not accompanied by an improvement in EFS is that all patients regardless of randomization arm received 6-MP individually titrated by WBC and at a starting maintenance dose of 75 mg/ m2 during maintenance therapy, meaning that all patients already received optimal 6-MP treatment irrespective of whether they received intensifications during consolidation.
+
+Patients randomized to 6-MP increments had significantly more days with 6-MP treatment interruptions. It is possible that the benefit from the intensified 6-MP dosage was counterbalanced by the decreased treatment continuity. However, regardless of treatment interruptions, patients receiving dose increments had markedly higher EOC concentrations of the pharmacologically active metabolite, DNA-TGN, which has been shown to predict relapse-free survival.3 Thus, the non-significantly increased number of relapses arm was most likely not caused by a reduction in overall treatment intensity.
+
+The non-significantly increased number of deaths in remission in the experimental arm is unlikely to be caused by the intensified regimen, because most of the patients who died did not receive any 6-MP increments. Among the three that did receive 6-MP increments, a causal relationship between the intensifications and death is unlikely, but a delayed effect cannot be ruled out.
+
+We were not able to reproduce the previously published reduction in MRD positivity among TPMT heterozygous patients.5 This may be due to protocol differences such as the coadministration of 6-MP and HDM in the NOPHO but not in the BFM protocol and the inclusion of cyclophosphamide and cytarabine in the BFM protocol, but nonetheless the lack of association in our study suggests a more complex relationship between 6-MP metabolism and treatment response than previously assumed.
+
+In conclusion, we do not recommend toxicity-titrated 6-MP during consolidation treatment. Furthermore, we recommend that future studies addressing treatment intensifications before the final risk stratification take into consideration the double role of MRD as both a measure of treatment intensity and a prognostic marker.
+
+### ACKNOWLEDGEMENTS
+
+This work was financially supported by the Swedish Childhood Cancer Foundation, the Danish Cancer Society, the Danish Childhood ୧୦ WILEY-Haematology
+
+Cancer Foundation, the Nordic Cancer Union, the Otto Christensen Foundation, University Hospital Rigshospitalet, and the Novo Nordic Foundation.
+
+### CONFLICT OF INTEREST
+
+All authors declare no conflict of interest.
+
+## ORCID
+
+Morten Tulstrup ♥ http://orcid.org/0000-0002-7444-7652
+
+# REFERENCES
+
+- 1. Evans WE, Hon YY, Bomgaars L, et al. Preponderance of thiopurine S-methyltransferase deficiency and heterozygosity among patients intolerant to mercaptopurine or azathioprine. J Clin Oncol. 2001;19:2293-2301.
+- 2. Moriyama T, Nishii R, Perez-Andreu V, et al. NUDT15 polymorphisms alter thiopurine metabolism and hematopoietic toxicity. Nat Genet. 2016:48:1-9.
+- 3. Nielsen SN, Grell K, Nersting J, et al. DNA-thioguanine nucleotide concentration and relapse-free survival during maintenance therapy of childhood acute lymphoblastic leukaemia (NOPHO ALL2008): a prospective substudy of a phase 3 trial. Lancet Oncol. 2017;2045:1-10.
+- 4. Schmiegelow K. Forestier E. Kristinsson J. et al. Thiopurine methyltransferase activity is related to the risk of relapse of childhood acute lymphoblastic leukemia: results from the NOPHO ALL-92 study. Leukemia. 2009;29:997-1003.
+- 5. Stanulla M, Schaeffeler E, Flohr T, et al. Thiopurine methyltransferase (TPMT) genotype and early treatment response to mercaptopurine in childhood acute lymphoblastic leukemia. JAMA. 2005;23:1485.
+- 6. Nygaard U, Schmiegelow K. Dose reduction of coadministered 6-mercaptopurine decreases myelotoxicity following high-dose methotrexate in childhood leukemia. 2003;17:1344-1348.
+- 7. Vang SI, Schmiegelow K, Frandsen T, Rosthøj S, Nersting J. Mercaptopurine metabolite levels are predictors of bone marrow toxicity following high-dose methotrexate therapy of childhood acute lymphoblastic leukaemia. Cancer Chemother Pharmacol. 2015;75:1089-1093.
+- 8. Frandsen TL, Abrahamsson J, Lausen B, et al. Individualized toxicity-titrated 6-mercaptopurine increments during high-dose
+
+methotrexate consolidation treatment of lower risk childhood acute lymphoblastic leukaemia. A Nordic Society of Paediatric Haematology and Oncology (NOPHO) pilot study. Br J Haematol. 2011;155:244-247.
+
+- 9. Toft N, Birgens H, Abrahamsson J, et al. Risk group assignment differs for children and adults 1-45 yr with acute lymphoblastic leukemia treated by the NOPHO ALL-2008 protocol. Eur J Haematol. 2013:90:404-412.
+- 10. van der Velden VHJ, Hochhaus A, Cazzaniga G, Szczepanski T, Gabert J, van Dongen JJM. Detection of minimal residual disease in hematologic malignancies by real-time quantitative PCR: principles, approaches, and laboratory aspects. Leukemia. 2003;17:1013-1034.
+- 11. Jacobsen JH, Schmiegelow K, Nersting J. Liquid chromatographytandem mass spectrometry quantification of 6-thioguanine in DNA using endogenous guanine as internal standard. J Chromatogr B Anal Technol Biomed Life Sci. 2012;881-882:115-118.
+- 12. Shipkova M. Armstrong VW. Wieland E. Oellerich M. Differences in nucleotide hydrolysis contribute to the differences between erythrocyte 6-thioguanine nucleotide concentrations determined by two widely used methods. Clin Chem. 2003;49:260-268.
+- 13. R Core Team. R: A language and environment for statistical computing. Vienna, Austria: R Foundation for Statistical Computing; 2015.
+- 14. Tulstrup M, Larsen HB, Castor A, et al. Parents' and Adolescents' Preferences for Intensified or Reduced Treatment in Randomized Trials. Pediatr Lymphoblastic Leukemia Blood Cancer. 2016;63:865-871.
+- 15. Parker C, Waters R, Leighton C, et al. Effect of mitoxantrone on outcome of children with first relapse of acute lymphoblastic leukaemia (ALL R3): an open-label randomised trial. Lancet. 2010;376:2009-2017.
+
+# SUPPORTING INFORMATION
+
+Additional Supporting Information may be found online in the supporting information tab for this article.
+
+How to cite this article: Tulstrup M, Frandsen TL, Abrahamsson J, et al. Individualized 6-mercaptopurine increments in consolidation treatment of childhood acute lymphoblastic leukemia: A NOPHO randomized controlled trial. Eur J Haematol. 2018;100:53–60. https://doi.org/10.1111/ejh.12979
+
