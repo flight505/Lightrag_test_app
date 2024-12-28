@@ -13,8 +13,8 @@ prompts/
 lightrag.log
 .DS_Store
 DB/*
+*.pdf
 responses/*
 chat.log
-DB/pdf/
-DB/deep/
 DB/dickens/
+DB/deeplearning/
