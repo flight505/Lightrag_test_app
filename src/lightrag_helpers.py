@@ -95,21 +95,19 @@ class ResponseProcessor:
     def format_full_response(
         self, query: str, result: Dict[str, Any]
     ) -> str:
-        """Create a fully formatted response with all components
-
-        Args:
-            query: Original query text
-            result: Raw response dictionary from LightRAG
-
-        Returns:
-            Formatted response string
-        """
+        """Create a fully formatted response with all components and formatted equations"""
         try:
             response = result.get("response", "No response available.")
             mode = result.get("mode", "Unknown")
             sources = result.get("sources", [])
 
-            logger.debug(f"Formatting full response for query: {query}")
+            # Format equations for better display while preserving original LaTeX
+            formatted_response = response
+            if '$$' in response:
+                # Add line breaks around equation blocks for proper rendering
+                formatted_response = response.replace('$$', '\n$$\n')
+                logger.debug("Formatted equations for display")
+
             formatted_sources = "\n".join([f"- {source}" for source in sources]) if sources else "No sources provided."
 
             return f"""
@@ -117,7 +115,7 @@ class ResponseProcessor:
             {query}
 
             ### Response:
-            {response}
+            {formatted_response}
 
             ### Mode:
             {mode}
@@ -127,9 +125,7 @@ class ResponseProcessor:
             """
 
         except Exception as e:
-            error_msg = f"Error formatting full response: {str(e)}"
-            print(colored(error_msg, "red"))
-            logger.error(error_msg)
+            logger.error(f"Error formatting full response: {str(e)}")
             raise
 
     def save_response_history(
