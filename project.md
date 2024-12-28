@@ -147,3 +147,8 @@ The document validation system ensures data quality by:
 10. **Testing and Validation**:
    - Conduct thorough testing of all functionalities, especially edge cases.
    - Use automated testing frameworks to ensure reliability.
+
+11. **Visualization of the KG RAG system**:
+   - Add a visualization of the KG RAG system. 
+   - Add a visualization of the traceability table. 
+   - Add a visualization of the source documents. 
