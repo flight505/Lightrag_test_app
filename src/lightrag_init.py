@@ -170,11 +170,10 @@ class LightRAGManager:
         try:
             logger.info(f"Processing query in {mode} mode: {query_text}")
             
-            # Create QueryParam with source tracking
+            # Create QueryParam with only supported parameters
             param_kwargs = {
                 "mode": mode,
-                "only_need_context": kwargs.get("only_need_context", False),
-                "return_source": True  # Enable source tracking
+                "only_need_context": kwargs.get("only_need_context", False)
             }
             
             # Add mode-specific parameters
@@ -183,25 +182,15 @@ class LightRAGManager:
             elif mode == "local":
                 param_kwargs["max_token_for_local_context"] = kwargs.get("max_token_for_local_context", 4000)
             
-            # Create QueryParam
             param = QueryParam(**param_kwargs)
             logger.debug(f"Query parameters: {param_kwargs}")
             
-            # Execute query
             result = self.rag.query(query_text, param=param)
             
-            # Extract sources if available
-            sources = []
-            if isinstance(result, dict) and "sources" in result:
-                sources = result.get("sources", [])
-                response_text = result.get("response", str(result))
-            else:
-                response_text = str(result)
-            
             return {
-                "response": response_text,
+                "response": result,
                 "mode": mode,
-                "sources": sources,
+                "sources": [],  # Sources will be populated by LightRAG when available
                 "time": datetime.now().isoformat(),
                 "token_usage": None,
             }
