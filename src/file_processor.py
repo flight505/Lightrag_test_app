@@ -1,29 +1,85 @@
 import os
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from pathlib import Path
 from datetime import datetime
 import hashlib
 import json
+import re
 
 logger = logging.getLogger(__name__)
 
-# Configuration for Marker PDF conversion
+# Configuration for Marker PDF conversion with equation focus
 MARKER_CONFIG = {
     "output_format": "markdown",
     "force_ocr": True,
-    "num_workers": 8
+    "num_workers": 8,
+    "equation_mode": True  # Enable special handling for equations
 }
 
 class FileProcessor:
-    """Handles file preprocessing and tracking"""
+    """Handles file preprocessing and tracking with enhanced equation support"""
     
     def __init__(self, store_path: str):
         self.store_path = Path(store_path)
         self.metadata_file = self.store_path / "metadata.json"
         self.metadata = self._load_metadata()
-        self.pdf_converter = None  # Initialize converter only when needed
+        self.pdf_converter = None
+        self.equation_pattern = re.compile(r'\$\$(.*?)\$\$', re.DOTALL)
         logger.info(f"FileProcessor initialized for store: {store_path}")
+
+    def _extract_equations(self, text: str) -> List[Tuple[str, str]]:
+        """
+        Extract LaTeX equations and generate unique identifiers
+        Returns: List of (equation_id, equation_latex) tuples
+        """
+        equations = []
+        for idx, match in enumerate(self.equation_pattern.finditer(text)):
+            equation = match.group(1).strip()
+            equation_id = f"eq_{hashlib.md5(equation.encode()).hexdigest()[:8]}"
+            equations.append((equation_id, equation))
+        return equations
+
+    def _process_text_with_equations(self, text: str) -> Tuple[str, Dict]:
+        """
+        Process text and extract equation metadata
+        Returns: (processed_text, equation_metadata)
+        """
+        equations = self._extract_equations(text)
+        equation_metadata = {
+            "equations": [
+                {
+                    "id": eq_id,
+                    "latex": eq_latex,
+                    "position": idx
+                }
+                for idx, (eq_id, eq_latex) in enumerate(equations)
+            ]
+        }
+        return text, equation_metadata
+
+    def _pdf_to_text(self, pdf_path: Path) -> Tuple[str, Dict]:
+        """Convert PDF to text using Marker with equation handling"""
+        try:
+            if self.pdf_converter is None:
+                self._initialize_marker()
+            
+            logger.info(f"Converting {pdf_path} to text with equation extraction...")
+            rendered = self.pdf_converter(str(pdf_path))
+            text = rendered.markdown
+            
+            if not text:
+                raise ValueError("No text extracted from PDF")
+            
+            # Process text and extract equations
+            processed_text, equation_metadata = self._process_text_with_equations(text)
+            
+            logger.info(f"Successfully converted {pdf_path} with {len(equation_metadata['equations'])} equations")
+            return processed_text, equation_metadata
+            
+        except Exception as e:
+            logger.error(f"Error in PDF processing: {e}")
+            raise ValueError(f"Failed to process PDF: {str(e)}")
 
     def _initialize_marker(self):
         """Lazy initialization of Marker converter"""
@@ -43,27 +99,6 @@ class FileProcessor:
             except Exception as e:
                 logger.error(f"Error initializing Marker: {e}")
                 raise
-
-    def _pdf_to_text(self, pdf_path: Path) -> str:
-        """Convert PDF to text using Marker"""
-        try:
-            # Initialize Marker only when needed
-            if self.pdf_converter is None:
-                self._initialize_marker()
-            
-            logger.info(f"Converting {pdf_path} to text using Marker...")
-            rendered = self.pdf_converter(str(pdf_path))
-            text = rendered.markdown
-            
-            if not text:
-                raise ValueError("No text extracted from PDF")
-                
-            logger.info(f"Successfully converted {pdf_path}")
-            return text
-            
-        except Exception as e:
-            logger.error(f"Error in PDF processing: {e}")
-            raise ValueError(f"Failed to process PDF: {str(e)}")
 
     def _load_metadata(self) -> Dict:
         """Load or create metadata file"""
@@ -86,10 +121,7 @@ class FileProcessor:
             return hashlib.md5(f.read()).hexdigest()
 
     def scan_and_convert_store(self) -> Dict[str, str]:
-        """
-        Scan store directory for new PDFs and convert them to text
-        Returns: Dict[filename: status]
-        """
+        """Scan store directory for new PDFs and convert them to text"""
         results = {}
         pdf_files = list(self.store_path.glob("*.pdf"))
         
@@ -97,9 +129,7 @@ class FileProcessor:
             logger.info(f"No PDF files found in {self.store_path}")
             return results
         
-        logger.info(f"Found {len(pdf_files)} PDF files to check")
-        
-        # Check for new or modified PDFs before initializing Marker
+        # Check for new/modified files before initializing Marker
         new_files_exist = any(
             str(pdf) not in self.metadata["files"] or 
             self.metadata["files"][str(pdf)]["hash"] != self._calculate_hash(pdf)
@@ -110,41 +140,43 @@ class FileProcessor:
             logger.info("No new or modified PDFs found")
             return {pdf.name: "skipped" for pdf in pdf_files}
         
-        # Process each PDF file
         for pdf_path in pdf_files:
             try:
                 file_hash = self._calculate_hash(pdf_path)
                 
-                # Skip if already processed and unchanged
                 if str(pdf_path) in self.metadata["files"]:
                     if self.metadata["files"][str(pdf_path)]["hash"] == file_hash:
                         results[pdf_path.name] = "skipped"
                         continue
                 
-                # Convert PDF to text using Marker
-                text = self._pdf_to_text(pdf_path)
-                if not text:
-                    results[pdf_path.name] = "failed: no text extracted"
-                    continue
+                # Convert and extract equations
+                text, equation_metadata = self._pdf_to_text(pdf_path)
                 
-                # Save text file
+                # Save text content
                 text_path = self.store_path / f"{pdf_path.stem}.txt"
                 with open(text_path, "w", encoding="utf-8") as f:
                     f.write(text)
                 
-                # Update metadata
+                # Save equation metadata separately
+                equation_path = self.store_path / f"{pdf_path.stem}_equations.json"
+                with open(equation_path, "w", encoding="utf-8") as f:
+                    json.dump(equation_metadata, f, indent=2)
+                
+                # Update metadata with equation information
                 self.metadata["files"][str(pdf_path)] = {
                     "original_name": pdf_path.name,
                     "processed_date": datetime.now().isoformat(),
                     "hash": file_hash,
                     "size": pdf_path.stat().st_size,
                     "type": ".pdf",
-                    "converted_path": str(text_path)
+                    "converted_path": str(text_path),
+                    "equation_metadata_path": str(equation_path),
+                    "equation_count": len(equation_metadata["equations"])
                 }
                 self._save_metadata()
                 
-                results[pdf_path.name] = "converted"
-                logger.info(f"Successfully converted {pdf_path.name}")
+                results[pdf_path.name] = f"converted (with {len(equation_metadata['equations'])} equations)"
+                logger.info(f"Successfully processed {pdf_path.name}")
                 
             except Exception as e:
                 logger.error(f"Error converting {pdf_path.name}: {str(e)}")

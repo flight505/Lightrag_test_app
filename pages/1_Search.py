@@ -8,9 +8,15 @@ from datetime import datetime
 from io import BytesIO
 from typing import Dict, List
 from pathlib import Path
+import re
+from PIL import Image
+import matplotlib.pyplot as plt
+import io
+import matplotlib as mpl
 
 import streamlit as st
 from docx import Document
+from latex2mathml.converter import convert
 
 from lightrag import QueryParam
 from src.lightrag_helpers import ResponseProcessor
@@ -235,6 +241,43 @@ def check_lightrag_ready() -> tuple[bool, str]:
         return False, "No store selected. Please select a store in the sidebar"
         
     return True, "Ready"
+
+
+def render_equation(text: str) -> str:
+    """Convert LaTeX equations to readable HTML"""
+    def replace_equation(match):
+        latex = match.group(1)
+        # Clean up the LaTeX for better rendering
+        latex = latex.replace(r'\mathit{', '{').replace('}', '}')
+        try:
+            mathml = convert(latex)
+            return f'<div style="font-size: 1.2em; margin: 1em 0;">{mathml}</div>'
+        except:
+            return match.group(0)
+    
+    # Find and replace LaTeX equations
+    pattern = r'\$\$(.*?)\$\$'
+    text = re.sub(pattern, replace_equation, text)
+    return text
+
+
+def latex_to_image(latex: str) -> Image:
+    """Convert LaTeX to image using matplotlib"""
+    # Set up matplotlib
+    plt.figure(figsize=(10, 2))
+    plt.axis('off')
+    
+    # Render equation
+    plt.text(0.5, 0.5, f'${latex}$',
+             size=14, ha='center', va='center')
+    
+    # Convert to image
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', bbox_inches='tight', 
+                transparent=True, dpi=300)
+    plt.close()
+    buf.seek(0)
+    return Image.open(buf)
 
 
 # Sidebar configuration
@@ -722,8 +765,17 @@ if "query_submitted" in st.session_state and st.session_state["query_submitted"]
 # Display response
 with response_expander:
     if st.session_state["responses"] and st.session_state["responses"][-1] != "...":
-        st.markdown(st.session_state["responses"][-1], unsafe_allow_html=True)
-        logger.debug("Displayed formatted response to the user.")
+        response_text = st.session_state["responses"][-1]
+        
+        # Find equations
+        equations = re.findall(r'\$\$(.*?)\$\$', response_text)
+        
+        # Display response with equation images
+        for eq in equations:
+            st.markdown("### Equation:")
+            st.image(latex_to_image(eq))
+            st.markdown("### Explanation:")
+            st.markdown(ResponseProcessor().explain_equation(eq))
 
 # Display key points
 with key_points_expander:

@@ -8163,3 +8163,187 @@ Current query: What are the main themes explored in A Christmas Carol?
 2024-12-28 02:18:48,276 - __main__ - INFO - Query completed in Hybrid mode
 2024-12-28 02:18:48,276 - __main__ - INFO - Query completed in Hybrid mode
 2024-12-28 02:18:48,276 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-28 03:30:18,662 - __main__ - INFO - Query submitted: Find equations related to MAPE
+2024-12-28 03:30:18,662 - __main__ - INFO - Query submitted: Find equations related to MAPE
+2024-12-28 03:30:18,662 - __main__ - INFO - Query submitted: Find equations related to MAPE
+2024-12-28 03:30:18,662 - __main__ - INFO - Query submitted: Find equations related to MAPE
+2024-12-28 03:30:18,662 - __main__ - INFO - Query submitted: Find equations related to MAPE
+2024-12-28 03:30:18,664 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 03:30:18,664 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 03:30:18,664 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 03:30:18,664 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 03:30:18,664 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 03:30:28,095 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-28 03:30:28,095 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-28 03:30:28,095 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-28 03:30:28,095 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-28 03:30:28,095 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-28 03:31:49,345 - __main__ - INFO - Query submitted: Find equations related to MAPE
+2024-12-28 03:31:49,345 - __main__ - INFO - Query submitted: Find equations related to MAPE
+2024-12-28 03:31:49,345 - __main__ - INFO - Query submitted: Find equations related to MAPE
+2024-12-28 03:31:49,345 - __main__ - INFO - Query submitted: Find equations related to MAPE
+2024-12-28 03:31:49,345 - __main__ - INFO - Query submitted: Find equations related to MAPE
+2024-12-28 03:31:49,345 - __main__ - INFO - Query submitted: Find equations related to MAPE
+2024-12-28 03:31:49,345 - __main__ - INFO - Query submitted: Find equations related to MAPE
+2024-12-28 03:31:49,345 - __main__ - INFO - Query submitted: Find equations related to MAPE
+2024-12-28 20:13:22,984 - __main__ - INFO - Query submitted: Please identify the specific equations that appear in the document's discussion of loss functions and ANC prediction methodology.
+2024-12-28 20:13:22,984 - __main__ - INFO - Query submitted: Please identify the specific equations that appear in the document's discussion of loss functions and ANC prediction methodology.
+2024-12-28 20:13:22,984 - __main__ - INFO - Query submitted: Please identify the specific equations that appear in the document's discussion of loss functions and ANC prediction methodology.
+2024-12-28 20:13:22,984 - __main__ - INFO - Query submitted: Please identify the specific equations that appear in the document's discussion of loss functions and ANC prediction methodology.
+2024-12-28 20:13:22,984 - __main__ - INFO - Query submitted: Please identify the specific equations that appear in the document's discussion of loss functions and ANC prediction methodology.
+2024-12-28 20:13:22,985 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:13:22,985 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:13:22,985 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:13:22,985 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:13:22,985 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:13:29,146 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-28 20:13:29,146 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-28 20:13:29,146 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-28 20:13:29,146 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-28 20:13:29,146 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-28 20:23:55,898 - __main__ - INFO - Query submitted: Which equations are discussed related to ANC prediction?
+2024-12-28 20:23:55,898 - __main__ - INFO - Query submitted: Which equations are discussed related to ANC prediction?
+2024-12-28 20:23:55,898 - __main__ - INFO - Query submitted: Which equations are discussed related to ANC prediction?
+2024-12-28 20:23:55,898 - __main__ - INFO - Query submitted: Which equations are discussed related to ANC prediction?
+2024-12-28 20:23:55,899 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:23:55,899 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:23:55,899 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:23:55,899 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:23:55,900 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_source'
+2024-12-28 20:23:55,900 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_source'
+2024-12-28 20:23:55,900 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_source'
+2024-12-28 20:23:55,900 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_source'
+2024-12-28 20:25:40,946 - __main__ - INFO - Query submitted: The equations are discussed in relation to ANC prediction.
+2024-12-28 20:25:40,946 - __main__ - INFO - Query submitted: The equations are discussed in relation to ANC prediction.
+2024-12-28 20:25:40,946 - __main__ - INFO - Query submitted: The equations are discussed in relation to ANC prediction.
+2024-12-28 20:25:40,946 - __main__ - INFO - Query submitted: The equations are discussed in relation to ANC prediction.
+2024-12-28 20:25:40,946 - __main__ - INFO - Query submitted: The equations are discussed in relation to ANC prediction.
+2024-12-28 20:25:40,946 - __main__ - INFO - Query submitted: The equations are discussed in relation to ANC prediction.
+2024-12-28 20:25:40,948 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:25:40,948 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:25:40,948 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:25:40,948 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:25:40,948 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:25:40,948 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:25:40,949 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_source'
+2024-12-28 20:25:40,949 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_source'
+2024-12-28 20:25:40,949 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_source'
+2024-12-28 20:25:40,949 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_source'
+2024-12-28 20:25:40,949 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_source'
+2024-12-28 20:25:40,949 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_source'
+2024-12-28 20:26:25,414 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 20:26:25,414 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 20:26:25,414 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 20:26:25,414 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 20:26:25,415 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:26:25,415 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:26:25,415 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:26:25,415 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:26:25,416 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:26:25,416 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:26:25,416 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:26:25,416 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:27:30,950 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+
+2024-12-28 20:27:30,950 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+
+2024-12-28 20:27:30,950 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+
+2024-12-28 20:27:30,950 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+
+2024-12-28 20:27:30,950 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+
+2024-12-28 20:27:30,950 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+
+2024-12-28 20:27:30,950 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+
+2024-12-28 20:27:30,950 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+
+2024-12-28 20:27:30,951 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:27:30,951 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:27:30,951 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:27:30,951 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:27:30,951 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:27:30,951 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:27:30,951 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:27:30,951 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:27:30,952 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:27:30,952 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:27:30,952 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:27:30,952 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:27:30,952 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:27:30,952 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:27:30,952 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:27:30,952 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:31:02,996 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 20:31:02,996 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 20:31:02,996 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 20:31:02,996 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 20:31:02,996 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 20:31:02,996 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 20:31:02,996 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 20:31:02,996 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 20:31:02,996 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 20:31:02,996 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 20:31:02,997 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:31:02,997 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:31:02,997 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:31:02,997 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:31:02,997 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:31:02,997 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:31:02,997 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:31:02,997 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:31:02,997 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:31:02,997 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 20:31:02,998 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:31:02,998 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:31:02,998 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:31:02,998 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:31:02,998 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:31:02,998 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:31:02,998 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:31:02,998 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:31:02,998 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 20:31:02,998 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 21:12:50,794 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:12:50,794 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:12:50,794 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:12:50,794 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:12:50,794 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:12:50,794 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:12:50,794 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:12:50,794 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:12:50,794 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:12:50,794 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:12:50,794 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:12:50,794 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:12:50,794 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:12:50,794 - __main__ - INFO - Query submitted: Which equations are discussed in relations to ANC prediction?
+2024-12-28 21:12:50,794 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:12:50,794 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:12:50,794 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:12:50,794 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:12:50,794 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:12:50,794 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:12:50,794 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:12:50,794 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:12:50,794 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:12:50,794 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:12:50,794 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:12:50,794 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:12:50,794 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:12:50,794 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-28 21:12:50,795 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 21:12:50,795 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 21:12:50,795 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 21:12:50,795 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 21:12:50,795 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 21:12:50,795 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 21:12:50,795 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 21:12:50,795 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 21:12:50,795 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 21:12:50,795 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 21:12:50,795 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 21:12:50,795 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 21:12:50,795 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
+2024-12-28 21:12:50,795 - __main__ - ERROR - Error processing query: QueryParam.__init__() got an unexpected keyword argument 'return_sources'
