@@ -2,6 +2,7 @@ import logging
 import os
 from typing import Optional, Dict, Any
 from datetime import datetime
+import time
 
 from lightrag import LightRAG, QueryParam
 from lightrag.llm import gpt_4o_complete, gpt_4o_mini_complete, openai_embedding
@@ -93,8 +94,8 @@ class LightRAGManager:
             
             # Construct full path using DB_ROOT
             full_input_dir = os.path.join(DB_ROOT, self.input_dir)
-            print(colored(f"Looking for files in: {full_input_dir}", "cyan"))  # Debug line
-
+            logger.info(f"Loading documents from: {full_input_dir}")
+            
             # Check if directory exists
             if not os.path.exists(full_input_dir):
                 raise FileNotFoundError(f"Directory not found: {full_input_dir}")
@@ -116,41 +117,47 @@ class LightRAGManager:
             
             for file_path in validation_results['valid_files']:
                 try:
+                    logger.info(f"Processing file: {file_path}")
                     with open(file_path, "r", encoding="utf-8") as f:
                         content = f.read()
                         is_valid, error = self.validator.validate_content(content)
                         
                         if is_valid:
-                            self.rag.insert(content)
-                            loaded_files.append(os.path.basename(file_path))
-                            total_size += len(content)
-                            print(colored(f"Successfully loaded: {file_path}", "green"))
+                            # Add debug logging for content
+                            logger.debug(f"Content length: {len(content)} characters")
+                            logger.debug(f"Content preview: {content[:200]}...")
+                            
+                            # Insert with error handling
+                            try:
+                                self.rag.insert(content)
+                                loaded_files.append(os.path.basename(file_path))
+                                total_size += len(content)
+                                logger.info(f"Successfully inserted content from: {file_path}")
+                            except Exception as e:
+                                logger.error(f"Error inserting content from {file_path}: {str(e)}")
+                                raise
                         else:
-                            logger.warning(f"Content validation failed for {file_path}: {error}")
-                            print(colored(f"Warning: {error}", "yellow"))
+                            logger.error(f"Invalid content in {file_path}: {error}")
+                            raise ValueError(f"Invalid content in {file_path}: {error}")
                             
                 except Exception as e:
-                    logger.error(f"Error loading file {file_path}: {str(e)}")
-                    print(colored(f"Error loading file {file_path}: {str(e)}", "red"))
+                    logger.error(f"Error processing file {file_path}: {str(e)}")
+                    raise
 
-            # Provide feedback about loaded documents
+            # Log successful loading
             if loaded_files:
                 print(colored("Documents loaded successfully!", "green"))
-                print(colored(f"Loaded {len(loaded_files)} files:", "cyan"))
+                print("Loaded", len(loaded_files), "files:")
                 for file in loaded_files:
-                    print(colored(f"- {file}", "cyan"))
-                print(colored(f"Total content size: {total_size/1024:.2f}KB", "cyan"))
-
-                # Verify documents were loaded correctly
+                    print(f"- {file}")
+                print(f"Total content size: {total_size/1024:.2f}KB")
+                
+                # Verify after loading
                 if not self.verify_documents():
-                    raise Exception("Document verification failed")
+                    raise Exception("Document verification failed after loading")
+                
             else:
-                warning_msg = (
-                    f"No text files found in {full_input_dir}. "  # Updated to show full path
-                    "Please make sure your documents are in .txt format."
-                )
-                print(colored(warning_msg, "yellow"))
-                logger.warning(warning_msg)
+                raise Exception("No documents were loaded")
 
         except Exception as e:
             error_msg = f"Error loading documents: {str(e)}"
@@ -207,31 +214,45 @@ class LightRAGManager:
             logger.error(error_msg)
             raise
 
-    def verify_documents(self) -> bool:
-        """Verify documents were loaded correctly"""
-        try:
-            # Try a simple test query
-            test_response = self.rag.query(
-                "Give me a one word response if you can access the document: YES or NO",
-                param=QueryParam(mode="naive"),
-            )
-
-            if test_response and "YES" in test_response.upper():
-                print(colored("Document verification successful!", "green"))
-                return True
-            else:
-                print(
-                    colored(
-                        "Document verification failed - no content accessible", "red"
-                    )
-                )
-                return False
-
-        except Exception as e:
-            error_msg = f"Error verifying documents: {str(e)}"
-            print(colored(error_msg, "red"))
-            logger.error(error_msg)
-            return False
+    def verify_documents(self, max_retries: int = 3, delay: float = 1.0) -> bool:
+        """Verify documents were loaded correctly with retries"""
+        for attempt in range(max_retries):
+            try:
+                logger.info(f"Verification attempt {attempt + 1} of {max_retries}")
+                
+                test_query = "Give me a one word response if you can access the document: YES or NO"
+                param = QueryParam(mode="naive")
+                
+                test_response = self.rag.query(test_query, param=param)
+                logger.info(f"Verification response: {test_response}")
+                
+                if test_response:
+                    if isinstance(test_response, str):
+                        positive_indicators = ['yes', 'true', 'accessible', 'available', 'loaded']
+                        response_lower = test_response.lower()
+                        is_positive = any(indicator in response_lower for indicator in positive_indicators)
+                        
+                        if is_positive:
+                            logger.info("Document verification successful!")
+                            print(colored("Document verification successful!", "green"))
+                            return True
+                
+                logger.warning(f"Verification attempt {attempt + 1} failed")
+                if attempt < max_retries - 1:
+                    time.sleep(delay)
+                    continue
+                    
+            except Exception as e:
+                logger.error(f"Error during verification attempt {attempt + 1}: {str(e)}")
+                if attempt < max_retries - 1:
+                    time.sleep(delay)
+                    continue
+                else:
+                    raise
+        
+        print(colored("Document verification failed - no content accessible", "red"))
+        logger.error("All verification attempts failed")
+        return False
 
     def _query_with_fallback(self, query_text: str, param: QueryParam) -> dict:
         """Fallback logic for query execution"""

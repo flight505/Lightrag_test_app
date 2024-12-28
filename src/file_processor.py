@@ -5,14 +5,18 @@ from pathlib import Path
 from datetime import datetime
 import hashlib
 import json
-from transformers import AutoProcessor, AutoModelForVision2Seq
-from pdfminer.high_level import extract_text
+from marker.converters.pdf import PdfConverter
+from marker.models import create_model_dict
+from marker.config.parser import ConfigParser
 
 logger = logging.getLogger(__name__)
 
-# Constants for HuggingFace model
-DEVICE = "mps"  # Use Metal Performance Shaders for Apple Silicon
-MODEL_NAME = "HuggingFaceM4/idefics2-8b"
+# Configuration for Marker PDF conversion
+MARKER_CONFIG = {
+    "output_format": "markdown",
+    "force_ocr": True,
+    "num_workers": 8  # Using Marker's built-in parallelization
+}
 
 class FileProcessor:
     """Handles file preprocessing and tracking"""
@@ -22,26 +26,32 @@ class FileProcessor:
         self.metadata_file = self.store_path / "metadata.json"
         self.metadata = self._load_metadata()
         
-        # Initialize model attributes but don't load yet
-        self.processor = None
-        self.model = None
-        self._model_initialized = False
+        # Initialize Marker converter
+        self.config_parser = ConfigParser(MARKER_CONFIG)
+        self.pdf_converter = PdfConverter(
+            config=self.config_parser.generate_config_dict(),
+            artifact_dict=create_model_dict(),
+        )
+        logger.info("Marker PDF converter initialized")
 
-    def _initialize_model(self):
-        """Lazy initialization of HuggingFace model"""
-        if not self._model_initialized:
-            try:
-                logger.info("Loading HuggingFace model...")
-                self.processor = AutoProcessor.from_pretrained(MODEL_NAME)
-                self.model = AutoModelForVision2Seq.from_pretrained(MODEL_NAME).to(DEVICE)
-                self._model_initialized = True
-                logger.info("HuggingFace model loaded successfully")
-            except Exception as e:
-                logger.error(f"Error loading HuggingFace model: {e}")
-                self.processor = None
-                self.model = None
-                self._model_initialized = False
-                raise
+    def _pdf_to_text(self, pdf_path: Path) -> str:
+        """Convert PDF to text using Marker"""
+        try:
+            logger.info(f"Converting {pdf_path} to text using Marker...")
+            
+            # Convert PDF using Marker
+            rendered = self.pdf_converter(str(pdf_path))
+            text = rendered.markdown
+            
+            if not text:
+                raise ValueError("No text extracted from PDF")
+                
+            logger.info(f"Successfully converted {pdf_path}")
+            return text
+            
+        except Exception as e:
+            logger.error(f"Error in PDF processing: {e}")
+            raise ValueError(f"Failed to process PDF: {str(e)}")
 
     def _load_metadata(self) -> Dict:
         """Load or create metadata file"""
@@ -62,119 +72,7 @@ class FileProcessor:
         """Calculate file hash for tracking changes"""
         with open(file_path, "rb") as f:
             return hashlib.md5(f.read()).hexdigest()
-            
-    def process_file(self, file_path: Path) -> Optional[str]:
-        """Process file and return text content"""
-        try:
-            file_hash = self._calculate_hash(file_path)
-            file_info = {
-                "original_name": file_path.name,
-                "processed_date": datetime.now().isoformat(),
-                "hash": file_hash,
-                "size": file_path.stat().st_size,
-                "type": file_path.suffix.lower()
-            }
-            
-            # Check if file already processed
-            if str(file_path) in self.metadata["files"]:
-                if self.metadata["files"][str(file_path)]["hash"] == file_hash:
-                    logger.info(f"File {file_path} already processed, skipping")
-                    return None
-                    
-            # Process based on file type
-            if file_path.suffix.lower() == '.pdf':
-                text = self._pdf_to_text(file_path)
-                output_path = self.store_path / f"{file_path.stem}.txt"
-                with open(output_path, "w", encoding="utf-8") as f:
-                    f.write(text)
-                file_info["converted_path"] = str(output_path)
-            elif file_path.suffix.lower() == '.txt':
-                with open(file_path, "r", encoding="utf-8") as f:
-                    text = f.read()
-                file_info["converted_path"] = str(file_path)
-            else:
-                logger.warning(f"Unsupported file type: {file_path.suffix}")
-                return None
-                
-            # Update metadata
-            self.metadata["files"][str(file_path)] = file_info
-            self.metadata["last_updated"] = datetime.now().isoformat()
-            self._save_metadata()
-            
-            return text
-            
-        except Exception as e:
-            logger.error(f"Error processing file {file_path}: {str(e)}")
-            return None
-            
-    def _pdf_to_text(self, pdf_path: Path) -> str:
-        """Convert PDF to text using pdfminer and HuggingFace model"""
-        try:
-            # Use pdfminer for text extraction
-            logger.info(f"Extracting text from {pdf_path}...")
-            text = extract_text(str(pdf_path))
-            
-            if not text:
-                raise ValueError("No text extracted from PDF")
-            
-            # Only use HuggingFace if model is initialized
-            if self._model_initialized:
-                logger.info("Processing text with Idefics2...")
-                # Add HuggingFace processing here
-                
-            return text
-            
-        except Exception as e:
-            logger.error(f"Error in PDF processing: {e}")
-            raise ValueError(f"Failed to process PDF: {str(e)}")
-            
-    def cleanup_unused(self) -> List[str]:
-        """Remove files that are no longer needed"""
-        removed = []
-        for file_path in list(self.metadata["files"].keys()):
-            if not Path(file_path).exists():
-                info = self.metadata["files"][file_path]
-                if "converted_path" in info:
-                    conv_path = Path(info["converted_path"])
-                    if conv_path.exists():
-                        conv_path.unlink()
-                del self.metadata["files"][file_path]
-                removed.append(file_path)
-        
-        self._save_metadata()
-        return removed 
-        
-    def process_files(self, files: List[Path], progress_callback=None) -> Dict[str, str]:
-        """
-        Process multiple files with progress tracking
-        Returns: Dict[filename: status]
-        """
-        results = {}
-        total = len(files)
-        
-        for i, file_path in enumerate(files):
-            try:
-                # Update progress
-                if progress_callback:
-                    progress = (i + 1) / total
-                    status = f"Processing {file_path.name} ({i + 1}/{total})"
-                    progress_callback(progress, status)
-                
-                # Process file
-                text = self.process_file(file_path)
-                
-                # Store result
-                if text:
-                    results[file_path.name] = "processed"
-                else:
-                    results[file_path.name] = "skipped"
-                    
-            except Exception as e:
-                logger.error(f"Error processing {file_path}: {str(e)}")
-                results[file_path.name] = f"error: {str(e)}"
-                
-        return results 
-        
+
     def scan_and_convert_store(self) -> Dict[str, str]:
         """
         Scan store directory for new PDFs and convert them to text
@@ -189,17 +87,7 @@ class FileProcessor:
         
         logger.info(f"Found {len(pdf_files)} PDF files to check")
         
-        # Only initialize model if we find PDFs to process
-        new_files_exist = any(
-            str(pdf) not in self.metadata["files"] or 
-            self.metadata["files"][str(pdf)]["hash"] != self._calculate_hash(pdf)
-            for pdf in pdf_files
-        )
-
-        if new_files_exist:
-            self._initialize_model()
-
-        # Process only new or modified files
+        # Process each PDF file
         for pdf_path in pdf_files:
             try:
                 file_hash = self._calculate_hash(pdf_path)
@@ -210,7 +98,7 @@ class FileProcessor:
                         results[pdf_path.name] = "skipped"
                         continue
                 
-                # Convert new or modified PDF
+                # Convert PDF to text using Marker
                 text = self._pdf_to_text(pdf_path)
                 if not text:
                     results[pdf_path.name] = "failed: no text extracted"
@@ -240,3 +128,19 @@ class FileProcessor:
                 results[pdf_path.name] = f"error: {str(e)}"
         
         return results
+
+    def cleanup_unused(self) -> List[str]:
+        """Remove files that are no longer needed"""
+        removed = []
+        for file_path in list(self.metadata["files"].keys()):
+            if not Path(file_path).exists():
+                info = self.metadata["files"][file_path]
+                if "converted_path" in info:
+                    conv_path = Path(info["converted_path"])
+                    if conv_path.exists():
+                        conv_path.unlink()
+                del self.metadata["files"][file_path]
+                removed.append(file_path)
+        
+        self._save_metadata()
+        return removed
