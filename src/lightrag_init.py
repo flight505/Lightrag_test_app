@@ -27,6 +27,7 @@ DEFAULT_MODEL = "gpt-4o-mini"
 SUPPORTED_MODELS = ["gpt-4o-mini", "gpt-4o", "o1-mini", "o1"]
 DEFAULT_CHUNK_SIZE = 500
 DEFAULT_CHUNK_OVERLAP = 50
+SUPPORTED_MODES = ["naive", "local", "global", "hybrid", "mix"]
 
 
 class LightRAGManager:
@@ -182,19 +183,26 @@ class LightRAGManager:
     def query(self, query_text: str, mode: str = "hybrid", **kwargs) -> dict:
         """Execute query using LightRAG with academic response processing"""
         try:
+            if mode not in SUPPORTED_MODES:
+                raise ValueError(f"Unsupported mode: {mode}. Must be one of {SUPPORTED_MODES}")
+                
             logger.info(f"Processing query in {mode} mode: {query_text}")
             
-            # Create QueryParam with only documented parameters
+            # Create QueryParam with documented parameters
             param_kwargs = {
                 "mode": mode,
-                "only_need_context": kwargs.get("only_need_context", False)
+                "only_need_context": kwargs.get("only_need_context", False),
+                "response_type": kwargs.get("response_type", "Multiple Paragraphs"),
+                "top_k": kwargs.get("top_k", 60),
             }
             
             # Add mode-specific parameters
-            if mode == "global":
-                param_kwargs["top_k"] = kwargs.get("top_k", 60)
-            elif mode == "local":
+            if mode in ["local", "mix"]:
                 param_kwargs["max_token_for_local_context"] = kwargs.get("max_token_for_local_context", 4000)
+            if mode in ["global", "mix"]:
+                param_kwargs["max_token_for_global_context"] = kwargs.get("max_token_for_global_context", 4000)
+            if mode != "naive":
+                param_kwargs["max_token_for_text_unit"] = kwargs.get("max_token_for_text_unit", 4000)
             
             param = QueryParam(**param_kwargs)
             logger.debug(f"Query parameters: {param_kwargs}")

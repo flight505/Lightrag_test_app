@@ -487,18 +487,27 @@ with col1:
     # Replace radio with segmented control
     selected_mode = st.segmented_control(
         "Select mode",
-        options=["Hybrid", "Naive", "Local", "Global"],
+        options=["Mix", "Hybrid", "Local", "Global"],
         key="mode_selector",
-        help="* Hybrid: Best for most queries - combines local and global search\n"
-             "* Naive: Direct LLM query with full context - best for simple questions\n"
+        help="* Mix: Knowledge Graph + Vector Retrieval - best for complex queries with relationships\n"
+             "* Hybrid: Best for most queries - combines local and global search\n"
              "* Local: Uses nearby context - best for specific details\n"
              "* Global: Searches entire knowledge base - best for broad themes\n",
         default="Hybrid"
     )
     
+    # Show mode description
+    mode_descriptions = {
+        "local": "Local context-based search - Good for specific details",
+        "global": "Global relationship search - Good for broad understanding",
+        "hybrid": "Combines local and global - Best overall balance",
+        "mix": "Knowledge Graph + Vector Retrieval - Best for complex queries with relationships"
+    }
+    st.caption(mode_descriptions[selected_mode.lower()])
+    
     # Update session state when mode changes
-    if selected_mode != st.session_state.get("current_search_mode"):
-        st.session_state["current_search_mode"] = selected_mode
+    if selected_mode.lower() != st.session_state.get("current_search_mode", "").lower():
+        st.session_state["current_search_mode"] = selected_mode.lower()
         st.toast(f"Switched to {selected_mode} mode", icon="🔄")
 
     # Initialize mode parameters
@@ -506,7 +515,7 @@ with col1:
     
     # Mode-specific settings in small expander
     with st.expander("Mode Settings", expanded=False):
-        if selected_mode == "Global":
+        if selected_mode.lower() == "global":
             mode_params["top_k"] = st.slider(
                 "Number of documents to retrieve",
                 min_value=3,
@@ -514,7 +523,7 @@ with col1:
                 value=10,
                 help="Higher values search more documents but take longer"
             )
-        elif selected_mode == "Local":
+        elif selected_mode.lower() == "local":
             mode_params["max_token_for_local_context"] = st.slider(
                 "Maximum context tokens",
                 min_value=1000,
@@ -522,13 +531,27 @@ with col1:
                 value=2000,
                 help="Maximum tokens to consider from local context"
             )
-        elif selected_mode == "Naive":
-            mode_params["max_token_for_text_unit"] = st.slider(
-                "Maximum tokens per text unit",
+        elif selected_mode.lower() == "mix":
+            mode_params["max_token_for_local_context"] = st.slider(
+                "Maximum local context tokens",
                 min_value=1000,
                 max_value=4000,
                 value=2000,
-                help="Maximum tokens to consider per text unit"
+                help="Maximum tokens to consider from local context"
+            )
+            mode_params["max_token_for_global_context"] = st.slider(
+                "Maximum global context tokens",
+                min_value=1000,
+                max_value=4000,
+                value=2000,
+                help="Maximum tokens to consider from global context"
+            )
+            mode_params["top_k"] = st.slider(
+                "Number of documents to retrieve",
+                min_value=3,
+                max_value=60,
+                value=10,
+                help="Higher values search more documents but take longer"
             )
         
         # Common parameters for all modes

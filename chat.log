@@ -333,3 +333,35 @@
 2024-12-29 23:32:26,351 - __main__ - INFO - Query completed in Hybrid mode
 2024-12-29 23:32:26,351 - __main__ - INFO - Query completed in Hybrid mode
 2024-12-29 23:32:26,351 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-29 23:48:52,288 - __main__ - INFO - Query submitted: Which papers discuss methodological approaches for handling irregularly spaced time series data, specifically regarding missing blood sample measurements, and what are the mathematical frameworks for addressing such gaps in temporal data?
+2024-12-29 23:48:52,288 - __main__ - INFO - Query submitted: Which papers discuss methodological approaches for handling irregularly spaced time series data, specifically regarding missing blood sample measurements, and what are the mathematical frameworks for addressing such gaps in temporal data?
+2024-12-29 23:48:52,288 - __main__ - INFO - Query submitted: Which papers discuss methodological approaches for handling irregularly spaced time series data, specifically regarding missing blood sample measurements, and what are the mathematical frameworks for addressing such gaps in temporal data?
+2024-12-29 23:48:52,288 - __main__ - INFO - Query submitted: Which papers discuss methodological approaches for handling irregularly spaced time series data, specifically regarding missing blood sample measurements, and what are the mathematical frameworks for addressing such gaps in temporal data?
+2024-12-29 23:48:52,289 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-29 23:48:52,289 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-29 23:48:52,289 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-29 23:48:52,289 - __main__ - INFO - Processing query with mode: hybrid
+2024-12-29 23:48:52,292 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-29 23:48:52,292 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-29 23:48:52,292 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-29 23:48:52,292 - __main__ - INFO - Query completed in Hybrid mode
+2024-12-29 23:52:55,245 - __main__ - INFO - Query submitted: Which papers are discussing irregular multivariate time series?
+
+2024-12-29 23:52:55,245 - __main__ - INFO - Query submitted: Which papers are discussing irregular multivariate time series?
+
+2024-12-29 23:52:55,245 - __main__ - INFO - Query submitted: Which papers are discussing irregular multivariate time series?
+
+2024-12-29 23:52:55,245 - __main__ - INFO - Query submitted: Which papers are discussing irregular multivariate time series?
+
+2024-12-29 23:52:55,245 - __main__ - INFO - Query submitted: Which papers are discussing irregular multivariate time series?
+
+2024-12-29 23:52:55,246 - __main__ - INFO - Processing query with mode: mix
+2024-12-29 23:52:55,246 - __main__ - INFO - Processing query with mode: mix
+2024-12-29 23:52:55,246 - __main__ - INFO - Processing query with mode: mix
+2024-12-29 23:52:55,246 - __main__ - INFO - Processing query with mode: mix
+2024-12-29 23:52:55,246 - __main__ - INFO - Processing query with mode: mix
+2024-12-29 23:53:05,821 - __main__ - INFO - Query completed in mix mode
+2024-12-29 23:53:05,821 - __main__ - INFO - Query completed in mix mode
+2024-12-29 23:53:05,821 - __main__ - INFO - Query completed in mix mode
+2024-12-29 23:53:05,821 - __main__ - INFO - Query completed in mix mode
+2024-12-29 23:53:05,821 - __main__ - INFO - Query completed in mix mode
