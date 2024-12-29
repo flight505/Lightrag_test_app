@@ -3,6 +3,7 @@ import os
 from typing import Optional, Dict, Any
 from datetime import datetime
 import time
+import re
 
 from lightrag import LightRAG, QueryParam
 from lightrag.llm import gpt_4o_complete, gpt_4o_mini_complete, openai_embedding
@@ -10,6 +11,8 @@ from lightrag.utils import EmbeddingFunc
 from termcolor import colored
 from src.file_manager import DB_ROOT
 from src.document_validator import DocumentValidator
+from src.academic_response_processor import AcademicResponseProcessor
+from src.file_processor import FileProcessor
 
 # Configure logging
 logging.basicConfig(
@@ -39,32 +42,35 @@ class LightRAGManager:
     ):
         """Initialize LightRAG with configuration parameters"""
         try:
+            print(colored(f"Initializing LightRAG with {model_name}...", "cyan"))
+            
+            # Store configuration
             self.api_key = api_key
             self.input_dir = input_dir
             self.model_name = model_name
             self.chunk_size = chunk_size
             self.chunk_overlap = chunk_overlap
-
-            print(colored(f"Initializing LightRAG with {model_name}...", "cyan"))
+            
+            # Set working directory
+            self.working_dir = os.path.join(DB_ROOT, self.input_dir)
+            logger.info(f"Working directory: {self.working_dir}")
+            
+            # Create directory if it doesn't exist
+            os.makedirs(self.working_dir, exist_ok=True)
+            
+            # Initialize components
+            self.validator = DocumentValidator(self.working_dir)
+            self.file_processor = FileProcessor(self.working_dir)
+            self.response_processor = AcademicResponseProcessor()
 
             # Initialize LightRAG with OpenAI configuration
             llm_func = (
                 gpt_4o_mini_complete if model_name == "gpt-4o-mini" else gpt_4o_complete
             )
 
-            # Initialize LightRAG with full path
-            full_working_dir = os.path.join(DB_ROOT, self.input_dir)
-            logger.info(f"Working directory: {full_working_dir}")
-            
-            # Create directory if it doesn't exist
-            os.makedirs(full_working_dir, exist_ok=True)
-
-            # Initialize validator (working_dir doesn't matter since we use DB_ROOT directly)
-            self.validator = DocumentValidator(working_dir=full_working_dir)
-
-            # Initialize LightRAG after validator
+            # Initialize LightRAG
             self.rag = LightRAG(
-                working_dir=full_working_dir,
+                working_dir=self.working_dir,
                 llm_model_func=llm_func,
                 llm_model_kwargs={
                     "api_key": self.api_key,
@@ -100,7 +106,10 @@ class LightRAGManager:
             if not os.path.exists(full_input_dir):
                 raise FileNotFoundError(f"Directory not found: {full_input_dir}")
 
-            # Validate store first
+            # Process any PDFs first
+            self.file_processor.scan_and_convert_store()
+            
+            # Validate store after PDF processing
             validation_results = self.validator.validate_store(self.input_dir)
             
             if validation_results['errors']:
@@ -129,7 +138,12 @@ class LightRAGManager:
                             
                             # Insert with error handling
                             try:
-                                self.rag.insert(content)
+                                # Store metadata in the content itself using a special format
+                                file_info = f"[Source: {os.path.basename(file_path)}]\n\n"
+                                content_with_source = file_info + content
+                                
+                                # Insert content directly
+                                self.rag.insert(content_with_source)
                                 loaded_files.append(os.path.basename(file_path))
                                 total_size += len(content)
                                 logger.info(f"Successfully inserted content from: {file_path}")
@@ -166,11 +180,11 @@ class LightRAGManager:
             raise
 
     def query(self, query_text: str, mode: str = "hybrid", **kwargs) -> dict:
-        """Execute query using LightRAG"""
+        """Execute query using LightRAG with academic response processing"""
         try:
             logger.info(f"Processing query in {mode} mode: {query_text}")
             
-            # Create QueryParam with only supported parameters
+            # Create QueryParam with only documented parameters
             param_kwargs = {
                 "mode": mode,
                 "only_need_context": kwargs.get("only_need_context", False)
@@ -185,12 +199,49 @@ class LightRAGManager:
             param = QueryParam(**param_kwargs)
             logger.debug(f"Query parameters: {param_kwargs}")
             
-            result = self.rag.query(query_text, param=param)
+            # Execute query
+            raw_result = self.rag.query(query_text, param=param)
+            logger.debug(f"Raw result: {raw_result}")
+            
+            # Extract response and sources
+            if isinstance(raw_result, dict):
+                response_text = raw_result.get('response', raw_result)
+                context = raw_result.get('context', [])
+            else:
+                response_text = str(raw_result)
+                context = []
+            
+            # Extract source information from context
+            source_files = set()  # Use set to avoid duplicates
+            
+            # Extract from context using our source format
+            source_pattern = re.compile(r'\[Source: ([^\]]+)\]')
+            
+            if isinstance(context, list):
+                for ctx in context:
+                    if isinstance(ctx, str):
+                        matches = source_pattern.findall(ctx)
+                        source_files.update(matches)
+            
+            # Convert set to list
+            source_files = list(source_files)
+            logger.info(f"Extracted sources: {source_files}")
+            
+            # Process response with academic formatting
+            formatted_response = self.response_processor.format_academic_response(
+                query=query_text,
+                result={
+                    "response": response_text,
+                    "mode": mode,
+                    "sources": source_files,
+                    "time": datetime.now().isoformat()
+                }
+            )
             
             return {
-                "response": result,
+                "response": formatted_response,
                 "mode": mode,
-                "sources": [],  # Sources will be populated by LightRAG when available
+                "sources": source_files,
                 "time": datetime.now().isoformat(),
                 "token_usage": None,
             }

@@ -187,13 +187,35 @@ class FileProcessor:
     def cleanup_unused(self) -> List[str]:
         """Remove files that are no longer needed"""
         removed = []
+        current_files = set()
+        
+        # First, scan for all current PDF files
+        for pdf_file in self.store_path.glob("*.pdf"):
+            current_files.add(str(pdf_file))
+        
+        # Check which files need cleanup
         for file_path in list(self.metadata["files"].keys()):
-            if not Path(file_path).exists():
-                info = self.metadata["files"][file_path]
+            path = Path(file_path)
+            info = self.metadata["files"][file_path]
+            
+            # Only cleanup if:
+            # 1. The original PDF no longer exists
+            # 2. The file is not a text file being used by LightRAG
+            if not path.exists() and not file_path.endswith('.txt'):
+                # If there's a converted text file, keep it unless explicitly told to remove
                 if "converted_path" in info:
                     conv_path = Path(info["converted_path"])
-                    if conv_path.exists():
-                        conv_path.unlink()
+                    if conv_path.exists() and conv_path.suffix == '.txt':
+                        # Keep the text file but update metadata
+                        new_key = str(conv_path)
+                        self.metadata["files"][new_key] = {
+                            "original_name": conv_path.name,
+                            "processed_date": info.get("processed_date", datetime.now().isoformat()),
+                            "type": ".txt",
+                            "is_converted": True,
+                            "original_pdf": path.name
+                        }
+                        
                 del self.metadata["files"][file_path]
                 removed.append(file_path)
         
