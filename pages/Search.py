@@ -49,6 +49,8 @@ if "active_store" not in st.session_state:
     st.session_state["active_store"] = None
 if "api_key_shown" not in st.session_state:
     st.session_state["api_key_shown"] = False
+if "openai_api_key" not in st.session_state:
+    st.session_state["openai_api_key"] = os.getenv("OPENAI_API_KEY", "")
 
 # Helper functions
 def manage_conversation_context(query: str, response: str):
@@ -175,6 +177,62 @@ def check_lightrag_ready() -> tuple[bool, str]:
         
     return True, "Ready"
 
+
+def rewrite_prompt(prompt: str) -> str:
+    """Rewrite the user prompt into a templated format using OpenAI."""
+    try:
+        from openai import OpenAI
+        
+        # Use API key from session state
+        if not st.session_state.get("openai_api_key"):
+            st.error("OpenAI API key not found in session state")
+            return prompt
+            
+        client = OpenAI(api_key=st.session_state["openai_api_key"])
+        
+        system_instruction = """
+        You are a prompt engineering assistant. Your task is to rewrite user prompts into a templated format.
+        The template should follow this structure:
+
+        <START_OF_SYSTEM_PROMPT>
+        You are an academic research assistant. Your task is to help answer questions about academic papers
+        and research documents. You should:
+        1. Think step by step
+        2. Cite specific sources and quotes
+        3. Be precise and academic in tone
+        4. Acknowledge uncertainty when present
+        5. Focus on factual information from the sources
+        </START_OF_SYSTEM_PROMPT>
+
+        <START_OF_USER>
+        {input_str}
+        </END_OF_USER>
+
+        Keep the original intent but make it more specific and detailed.
+        You will answer a reasoning question. Think step by step. The last two lines of your response should be of the following format: 
+        - '> Answer: $VALUE' where VALUE is concise and to the point.
+        - '> Sources: $SOURCE1, $SOURCE2, ...' where SOURCE1, SOURCE2, etc. are the sources you used to justify your answer.
+        """
+
+        response = client.chat.completions.create(
+            model="gpt-4",  # Using GPT-4 for better prompt engineering
+            messages=[
+                {"role": "system", "content": system_instruction},
+                {"role": "user", "content": f"Rewrite this prompt: {prompt}"}
+            ],
+            temperature=0.7
+        )
+        
+        rewritten = response.choices[0].message.content
+        logger.info(f"Prompt rewritten ({len(prompt)} → {len(rewritten)} chars)")
+        return rewritten
+        
+    except Exception as e:
+        logger.error(f"Error rewriting prompt: {str(e)}")
+        st.warning(f"Could not rewrite prompt: {str(e)}")
+        # Return original prompt if rewrite fails
+        return prompt
+
 # Page configuration
 st.set_page_config(
     page_title="LightRAG Chat",
@@ -196,10 +254,87 @@ with nav_col3:
     if st.button("📁 Manage Documents", use_container_width=True):
         st.switch_page("pages/Manage.py")
 
-st.divider()
 
 # Main interface
 st.write("## 💬 LightRAG Chat")
+
+# Configuration form
+with st.form("configuration_form"):
+    st.markdown("**Configure your chat:**")
+    
+    # API key handling
+    if not st.session_state["openai_api_key"]:
+        api_key = st.text_input("Your API key", type="password")
+        if not api_key:
+            st.warning("Please enter your OpenAI API key or set OPENAI_API_KEY environment variable")
+    else:
+        api_key = st.session_state["openai_api_key"]
+        if not st.session_state.get("api_key_shown"):
+            st.toast("Using API key from environment variable")
+            st.session_state["api_key_shown"] = True
+
+    model = st.selectbox(
+        "Select your model",
+        options=SUPPORTED_MODELS,
+        index=SUPPORTED_MODELS.index(DEFAULT_MODEL),
+    )
+
+    with st.expander("Advanced Settings"):
+        chunk_size = st.number_input(
+            "Chunk size", value=500, help="Size of text chunks for processing"
+        )
+        chunk_overlap = st.number_input(
+            "Chunk overlap", value=50, help="Overlap between text chunks"
+        )
+        temperature = st.slider(
+            "Temperature",
+            min_value=0.0,
+            max_value=1.0,
+            value=0.0,
+            step=0.1,
+            help="Controls response creativity (0: focused, 1: creative)",
+        )
+
+    config_submitted = st.form_submit_button("Initialize Chat")
+
+    if config_submitted:
+        if not st.session_state["active_store"]:
+            st.error("Please select a store first")
+        elif not api_key:
+            st.error("API key is required")
+        else:
+            try:
+                with st.spinner("Initializing LightRAG..."):
+                    # Store API key in session state
+                    st.session_state["openai_api_key"] = api_key
+                    
+                    # Get correct store path
+                    store_path = os.path.join(DB_ROOT, st.session_state["active_store"])
+                    
+                    # Initialize LightRAG manager with correct parameters
+                    st.session_state["rag_manager"] = LightRAGManager(
+                        api_key=st.session_state["openai_api_key"],
+                        input_dir=store_path,
+                        model_name=model,
+                        chunk_size=chunk_size,
+                        chunk_overlap=chunk_overlap,
+                        temperature=temperature
+                    )
+                    
+                    # Load documents
+                    st.session_state["rag_manager"].load_documents()
+                    
+                    # Set status to ready
+                    st.session_state["status_ready"] = True
+                    
+                    # Force rerun to update UI
+                    st.rerun()
+
+            except Exception as e:
+                st.error(f"Configuration error: {str(e)}")
+                logger.error(f"Configuration error: {str(e)}", exc_info=True)
+
+st.divider()
 
 # Create two columns for the main interface
 col1, col2 = st.columns([3, 1])
@@ -207,6 +342,7 @@ col1, col2 = st.columns([3, 1])
 with col1:
     # Chat interface
     chat_container = st.container()
+    st.write(st.session_state["rag_manager"])
     
     with chat_container:
         is_ready, status_msg = check_lightrag_ready()
@@ -214,6 +350,37 @@ with col1:
         if not is_ready:
             st.warning(status_msg)
         else:
+            # Mode and rewrite selections in columns
+            mode_col, rewrite_col = st.columns([3, 2])
+            
+            with mode_col:
+                # Mode selection
+                mode = st.segmented_control(
+                    "Search Mode",
+                    options=["Mix", "Hybrid", "Local", "Global"],
+                    default="Mix",
+                    help="""
+                    **Mix**: Combines knowledge graph and vector search for comprehensive results
+                    **Hybrid**: Balances local and global context
+                    **Local**: Focuses on specific document context
+                    **Global**: Explores broader relationships across documents
+                    """
+                )
+                st.session_state["search_mode"] = mode
+            
+            with rewrite_col:
+                # Prompt rewrite selection
+                rewrite = st.segmented_control(
+                    "Prompt Style",
+                    options=["Direct", "Rewrite"],
+                    default="Direct",
+                    help="""
+                    **Direct**: Use the prompt as entered
+                    **Rewrite**: Enhance the prompt with academic style and structure
+                    """
+                )
+                st.session_state["rewrite_prompt"] = (rewrite == "Rewrite")
+
             # Add chat controls
             chat_controls_col1, chat_controls_col2 = st.columns([2, 1])
             with chat_controls_col1:
@@ -252,10 +419,25 @@ with col1:
                     # Prepare query with context
                     query = f"{context}\nCurrent query: {prompt}" if context else prompt
                     logger.info(f"Prepared query: {query}")
+                    
+                    # Rewrite prompt if enabled
+                    if st.session_state.get("rewrite_prompt", False):
+                        with st.status("Rewriting prompt..."):
+                            query = rewrite_prompt(query)
+                            logger.info(f"Rewritten query: {query}")
 
                     # Process query with progress indicator
                     with st.status("Processing...") as status:
-                        result = st.session_state["rag_manager"].query(query)
+                        # Create query parameters with selected mode
+                        query_params = QueryParam(
+                            mode=st.session_state["search_mode"].lower()
+                        )
+                        
+                        # Execute query with mode
+                        result = st.session_state["rag_manager"].query(
+                            query,
+                            query_params=query_params
+                        )
                         logger.info(f"Query result: {result}")
 
                         if result and result.get("response"):
@@ -263,8 +445,12 @@ with col1:
                             formatted_response = (
                                 f"{result['response']}\n\n"
                                 f"*Sources:*\n"
-                                f"{st.session_state['response_processor'].format_sources(result.get('sources', []))}"
                             )
+                            
+                            # Add sources if available
+                            if result.get("sources"):
+                                sources_text = "\n".join([f"- {source}" for source in result["sources"]])
+                                formatted_response += sources_text
                             
                             # Add assistant response to chat history
                             st.session_state["chat_history"].append({
@@ -354,80 +540,6 @@ with col2:
                         st.rerun()
                 else:
                     st.info("Not enough conversation history to summarize.")
-
-    # Configuration form
-    with st.form("configuration_form"):
-        st.markdown("**Configure your chat:**")
-        
-        # Get API key from environment variable first
-        api_key = os.getenv("OPENAI_API_KEY", "")
-        
-        # Only show API key input if not in environment
-        if not api_key:
-            api_key = st.text_input("Your API key", type="password")
-            if not api_key:
-                st.warning("Please enter your OpenAI API key or set OPENAI_API_KEY environment variable")
-        elif not st.session_state.get("api_key_shown"):
-            st.toast("Using API key from environment variable")
-            st.session_state["api_key_shown"] = True
-
-        model = st.selectbox(
-            "Select your model",
-            options=SUPPORTED_MODELS,
-            index=SUPPORTED_MODELS.index(DEFAULT_MODEL),
-        )
-
-        with st.expander("Advanced Settings"):
-            chunk_size = st.number_input(
-                "Chunk size", value=500, help="Size of text chunks for processing"
-            )
-            chunk_overlap = st.number_input(
-                "Chunk overlap", value=50, help="Overlap between text chunks"
-            )
-            temperature = st.slider(
-                "Temperature",
-                min_value=0.0,
-                max_value=1.0,
-                value=0.0,
-                step=0.1,
-                help="Controls response creativity (0: focused, 1: creative)",
-            )
-
-        config_submitted = st.form_submit_button("Initialize Chat")
-
-        if config_submitted:
-            if not st.session_state["active_store"]:
-                st.error("Please select a store first")
-            elif not api_key:
-                st.error("API key is required")
-            else:
-                try:
-                    with st.spinner("Initializing LightRAG..."):
-                        # Get correct store path
-                        store_path = os.path.join(DB_ROOT, st.session_state["active_store"])
-                        
-                        # Initialize LightRAG manager with correct parameters
-                        st.session_state["rag_manager"] = LightRAGManager(
-                            api_key=api_key,
-                            input_dir=store_path,
-                            model_name=model,
-                            chunk_size=chunk_size,
-                            chunk_overlap=chunk_overlap,
-                            temperature=temperature
-                        )
-                        
-                        # Load documents
-                        st.session_state["rag_manager"].load_documents()
-                        
-                        # Set status to ready
-                        st.session_state["status_ready"] = True
-                        
-                        # Force rerun to update UI
-                        st.rerun()
-
-                except Exception as e:
-                    st.error(f"Configuration error: {str(e)}")
-                    logger.error(f"Configuration error: {str(e)}", exc_info=True)
 
 # Add Knowledge Graph section at the bottom
 if "show_graph" in st.session_state and st.session_state["show_graph"]:
@@ -536,3 +648,4 @@ if "show_graph" in st.session_state and st.session_state["show_graph"]:
         if st.button("Hide Knowledge Graph"):
             st.session_state["show_graph"] = False
             st.rerun()
+    

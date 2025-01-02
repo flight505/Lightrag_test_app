@@ -56,6 +56,7 @@ class LightRAGManager:
         # Initialize components
         self.validator = DocumentValidator(working_dir=self.input_dir)
         self.file_processor = FileProcessor(store_path=self.input_dir)
+        self.response_processor = AcademicResponseProcessor()
         
         # Initialize LightRAG
         self.rag = LightRAG(
