@@ -258,10 +258,10 @@ with nav_col3:
 # Main interface
 st.write("## 💬 LightRAG Chat")
 
-# Configuration form
-with st.form("configuration_form"):
+    # Configuration form
+    with st.form("configuration_form"):
     st.markdown("**Configure your chat:**")
-    
+        
     # API key handling
     if not st.session_state["openai_api_key"]:
         api_key = st.text_input("Your API key", type="password")
@@ -273,37 +273,37 @@ with st.form("configuration_form"):
             st.toast("Using API key from environment variable")
             st.session_state["api_key_shown"] = True
 
-    model = st.selectbox(
+        model = st.selectbox(
         "Select your model",
-        options=SUPPORTED_MODELS,
-        index=SUPPORTED_MODELS.index(DEFAULT_MODEL),
-    )
+            options=SUPPORTED_MODELS,
+            index=SUPPORTED_MODELS.index(DEFAULT_MODEL),
+        )
 
-    with st.expander("Advanced Settings"):
-        chunk_size = st.number_input(
-            "Chunk size", value=500, help="Size of text chunks for processing"
-        )
-        chunk_overlap = st.number_input(
-            "Chunk overlap", value=50, help="Overlap between text chunks"
-        )
-        temperature = st.slider(
-            "Temperature",
-            min_value=0.0,
-            max_value=1.0,
-            value=0.0,
-            step=0.1,
-            help="Controls response creativity (0: focused, 1: creative)",
-        )
+        with st.expander("Advanced Settings"):
+            chunk_size = st.number_input(
+                "Chunk size", value=500, help="Size of text chunks for processing"
+            )
+            chunk_overlap = st.number_input(
+                "Chunk overlap", value=50, help="Overlap between text chunks"
+            )
+            temperature = st.slider(
+                "Temperature",
+                min_value=0.0,
+                max_value=1.0,
+                value=0.0,
+                step=0.1,
+                help="Controls response creativity (0: focused, 1: creative)",
+            )
 
     config_submitted = st.form_submit_button("Initialize Chat")
 
-    if config_submitted:
+        if config_submitted:
         if not st.session_state["active_store"]:
             st.error("Please select a store first")
-        elif not api_key:
-            st.error("API key is required")
-        else:
-            try:
+            elif not api_key:
+                st.error("API key is required")
+            else:
+                try:
                 with st.spinner("Initializing LightRAG..."):
                     # Store API key in session state
                     st.session_state["openai_api_key"] = api_key
@@ -321,20 +321,28 @@ with st.form("configuration_form"):
                         temperature=temperature
                     )
                     
-                    # Load documents
-                    st.session_state["rag_manager"].load_documents()
+                    # Validate store using DocumentValidator
+                    validation_results = st.session_state["rag_manager"].validator.validate_store(store_path)
                     
-                    # Set status to ready
+                    if validation_results['errors']:
+                        for error in validation_results['errors']:
+                            st.warning(f"Validation warning: {error}")
+                    
+                    if validation_results['valid_files']:
+                        st.toast("Using existing indexed store")
+                        st.session_state["status_ready"] = True
+                    else:
+                        st.info("No valid files found. Starting indexing...")
+                        st.session_state["rag_manager"].load_documents()
                     st.session_state["status_ready"] = True
-                    
+
                     # Force rerun to update UI
                     st.rerun()
-
-            except Exception as e:
-                st.error(f"Configuration error: {str(e)}")
+                except Exception as e:
+                    st.error(f"Configuration error: {str(e)}")
                 logger.error(f"Configuration error: {str(e)}", exc_info=True)
 
-st.divider()
+            st.divider()
 
 # Create two columns for the main interface
 col1, col2 = st.columns([3, 1])
@@ -367,6 +375,7 @@ with col1:
                     """
                 )
                 st.session_state["search_mode"] = mode
+                logger.info(f"Search mode selected: {mode}")
             
             with rewrite_col:
                 # Prompt rewrite selection
@@ -430,12 +439,14 @@ with col1:
                     with st.status("Processing...") as status:
                         # Create query parameters with selected mode
                         query_params = QueryParam(
-                            mode=st.session_state["search_mode"].lower()
+                            mode=st.session_state["search_mode"].upper()
                         )
+                        logger.info(f"Using search mode: {st.session_state['search_mode'].upper()}")
                         
                         # Execute query with mode
                         result = st.session_state["rag_manager"].query(
                             query,
+                            mode=st.session_state["search_mode"].upper(),
                             query_params=query_params
                         )
                         logger.info(f"Query result: {result}")
@@ -560,7 +571,7 @@ if "show_graph" in st.session_state and st.session_state["show_graph"]:
                 
                 if not os.path.exists(graph_path):
                     st.warning("⚠️ Knowledge Graph not found. Please initialize and index documents first.")
-                else:
+    else:
                     graph = nx.read_graphml(graph_path)
                     
                     # Basic stats in columns
