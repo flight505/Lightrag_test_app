@@ -16,7 +16,3 @@ DB/*
 *.pdf
 responses/*
 chat.log
-DB/dickens/
-DB/deeplearning/
-DB/Timeseries/
-DB/test_store/
