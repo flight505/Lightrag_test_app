@@ -42,3 +42,4 @@ pytest-asyncio
 httpx
 beautifulsoup4
 marker-pdf
+matplotlib
