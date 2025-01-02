@@ -38,74 +38,56 @@ class LightRAGManager:
         api_key: str,
         input_dir: str,
         model_name: str = DEFAULT_MODEL,
-        chunk_size: int = DEFAULT_CHUNK_SIZE,
-        chunk_overlap: int = DEFAULT_CHUNK_OVERLAP,
+        chunk_size: int = 500,
+        chunk_overlap: int = 50,
+        temperature: float = 0.0,
     ):
-        """Initialize LightRAG with configuration parameters"""
-        try:
-            print(colored(f"Initializing LightRAG with {model_name}...", "cyan"))
-            
-            # Store configuration
-            self.api_key = api_key
-            self.input_dir = input_dir
-            self.model_name = model_name
-            self.chunk_size = chunk_size
-            self.chunk_overlap = chunk_overlap
-            
-            # Set working directory
-            self.working_dir = os.path.join(DB_ROOT, self.input_dir)
-            logger.info(f"Working directory: {self.working_dir}")
-            
-            # Create directory if it doesn't exist
-            os.makedirs(self.working_dir, exist_ok=True)
-            
-            # Initialize components
-            self.validator = DocumentValidator(self.working_dir)
-            self.file_processor = FileProcessor(self.working_dir)
-            self.response_processor = AcademicResponseProcessor()
-
-            # Initialize LightRAG with OpenAI configuration
-            llm_func = (
-                gpt_4o_mini_complete if model_name == "gpt-4o-mini" else gpt_4o_complete
-            )
-
-            # Initialize LightRAG
-            self.rag = LightRAG(
-                working_dir=self.working_dir,
-                llm_model_func=llm_func,
-                llm_model_kwargs={
-                    "api_key": self.api_key,
-                },
-                embedding_func=EmbeddingFunc(
-                    embedding_dim=1536,
-                    max_token_size=8192,
-                    func=lambda texts: openai_embedding(
-                        texts=texts,
-                        api_key=self.api_key,
-                    ),
+        """Initialize LightRAG with configuration"""
+        print(f"Initializing LightRAG with {model_name}...")
+        
+        self.input_dir = input_dir
+        self.model_name = model_name
+        self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
+        self.temperature = temperature
+        
+        logger.info(f"Working directory: {self.input_dir}")
+        
+        # Initialize components
+        self.validator = DocumentValidator(working_dir=self.input_dir)
+        self.file_processor = FileProcessor(store_path=self.input_dir)
+        
+        # Initialize LightRAG
+        self.rag = LightRAG(
+            working_dir=self.input_dir,
+            llm_model_func=gpt_4o_mini_complete if model_name == "gpt-4o-mini" else gpt_4o_complete,
+            llm_model_kwargs={
+                "api_key": api_key,
+                "temperature": temperature
+            },
+            embedding_func=EmbeddingFunc(
+                embedding_dim=1536,
+                max_token_size=8192,
+                func=lambda texts: openai_embedding(
+                    texts=texts,
+                    api_key=api_key,
                 ),
-            )
-
-            print(colored("LightRAG initialization successful!", "green"))
-
-        except Exception as e:
-            error_msg = f"Error initializing LightRAG: {str(e)}"
-            print(colored(error_msg, "red"))
-            logger.error(error_msg)
-            raise
+            ),
+        )
+        
+        print("LightRAG initialization successful!")
 
     def load_documents(self) -> None:
         """Load documents from input directory"""
         try:
-            print(colored("Loading documents...", "cyan"))
+            print("Loading documents...")
             
-            # Construct full path using DB_ROOT
-            full_input_dir = os.path.join(DB_ROOT, self.input_dir)
-            logger.info(f"Loading documents from: {full_input_dir}")
+            # Use the input_dir directly since it's already the full path
+            logger.info(f"Loading documents from: {self.input_dir}")
             
             # Check if directory exists
-            if not os.path.exists(full_input_dir):
-                raise FileNotFoundError(f"Directory not found: {full_input_dir}")
+            if not os.path.exists(self.input_dir):
+                raise FileNotFoundError(f"Directory not found: {self.input_dir}")
 
             # Process any PDFs first
             self.file_processor.scan_and_convert_store()
@@ -116,7 +98,7 @@ class LightRAGManager:
             if validation_results['errors']:
                 for error in validation_results['errors']:
                     logger.warning(f"Validation error: {error}")
-                    print(colored(f"Warning: {error}", "yellow"))
+                    print(f"Warning: {error}")
                     
             if not validation_results['valid_files']:
                 raise Exception("No valid documents found to load")
