@@ -201,42 +201,6 @@ st.divider()
 # Main interface
 st.write("## 💬 LightRAG Chat")
 
-# Store selection in main content
-store_col1, store_col2 = st.columns([3, 1])
-with store_col1:
-    # List existing stores
-    stores = [d for d in os.listdir(DB_ROOT) if os.path.isdir(os.path.join(DB_ROOT, d))]
-    
-    # Store selection
-    selected_store = st.selectbox(
-        "Select Document Store",
-        ["Create New..."] + stores,
-        index=0 if st.session_state["active_store"] is None else 
-              stores.index(st.session_state["active_store"]) + 1,
-        help="Choose an existing document store or create a new one"
-    )
-
-with store_col2:
-    if selected_store == "Create New...":
-        new_store = st.text_input("Store Name")
-        if st.button("Create Store", type="primary", use_container_width=True):
-            if new_store:
-                store_path = create_store_directory(new_store)
-                if store_path:
-                    st.session_state["active_store"] = new_store
-                    st.session_state["file_processor"] = FileProcessor(store_path)
-                    st.success(f"Created store: {new_store}")
-                    st.rerun()
-    else:
-        store_path = os.path.join(DB_ROOT, selected_store)
-        if st.session_state["active_store"] != selected_store:
-            st.session_state["file_processor"] = None
-            st.session_state["active_store"] = selected_store
-            st.session_state["file_processor"] = FileProcessor(store_path)
-            st.rerun()
-
-st.divider()
-
 # Create two columns for the main interface
 col1, col2 = st.columns([3, 1])
 

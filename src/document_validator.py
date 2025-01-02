@@ -48,62 +48,56 @@ class DocumentValidator:
             logger.error(f"Error validating file {file_path}: {str(e)}")
             return False, str(e)
             
-    def validate_store(self, store_name: str) -> Dict[str, List[str]]:
-        """
-        Validates all documents in a store
-        Returns: {
-            'valid_files': [...],
-            'invalid_files': [...],
-            'errors': [...]
-        }
-        """
-        store_path = os.path.join(DB_ROOT, store_name)
+    def validate_store(self, store_path: str) -> Dict:
+        """Validate the document store directory"""
         logger.info(f"Validating store at path: {store_path}")
         
+        # Initialize results
         results = {
             'valid_files': [],
-            'invalid_files': [],
             'errors': []
         }
         
-        if not os.path.exists(store_path):
-            error_msg = f"Store not found at: {store_path}"
+        try:
+            # Get all text files in the store
+            txt_files = list(Path(store_path).glob("*.txt"))
+            
+            # Filter out system files
+            system_files = ["graph_chunk_entity_relation.graphml", "graph_visualization.html", 
+                          "kv_store_full_docs.json", "kv_store_llm_response_cache.json",
+                          "kv_store_text_chunks.json", "metadata.json", "vdb_chunks.json",
+                          "vdb_entities.json", "vdb_relationships.json"]
+            
+            txt_files = [f for f in txt_files if f.name not in system_files]
+            
+            logger.info(f"All files found in store: {[f.name for f in txt_files]}")
+            
+            if not txt_files:
+                error_msg = f"No .txt files found in {store_path}"
+                logger.error(error_msg)
+                results['errors'].append(error_msg)
+                return results
+            
+            # Validate each file
+            for file_path in txt_files:
+                try:
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        content = f.read()
+                        is_valid, error = self.validate_content(content)
+                        if is_valid:
+                            results['valid_files'].append(file_path)
+                        else:
+                            results['errors'].append(f"Invalid content in {file_path}: {error}")
+                except Exception as e:
+                    results['errors'].append(f"Error reading {file_path}: {str(e)}")
+            
+            return results
+            
+        except Exception as e:
+            error_msg = f"Error validating store: {str(e)}"
             logger.error(error_msg)
             results['errors'].append(error_msg)
             return results
-            
-        # Debug: List all files in directory
-        all_files = []
-        for root, _, files in os.walk(store_path):
-            for file in files:
-                file_path = os.path.join(root, file)
-                all_files.append(file_path)
-        logger.info(f"All files found in store: {all_files}")
-        
-        # Check if any .txt files exist
-        txt_files = [f for f in all_files if f.endswith('.txt')]
-        if not txt_files:
-            error_msg = f"No .txt files found in {store_path}"
-            logger.error(error_msg)
-            results['errors'].append(error_msg)
-            return results
-            
-        # Validate each .txt file
-        for file_path in txt_files:
-            logger.info(f"Validating file: {file_path}")
-            is_valid, error = self.validate_file(file_path)
-            
-            if is_valid:
-                results['valid_files'].append(file_path)
-                logger.info(f"Valid file found: {file_path}")
-            else:
-                results['invalid_files'].append(file_path)
-                if error:
-                    results['errors'].append(f"{os.path.basename(file_path)}: {error}")
-                    logger.warning(f"Invalid file: {file_path} - {error}")
-        
-        logger.info(f"Validation results: {results}")
-        return results
 
     def validate_content(self, content: str) -> Tuple[bool, Optional[str]]:
         """

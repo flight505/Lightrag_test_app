@@ -81,8 +81,6 @@ class LightRAGManager:
         """Load documents from input directory"""
         try:
             print("Loading documents...")
-            
-            # Use the input_dir directly since it's already the full path
             logger.info(f"Loading documents from: {self.input_dir}")
             
             # Check if directory exists
