@@ -1,11 +1,65 @@
 ## Project Overview
 The LightRAG application is designed to serve as a comprehensive tool for academic research and writing academic papers, providing a user-friendly interface for querying and visualizing graph-based data. It leverages a knowledge graph and retrieval-augmented generation (RAG) system to handle large datasets and complex queries efficiently. It has a Agentic mode that can use the KG RAG system to write long form reports. Key features include:
 
-- **Multi-Mode Search**: Supports local, global, hybrid, and naive search functionalities.
+- **Multi-Mode Search**: Supports Mix, Hybrid, Local, and Global search functionalities.
 - **File Handling**: Converts various document formats (docx, text, pdf) to .txt and organizes them into a "converted" subfolder.
-- **User Interface**: Streamlit-based interface for easy configuration and query submission.
+- **User Interface**: Streamlit-based interface with horizontal navigation and clean layout.
 - **Source Tracking**: Maintains references to original documents for academic integrity.
 - **Equation Handling**: Extracts and renders LaTeX equations for better understanding.
+- **Prompt Rewriting**: Option to enhance prompts with academic style and structure.
+- **Knowledge Graph Visualization**: Interactive visualization of the knowledge graph with detailed statistics.
+
+## Recent Improvements
+
+1. **UI/UX Enhancements**:
+   - Implemented horizontal navigation menu for better page switching
+   - Moved store selection to main content area for better visibility
+   - Added segmented controls for search mode and prompt style selection
+   - Improved layout with clear section dividers
+   - Disabled sidebar for cleaner interface
+
+2. **State Management**:
+   - Improved session state handling to prevent unnecessary reindexing
+   - Enhanced store validation using DocumentValidator
+   - Better API key management with environment variable support
+   - Persistent store selection across page navigation
+
+3. **Search and Chat Features**:
+   - Added prompt rewriting option for academic style
+   - Improved search mode selection with Mix, Hybrid, Local, and Global options
+   - Enhanced chat interface with better message formatting
+   - Added source tracking in chat responses
+
+4. **Knowledge Graph Features**:
+   - Added comprehensive graph statistics display
+   - Interactive graph visualization using pyvis
+   - Detailed metrics including node connections and graph density
+   - Visual representation of most connected nodes
+
+5. **Error Handling**:
+   - Improved validation messages and error reporting
+   - Better handling of uninitialized states
+   - Clear user feedback for system status
+
+## Main files:
+
+1. `src/file_manager.py`: Contains functions for creating document directories and updating the `.gitignore` file to manage file storage and exclusion.
+
+2. `pages/Search.py`: Implements the Streamlit interface for chat mode with:
+   - Horizontal navigation menu
+   - Segmented controls for search mode and prompt style
+   - Knowledge graph visualization
+   - Enhanced chat interface with source tracking
+   - Improved state management
+
+3. `src/lightrag_helpers.py`: Includes helper functions for processing LightRAG responses, managing sources, formatting responses, and handling LaTeX equations.
+
+4. `src/document_validator.py`: Implements comprehensive document validation including:
+   - File validation (existence, format, encoding)
+   - Content validation (emptiness, minimum length)
+   - Store validation (structure, file collection)
+   - Error reporting and logging
+   - Prevention of unnecessary reindexing
 
 - **Search Functionality**:
 **Implementation**: Located in `pages/1_Search.py`, this module provides various search functionalities: 
@@ -20,37 +74,6 @@ The LightRAG application is designed to serve as a comprehensive tool for academ
 - **Usability Improvements**: Refine the user interface to make configuration options more intuitive. Add tooltips and help sections for new users.
 - **Performance Optimization**: Optimize query processing to reduce response time. Implement caching mechanisms for frequently accessed data.
 - **Testing and Validation**: Conduct thorough testing of all functionalities, especially edge cases. Suggestion: Use automated testing frameworks to ensure reliability.
-
-## Main files:
-
-1. `src/file_manager.py`: Contains functions for creating document directories and updating the `.gitignore` file to manage file storage and exclusion.
-
-2. `pages/1_Search.py`: Implements the Streamlit interface for search and chat modes, managing session states and processing queries with progress updates. Includes store selection, file scanning, and PDF conversion.
-
-3. `src/lightrag_helpers.py`: Includes helper functions for processing LightRAG responses, managing sources, formatting responses, and handling LaTeX equations.
-
-4. `src/global_helper_functions.py`: Contains functions for mapping generated responses to source documents and creating traceability tables for global search.
-
-5. `src/Graph_query.py`: Sets up the Streamlit page configuration for querying the knowledge base using LightRAG.
-
-6. `src/lightrag_init.py`: Manages the initialization and configuration of LightRAG, including document loading, validation, and query execution. Integrates with DocumentValidator for file and content validation.
-
-7. `src/local_helper_functions.py`: Provides functions for local search post-processing, mapping responses to source documents, and creating traceability tables.
-
-8. `src/document_validator.py`: Implements comprehensive document validation including:
-   - File validation (existence, format, encoding)
-   - Content validation (emptiness, minimum length)
-   - Store validation (structure, file collection)
-   - Error reporting and logging
-
-9. `src/file_processor.py`: Handles file preprocessing, including PDF conversion to text using Marker, and tracks file metadata.
-
-The document validation system ensures data quality by:
-- Validating files before processing
-- Checking content integrity
-- Providing detailed error feedback
-- Maintaining validation logs
-- Supporting the LightRAG initialization process
 
 ## Helper Functions
 
