@@ -36,13 +36,20 @@ class BatchInserter:
         self.flush()
         
     def add(self, document: Dict):
+        """Add a document to the batch"""
         self.current_batch.append(document)
         if len(self.current_batch) >= self.batch_size:
             self.flush()
             
     def flush(self):
+        """Insert all documents in the current batch"""
         if self.current_batch:
-            self.rag.insert_batch(self.current_batch)
+            for doc in self.current_batch:
+                # Add source information to content
+                file_info = f"[Source: {doc['metadata']['source']}]\n\n"
+                content_with_source = file_info + doc['content']
+                # Insert using LightRAG's insert method
+                self.rag.insert(content_with_source)
             self.current_batch = []
 
 class FileProcessor:

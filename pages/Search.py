@@ -441,17 +441,14 @@ with col1:
 
                     # Process query with progress indicator
                     with st.status("Processing...") as status:
-                        # Create query parameters with selected mode
-                        query_params = QueryParam(
-                            mode=st.session_state["search_mode"].upper()
-                        )
-                        logger.info(f"Using search mode: {st.session_state['search_mode'].upper()}")
+                        # Get the search mode
+                        mode = st.session_state["search_mode"].lower()
+                        logger.info(f"Using search mode: {mode}")
                         
                         # Execute query with mode
                         result = st.session_state["rag_manager"].query(
                             query,
-                            mode=st.session_state["search_mode"].upper(),
-                            query_params=query_params
+                            mode=mode
                         )
                         logger.info(f"Query result: {result}")
 

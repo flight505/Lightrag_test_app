@@ -74,40 +74,66 @@ class AcademicResponseProcessor:
             logger.error(f"Error extracting references: {str(e)}")
             return []
 
-    def process_response(self, result: Dict[str, Any]) -> Tuple[str, List[AcademicReference]]:
-        """Process the LightRAG response and extract academic components
-        
-        Args:
-            result: Raw response dictionary from LightRAG
-            
-        Returns:
-            Tuple containing:
-            - Processed response text
-            - List of academic references
-        """
+    def _add_citations(self, text: str) -> str:
+        """Add academic citations to text"""
         try:
-            response = result.get("response", "")
-            sources = result.get("sources", [])
-            
-            # Extract references from response text
-            references = self.extract_references_from_text(response)
-            
-            # Add source documents as references
-            for source in sources:
-                if isinstance(source, str) and source not in self.source_cache:
-                    ref = AcademicReference(
-                        title=source,
-                        source_file=source
-                    )
-                    references.append(ref)
-                    self.source_cache[source] = ref
-                    
-            return response, references
-
+            # Extract potential citations and add proper formatting
+            citation_pattern = r'\[([^\]]+)\]'
+            return re.sub(citation_pattern, r'(\1)', text)
         except Exception as e:
-            error_msg = f"Error processing academic response: {str(e)}"
-            logger.error(error_msg)
-            raise
+            logger.error(f"Error adding citations: {str(e)}")
+            return text
+
+    def _format_equations(self, text: str) -> str:
+        """Format mathematical equations in text"""
+        try:
+            # Ensure equations are properly formatted with newlines
+            text = re.sub(r'(?<!\n)\$\$', '\n$$', text)
+            text = re.sub(r'\$\$(?!\n)', '$$\n', text)
+            return text
+        except Exception as e:
+            logger.error(f"Error formatting equations: {str(e)}")
+            return text
+
+    def _format_references(self, text: str) -> str:
+        """Format academic references in text"""
+        try:
+            # Look for reference section and format it
+            ref_section_pattern = r'(References:|Bibliography:|Sources:)(.*?)(?=\n\n|$)'
+            
+            def format_ref_section(match):
+                header = match.group(1)
+                content = match.group(2)
+                # Format each reference on a new line with bullet points
+                formatted_refs = '\n'.join(f'- {ref.strip()}' 
+                                         for ref in content.split('\n') 
+                                         if ref.strip())
+                return f'{header}\n{formatted_refs}'
+            
+            return re.sub(ref_section_pattern, format_ref_section, text, flags=re.DOTALL)
+        except Exception as e:
+            logger.error(f"Error formatting references: {str(e)}")
+            return text
+
+    def process_response(self, response: str) -> str:
+        """Process the response to enhance academic formatting"""
+        try:
+            if not response:
+                return ""
+            
+            # Process the response string directly
+            formatted_response = response
+            
+            # Add academic formatting
+            formatted_response = self._add_citations(formatted_response)
+            formatted_response = self._format_equations(formatted_response)
+            formatted_response = self._format_references(formatted_response)
+            
+            return formatted_response
+            
+        except Exception as e:
+            logger.error(f"Error processing academic response: {str(e)}")
+            return response  # Return original response if processing fails
 
     def format_academic_response(
         self, 

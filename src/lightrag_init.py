@@ -15,6 +15,14 @@ from src.document_validator import DocumentValidator
 from src.academic_response_processor import AcademicResponseProcessor
 from src.file_processor import FileProcessor, ChunkingConfig, BatchInserter
 
+# Constants
+DEFAULT_MODEL = "gpt-4o-mini"
+SUPPORTED_MODELS = ["gpt-4o-mini", "gpt-4o", "o1-mini", "o1"]
+DEFAULT_CHUNK_SIZE = 500
+DEFAULT_CHUNK_OVERLAP = 50
+SUPPORTED_MODES = ["naive", "local", "global", "hybrid", "mix"]
+MAX_WORKERS = 4  # Maximum number of parallel workers for file processing
+
 # Configure logging
 logging.basicConfig(
     filename="lightrag.log",
@@ -22,14 +30,6 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
-
-# Define major constants
-DEFAULT_MODEL = "gpt-4o-mini"
-SUPPORTED_MODELS = ["gpt-4o-mini", "gpt-4o", "o1-mini", "o1"]
-DEFAULT_CHUNK_SIZE = 500
-DEFAULT_CHUNK_OVERLAP = 50
-SUPPORTED_MODES = ["naive", "local", "global", "hybrid", "mix"]
-MAX_WORKERS = 4  # Maximum number of parallel workers for file processing
 
 class LightRAGManager:
     """Manager class for LightRAG initialization and configuration"""
@@ -89,7 +89,7 @@ class LightRAGManager:
         self.temperature = temperature
 
     def load_documents(self, file_paths: Optional[List[str]] = None) -> None:
-        """Load and index documents with enhanced batch processing and progress tracking"""
+        """Load and index documents following LightRAG's documentation"""
         try:
             print(colored("\nIndexing documents...", "cyan"))
             
@@ -113,36 +113,33 @@ class LightRAGManager:
             if not file_paths:
                 raise Exception("No valid documents found to load")
             
-            # Process files in batches with progress tracking
-            print(colored("\nProcessing documents...", "cyan"))
-            
-            # First, process all documents
-            self.file_processor.batch_process_files(
-                file_paths,
-                self.rag,
-                max_workers=MAX_WORKERS
-            )
-            
-            # Then, index each document with LightRAG
-            print(colored("\nIndexing with LightRAG...", "cyan"))
+            # Process and index documents
             total = len(file_paths)
+            print(colored(f"\nProcessing and indexing {total} documents...", "cyan"))
+            
             for idx, file_path in enumerate(file_paths, 1):
                 try:
+                    # Read and validate content
                     with open(file_path, 'r', encoding='utf-8') as f:
                         content = f.read()
-                        
-                    # Add source information to content
+                    
+                    is_valid, error = self.validator.validate_content(content)
+                    if not is_valid:
+                        logger.warning(f"Skipping {file_path}: {error}")
+                        continue
+                    
+                    # Add source information
                     file_info = f"[Source: {os.path.basename(file_path)}]\n\n"
                     content_with_source = file_info + content
                     
                     # Insert into LightRAG with progress indicator
-                    print(f"\rIndexing document {idx}/{total}: {os.path.basename(file_path)}", end='')
+                    print(f"\rProcessing document {idx}/{total}: {os.path.basename(file_path)}", end='')
                     self.rag.insert(content_with_source)
                     
                 except Exception as e:
-                    print(colored(f"\n✗ Error indexing {file_path}: {str(e)}", "red"))
-                    logger.error(f"Error indexing {file_path}: {str(e)}")
-                    raise
+                    print(colored(f"\n✗ Error processing {file_path}: {str(e)}", "red"))
+                    logger.error(f"Error processing {file_path}: {str(e)}")
+                    continue
             
             print(colored("\n\nIndexing complete! ✓", "green"))
             print(f"Successfully processed and indexed {total} files")
@@ -156,32 +153,61 @@ class LightRAGManager:
         self,
         query: str,
         mode: str = "hybrid",
-        only_context: bool = False
+        only_context: bool = False,
+        temperature: Optional[float] = None,
+        **kwargs
     ) -> Dict[str, Any]:
         """Enhanced query processing with academic formatting"""
         try:
+            # Convert mode to lowercase first
+            mode = str(mode).lower()
+            
+            # Then check if it's supported
             if mode not in SUPPORTED_MODES:
                 raise ValueError(f"Unsupported mode: {mode}. Use one of {SUPPORTED_MODES}")
             
-            # Process query with temperature
+            # Create query parameters according to LightRAG's QueryParam spec
+            param_kwargs = {}
+            
+            # Handle temperature setting through llm_model_kwargs
+            if temperature is not None:
+                param_kwargs["llm_model_kwargs"] = {"temperature": temperature}
+            elif self.temperature != 0.0:
+                param_kwargs["llm_model_kwargs"] = {"temperature": self.temperature}
+            
+            # Add any additional kwargs that match QueryParam's parameters
+            valid_param_keys = [
+                "top_k", 
+                "max_token_for_text_unit",
+                "max_token_for_global_context", 
+                "max_token_for_local_context",
+                "response_type"
+            ]
+            for key in valid_param_keys:
+                if key in kwargs:
+                    param_kwargs[key] = kwargs[key]
+            
+            # Create query parameters
             param = QueryParam(
-                mode=mode, 
+                mode=mode,
                 only_need_context=only_context,
-                llm_model_kwargs={"temperature": self.temperature}
+                **param_kwargs
             )
             
-            # Process query
+            # Process query - LightRAG returns a string
             response = self.rag.query(query, param=param)
             
-            # Process response for academic formatting
+            # Process response for academic formatting if needed
             if not only_context:
                 response = self.response_processor.process_response(response)
             
+            # Return response in our standard format
             return {
                 "response": response,
                 "mode": mode,
                 "timestamp": datetime.now().isoformat(),
-                "model": self.model_name
+                "model": self.model_name,
+                "temperature": temperature if temperature is not None else self.temperature
             }
             
         except Exception as e:
