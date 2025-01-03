@@ -1,6 +1,6 @@
 import os
 import logging
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional, Tuple, Any
 from pathlib import Path
 from src.file_manager import DB_ROOT
 
@@ -48,56 +48,56 @@ class DocumentValidator:
             logger.error(f"Error validating file {file_path}: {str(e)}")
             return False, str(e)
             
-    def validate_store(self, store_path: str) -> Dict:
-        """Validate the document store directory"""
+    def validate_store(self, store_path: str) -> Dict[str, Any]:
+        """
+        Validate all files in a store directory
+        
+        Args:
+            store_path: Path to the store directory
+            
+        Returns:
+            Dict containing validation results
+        """
         logger.info(f"Validating store at path: {store_path}")
         
-        # Initialize results
-        results = {
-            'valid_files': [],
-            'errors': []
-        }
+        # Get all txt files in the store
+        txt_files = [
+            os.path.join(store_path, f) 
+            for f in os.listdir(store_path) 
+            if f.endswith('.txt')
+        ]
         
-        try:
-            # Get all text files in the store
-            txt_files = list(Path(store_path).glob("*.txt"))
+        logger.info(f"All files found in store: {[os.path.basename(f) for f in txt_files]}")
+        
+        # Validate all files
+        return self.validate_files(txt_files)
+
+    def validate_files(self, file_paths: List[str]) -> Dict[str, Any]:
+        """
+        Validate multiple files and return validation results
+        
+        Args:
+            file_paths: List of file paths to validate
             
-            # Filter out system files
-            system_files = ["graph_chunk_entity_relation.graphml", "graph_visualization.html", 
-                          "kv_store_full_docs.json", "kv_store_llm_response_cache.json",
-                          "kv_store_text_chunks.json", "metadata.json", "vdb_chunks.json",
-                          "vdb_entities.json", "vdb_relationships.json"]
-            
-            txt_files = [f for f in txt_files if f.name not in system_files]
-            
-            logger.info(f"All files found in store: {[f.name for f in txt_files]}")
-            
-            if not txt_files:
-                error_msg = f"No .txt files found in {store_path}"
-                logger.error(error_msg)
-                results['errors'].append(error_msg)
-                return results
-            
-            # Validate each file
-            for file_path in txt_files:
-                try:
-                    with open(file_path, "r", encoding="utf-8") as f:
-                        content = f.read()
-                        is_valid, error = self.validate_content(content)
-                        if is_valid:
-                            results['valid_files'].append(file_path)
-                        else:
-                            results['errors'].append(f"Invalid content in {file_path}: {error}")
-                except Exception as e:
-                    results['errors'].append(f"Error reading {file_path}: {str(e)}")
-            
-            return results
-            
-        except Exception as e:
-            error_msg = f"Error validating store: {str(e)}"
-            logger.error(error_msg)
-            results['errors'].append(error_msg)
-            return results
+        Returns:
+            Dict containing valid_files list and invalid_files dict with error messages
+        """
+        valid_files = []
+        invalid_files = {}
+        
+        for file_path in file_paths:
+            is_valid, error_msg = self.validate_file(file_path)
+            if is_valid:
+                valid_files.append(file_path)
+            else:
+                invalid_files[file_path] = error_msg
+                logger.warning(f"Invalid file {file_path}: {error_msg}")
+        
+        return {
+            "valid_files": valid_files,
+            "invalid_files": invalid_files,
+            "errors": [f"Invalid file {f}: {err}" for f, err in invalid_files.items()] if invalid_files else []
+        }
 
     def validate_content(self, content: str) -> Tuple[bool, Optional[str]]:
         """
