@@ -1,38 +1,65 @@
 import os
 import logging
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Generator
 from pathlib import Path
 from datetime import datetime
 import hashlib
 import json
 import re
+from termcolor import colored
+from dataclasses import dataclass
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import concurrent.futures
 
 logger = logging.getLogger(__name__)
 
-# Configuration for Marker PDF conversion with equation focus
-MARKER_CONFIG = {
-    "output_format": "markdown",
-    "force_ocr": True,
-    "num_workers": 8,
-    "equation_mode": True  # Enable special handling for equations
-}
+@dataclass
+class ChunkingConfig:
+    """Configuration for document chunking"""
+    chunk_size: int = 500
+    chunk_overlap: int = 50
+    chunk_strategy: str = "sentence"  # "sentence", "paragraph", or "fixed"
+    preserve_markdown: bool = True
+    equation_handling: str = "preserve"
+
+class BatchInserter:
+    """Handles batch insertion of documents"""
+    def __init__(self, rag, batch_size: int = 10):
+        self.rag = rag
+        self.batch_size = batch_size
+        self.current_batch = []
+        
+    def __enter__(self):
+        return self
+        
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.flush()
+        
+    def add(self, document: Dict):
+        self.current_batch.append(document)
+        if len(self.current_batch) >= self.batch_size:
+            self.flush()
+            
+    def flush(self):
+        if self.current_batch:
+            self.rag.insert_batch(self.current_batch)
+            self.current_batch = []
 
 class FileProcessor:
     """Handles file preprocessing and tracking with enhanced equation support"""
     
-    def __init__(self, store_path: str):
+    def __init__(self, store_path: str, chunking_config: Optional[ChunkingConfig] = None):
         self.store_path = Path(store_path)
         self.metadata_file = self.store_path / "metadata.json"
         self.metadata = self._load_metadata()
         self.pdf_converter = None
         self.equation_pattern = re.compile(r'\$\$(.*?)\$\$', re.DOTALL)
+        self.reference_pattern = re.compile(r'\[@(.*?)\]', re.DOTALL)
+        self.chunking_config = chunking_config or ChunkingConfig()
         logger.info(f"FileProcessor initialized for store: {store_path}")
 
     def _extract_equations(self, text: str) -> List[Tuple[str, str]]:
-        """
-        Extract LaTeX equations and generate unique identifiers
-        Returns: List of (equation_id, equation_latex) tuples
-        """
+        """Extract LaTeX equations and generate unique identifiers"""
         equations = []
         for idx, match in enumerate(self.equation_pattern.finditer(text)):
             equation = match.group(1).strip()
@@ -40,184 +67,126 @@ class FileProcessor:
             equations.append((equation_id, equation))
         return equations
 
-    def _process_text_with_equations(self, text: str) -> Tuple[str, Dict]:
-        """
-        Process text and extract equation metadata
-        Returns: (processed_text, equation_metadata)
-        """
-        equations = self._extract_equations(text)
-        equation_metadata = {
-            "equations": [
-                {
-                    "id": eq_id,
-                    "latex": eq_latex,
-                    "position": idx
-                }
-                for idx, (eq_id, eq_latex) in enumerate(equations)
-            ]
-        }
-        return text, equation_metadata
+    def _extract_references(self, text: str) -> List[str]:
+        """Extract academic references from the text"""
+        return [ref.group(1) for ref in self.reference_pattern.finditer(text)]
 
-    def _pdf_to_text(self, pdf_path: Path) -> Tuple[str, Dict]:
-        """Convert PDF to text using Marker with equation handling"""
+    def process_document(self, file_path: str) -> Dict:
+        """Process a single document with rich metadata"""
         try:
-            if self.pdf_converter is None:
-                self._initialize_marker()
-            
-            logger.info(f"Converting {pdf_path} to text with equation extraction...")
-            rendered = self.pdf_converter(str(pdf_path))
-            text = rendered.markdown
-            
-            if not text:
-                raise ValueError("No text extracted from PDF")
-            
-            # Process text and extract equations
-            processed_text, equation_metadata = self._process_text_with_equations(text)
-            
-            logger.info(f"Successfully converted {pdf_path} with {len(equation_metadata['equations'])} equations")
-            return processed_text, equation_metadata
-            
-        except Exception as e:
-            logger.error(f"Error in PDF processing: {e}")
-            raise ValueError(f"Failed to process PDF: {str(e)}")
-
-    def _initialize_marker(self):
-        """Lazy initialization of Marker converter"""
-        if self.pdf_converter is None:
-            try:
-                from marker.converters.pdf import PdfConverter
-                from marker.models import create_model_dict
-                from marker.config.parser import ConfigParser
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
                 
-                logger.info("Initializing Marker PDF converter...")
-                self.config_parser = ConfigParser(MARKER_CONFIG)
-                self.pdf_converter = PdfConverter(
-                    config=self.config_parser.generate_config_dict(),
-                    artifact_dict=create_model_dict(),
-                )
-                logger.info("Marker PDF converter initialized successfully")
-            except Exception as e:
-                logger.error(f"Error initializing Marker: {e}")
-                raise
+            metadata = {
+                "source": os.path.basename(file_path),
+                "created": datetime.fromtimestamp(os.path.getctime(file_path)).isoformat(),
+                "modified": datetime.fromtimestamp(os.path.getmtime(file_path)).isoformat(),
+                "file_type": Path(file_path).suffix[1:],
+                "size": os.path.getsize(file_path),
+                "equations": self._extract_equations(content),
+                "references": self._extract_references(content),
+                "chunks": self._get_chunk_info(content)
+            }
+            
+            return {"content": content, "metadata": metadata}
+        except Exception as e:
+            logger.error(f"Error processing {file_path}: {str(e)}")
+            raise
+
+    def process_large_file(self, file_path: str, chunk_size: int = 1024*1024) -> Generator:
+        """Process large files in chunks to manage memory"""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                while True:
+                    chunk = f.read(chunk_size)
+                    if not chunk:
+                        break
+                    yield self._process_chunk(chunk, file_path)
+        except Exception as e:
+            logger.error(f"Error processing large file {file_path}: {str(e)}")
+            raise
+
+    def _process_chunk(self, chunk: str, file_path: str) -> Dict:
+        """Process a single chunk of a large file"""
+        metadata = {
+            "source": os.path.basename(file_path),
+            "chunk_hash": hashlib.md5(chunk.encode()).hexdigest(),
+            "equations": self._extract_equations(chunk),
+            "references": self._extract_references(chunk)
+        }
+        return {"content": chunk, "metadata": metadata}
+
+    def _get_chunk_info(self, content: str) -> Dict:
+        """Get information about how the content will be chunked"""
+        if self.chunking_config.chunk_strategy == "sentence":
+            chunks = self._split_into_sentences(content)
+        elif self.chunking_config.chunk_strategy == "paragraph":
+            chunks = content.split('\n\n')
+        else:  # fixed size chunks
+            chunks = [content[i:i + self.chunking_config.chunk_size] 
+                     for i in range(0, len(content), self.chunking_config.chunk_size)]
+        
+        return {
+            "total_chunks": len(chunks),
+            "avg_chunk_size": sum(len(c) for c in chunks) / len(chunks) if chunks else 0,
+            "strategy": self.chunking_config.chunk_strategy
+        }
+
+    def _split_into_sentences(self, text: str) -> List[str]:
+        """Split text into sentences while preserving equations and markdown"""
+        # Basic sentence splitting that preserves markdown and equations
+        sentence_endings = r'(?<=[.!?])\s+(?=[A-Z])'
+        if self.chunking_config.preserve_markdown:
+            # Don't split inside markdown code blocks or equations
+            text = re.sub(r'```.*?```', lambda m: m.group().replace('.', '∎'), text, flags=re.DOTALL)
+            text = re.sub(r'\$\$.*?\$\$', lambda m: m.group().replace('.', '∎'), text, flags=re.DOTALL)
+        
+        sentences = re.split(sentence_endings, text)
+        return [s.strip() for s in sentences if s.strip()]
+
+    def batch_process_files(self, file_paths: List[str], rag, max_workers: int = 4) -> None:
+        """Process multiple files in parallel with progress tracking"""
+        total = len(file_paths)
+        processed = 0
+        
+        print(colored(f"\nProcessing {total} files...", "cyan"))
+        
+        with BatchInserter(rag) as inserter:
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                future_to_file = {
+                    executor.submit(self.process_document, file_path): file_path 
+                    for file_path in file_paths
+                }
+                
+                for future in concurrent.futures.as_completed(future_to_file):
+                    file_path = future_to_file[future]
+                    try:
+                        doc = future.result()
+                        inserter.add(doc)
+                        processed += 1
+                        self._update_progress(processed, total, file_path)
+                    except Exception as e:
+                        print(colored(f"\n✗ Error processing {file_path}: {str(e)}", "red"))
+
+    def _update_progress(self, current: int, total: int, current_file: str) -> None:
+        """Update the progress bar"""
+        bar_length = 50
+        progress = current / total
+        filled = int(bar_length * progress)
+        bar = '=' * filled + '-' * (bar_length - filled)
+        print(f'\rProgress: [{bar}] {current}/{total} | Current: {os.path.basename(current_file)}', end='')
+        if current == total:
+            print(colored("\n\nProcessing complete! ✓", "green"))
 
     def _load_metadata(self) -> Dict:
-        """Load or create metadata file"""
+        """Load metadata from file or create new if not exists"""
         if self.metadata_file.exists():
-            with open(self.metadata_file, "r", encoding="utf-8") as f:
+            with open(self.metadata_file, 'r', encoding='utf-8') as f:
                 return json.load(f)
-        return {
-            "files": {},
-            "last_updated": datetime.now().isoformat()
-        }
-        
-    def _save_metadata(self):
+        return {"files": {}, "last_updated": None}
+
+    def _save_metadata(self) -> None:
         """Save metadata to file"""
-        with open(self.metadata_file, "w", encoding="utf-8") as f:
-            json.dump(self.metadata, f, indent=4)
-            
-    def _calculate_hash(self, file_path: Path) -> str:
-        """Calculate file hash for tracking changes"""
-        with open(file_path, "rb") as f:
-            return hashlib.md5(f.read()).hexdigest()
-
-    def scan_and_convert_store(self) -> Dict[str, str]:
-        """Scan store directory for new PDFs and convert them to text"""
-        results = {}
-        pdf_files = list(self.store_path.glob("*.pdf"))
-        
-        if not pdf_files:
-            logger.info(f"No PDF files found in {self.store_path}")
-            return results
-        
-        # Check for new/modified files before initializing Marker
-        new_files_exist = any(
-            str(pdf) not in self.metadata["files"] or 
-            self.metadata["files"][str(pdf)]["hash"] != self._calculate_hash(pdf)
-            for pdf in pdf_files
-        )
-        
-        if not new_files_exist:
-            logger.info("No new or modified PDFs found")
-            return {pdf.name: "skipped" for pdf in pdf_files}
-        
-        for pdf_path in pdf_files:
-            try:
-                file_hash = self._calculate_hash(pdf_path)
-                
-                if str(pdf_path) in self.metadata["files"]:
-                    if self.metadata["files"][str(pdf_path)]["hash"] == file_hash:
-                        results[pdf_path.name] = "skipped"
-                        continue
-                
-                # Convert and extract equations
-                text, equation_metadata = self._pdf_to_text(pdf_path)
-                
-                # Save text content
-                text_path = self.store_path / f"{pdf_path.stem}.txt"
-                with open(text_path, "w", encoding="utf-8") as f:
-                    f.write(text)
-                
-                # Save equation metadata separately
-                equation_path = self.store_path / f"{pdf_path.stem}_equations.json"
-                with open(equation_path, "w", encoding="utf-8") as f:
-                    json.dump(equation_metadata, f, indent=2)
-                
-                # Update metadata with equation information
-                self.metadata["files"][str(pdf_path)] = {
-                    "original_name": pdf_path.name,
-                    "processed_date": datetime.now().isoformat(),
-                    "hash": file_hash,
-                    "size": pdf_path.stat().st_size,
-                    "type": ".pdf",
-                    "converted_path": str(text_path),
-                    "equation_metadata_path": str(equation_path),
-                    "equation_count": len(equation_metadata["equations"])
-                }
-                self._save_metadata()
-                
-                results[pdf_path.name] = f"converted (with {len(equation_metadata['equations'])} equations)"
-                logger.info(f"Successfully processed {pdf_path.name}")
-                
-            except Exception as e:
-                logger.error(f"Error converting {pdf_path.name}: {str(e)}")
-                results[pdf_path.name] = f"error: {str(e)}"
-        
-        return results
-
-    def cleanup_unused(self) -> List[str]:
-        """Remove files that are no longer needed"""
-        removed = []
-        current_files = set()
-        
-        # First, scan for all current PDF files
-        for pdf_file in self.store_path.glob("*.pdf"):
-            current_files.add(str(pdf_file))
-        
-        # Check which files need cleanup
-        for file_path in list(self.metadata["files"].keys()):
-            path = Path(file_path)
-            info = self.metadata["files"][file_path]
-            
-            # Only cleanup if:
-            # 1. The original PDF no longer exists
-            # 2. The file is not a text file being used by LightRAG
-            if not path.exists() and not file_path.endswith('.txt'):
-                # If there's a converted text file, keep it unless explicitly told to remove
-                if "converted_path" in info:
-                    conv_path = Path(info["converted_path"])
-                    if conv_path.exists() and conv_path.suffix == '.txt':
-                        # Keep the text file but update metadata
-                        new_key = str(conv_path)
-                        self.metadata["files"][new_key] = {
-                            "original_name": conv_path.name,
-                            "processed_date": info.get("processed_date", datetime.now().isoformat()),
-                            "type": ".txt",
-                            "is_converted": True,
-                            "original_pdf": path.name
-                        }
-                        
-                del self.metadata["files"][file_path]
-                removed.append(file_path)
-        
-        self._save_metadata()
-        return removed
+        self.metadata["last_updated"] = datetime.now().isoformat()
+        with open(self.metadata_file, 'w', encoding='utf-8') as f:
+            json.dump(self.metadata, f, indent=2)

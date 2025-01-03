@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Optional
 import logging
 import shutil
+from datetime import datetime
 
 # Constants
 DB_ROOT = "DB"
@@ -10,7 +11,7 @@ GITIGNORE_PATH = ".gitignore"
 
 def create_store_directory(store_name: str) -> Optional[str]:
     """
-    Create a store directory directly in DB folder.
+    Create a store directory with required structure and metadata files.
     
     Args:
         store_name: Name of the store to create
@@ -36,11 +37,29 @@ def create_store_directory(store_name: str) -> Optional[str]:
                 logging.warning(f"Removed duplicate store outside DB: {store_name}")
             return store_path
             
-        # Create new store in DB
+        # Create new store in DB with required structure
         if not os.path.exists(store_path):
             os.makedirs(store_path)
+            
+            # Create required subdirectories
+            os.makedirs(os.path.join(store_path, "converted"), exist_ok=True)  # For converted documents
+            os.makedirs(os.path.join(store_path, "cache"), exist_ok=True)      # For embeddings cache
+            
+            # Initialize metadata file
+            metadata_path = os.path.join(store_path, "metadata.json")
+            with open(metadata_path, 'w', encoding='utf-8') as f:
+                import json
+                json.dump({
+                    "name": store_name,
+                    "created": datetime.now().isoformat(),
+                    "files": {},
+                    "last_updated": None
+                }, f, indent=2)
+            
+            # Update gitignore
             update_gitignore(store_path)
-            logging.info(f"Created store directory: {store_path}")
+            
+            logging.info(f"Created store directory with structure: {store_path}")
             return store_path
         else:
             logging.warning(f"Store directory already exists: {store_path}")

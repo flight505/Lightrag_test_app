@@ -258,10 +258,10 @@ with nav_col3:
 # Main interface
 st.write("## 💬 LightRAG Chat")
 
-    # Configuration form
-    with st.form("configuration_form"):
+# Configuration form
+with st.form("configuration_form"):
     st.markdown("**Configure your chat:**")
-        
+    
     # API key handling
     if not st.session_state["openai_api_key"]:
         api_key = st.text_input("Your API key", type="password")
@@ -274,7 +274,7 @@ st.write("## 💬 LightRAG Chat")
             st.session_state["api_key_shown"] = True
 
         model = st.selectbox(
-        "Select your model",
+            "Select your model",
             options=SUPPORTED_MODELS,
             index=SUPPORTED_MODELS.index(DEFAULT_MODEL),
         )
@@ -297,19 +297,22 @@ st.write("## 💬 LightRAG Chat")
 
     config_submitted = st.form_submit_button("Initialize Chat")
 
-        if config_submitted:
+    if config_submitted:
         if not st.session_state["active_store"]:
             st.error("Please select a store first")
-            elif not api_key:
-                st.error("API key is required")
-            else:
-                try:
+        elif not api_key:
+            st.error("API key is required")
+        else:
+            try:
                 with st.spinner("Initializing LightRAG..."):
+                    # Create store directory if it doesn't exist
+                    store_path = os.path.join(DB_ROOT, st.session_state["active_store"])
+                    if not os.path.exists(store_path):
+                        create_store_directory(st.session_state["active_store"])
+                        st.toast(f"Created new store: {st.session_state['active_store']}")
+                    
                     # Store API key in session state
                     st.session_state["openai_api_key"] = api_key
-                    
-                    # Get correct store path
-                    store_path = os.path.join(DB_ROOT, st.session_state["active_store"])
                     
                     # Initialize LightRAG manager with correct parameters
                     st.session_state["rag_manager"] = LightRAGManager(
@@ -329,20 +332,21 @@ st.write("## 💬 LightRAG Chat")
                             st.warning(f"Validation warning: {error}")
                     
                     if validation_results['valid_files']:
-                        st.toast("Using existing indexed store")
-                        st.session_state["status_ready"] = True
+                        with st.status("Indexing documents..."):
+                            st.session_state["rag_manager"].load_documents(validation_results['valid_files'])
+                            st.toast("Documents indexed successfully!")
+                            st.session_state["status_ready"] = True
                     else:
-                        st.info("No valid files found. Starting indexing...")
-                        st.session_state["rag_manager"].load_documents()
-                    st.session_state["status_ready"] = True
+                        st.info("No valid files found. Please add documents in the Manage Documents page.")
+                        st.session_state["status_ready"] = True
 
                     # Force rerun to update UI
                     st.rerun()
-                except Exception as e:
-                    st.error(f"Configuration error: {str(e)}")
+            except Exception as e:
+                st.error(f"Configuration error: {str(e)}")
                 logger.error(f"Configuration error: {str(e)}", exc_info=True)
 
-            st.divider()
+st.divider()
 
 # Create two columns for the main interface
 col1, col2 = st.columns([3, 1])
@@ -555,8 +559,7 @@ with col2:
 # Add Knowledge Graph section at the bottom
 if "show_graph" in st.session_state and st.session_state["show_graph"]:
     st.divider()
-    graph_container = st.container()
-    with graph_container:
+    with st.container():
         st.markdown("## 📊 Knowledge Graph Analysis")
         
         # Create three columns for the metrics
@@ -571,7 +574,8 @@ if "show_graph" in st.session_state and st.session_state["show_graph"]:
                 
                 if not os.path.exists(graph_path):
                     st.warning("⚠️ Knowledge Graph not found. Please initialize and index documents first.")
-    else:
+                else:
+                    # Load and analyze graph
                     graph = nx.read_graphml(graph_path)
                     
                     # Basic stats in columns
@@ -591,7 +595,6 @@ if "show_graph" in st.session_state and st.session_state["show_graph"]:
                         if graph.number_of_nodes() > 0:
                             density = nx.density(graph)
                             components = nx.number_connected_components(graph.to_undirected())
-                            
                             st.markdown(f"""
                             - **Graph Density:** {density:.4f}
                             - **Connected Components:** {components}
@@ -626,37 +629,62 @@ if "show_graph" in st.session_state and st.session_state["show_graph"]:
                     
                     # Visualization section
                     st.markdown("### Interactive Graph Visualization")
+                    
                     try:
                         from pyvis.network import Network
                         import random
                         
                         with st.spinner("Generating interactive network visualization..."):
-                            net = Network(height="600px", width="100%", notebook=True)
+                            net = Network(
+                                height="600px", 
+                                width="100%", 
+                                bgcolor="#ffffff",
+                                font_color="#333333",
+                                directed=True
+                            )
+                            
                             net.from_nx(graph)
                             
-                            # Apply visual styling
                             for node in net.nodes:
-                                node["color"] = "#{:06x}".format(random.randint(0, 0xFFFFFF))
+                                node.update({
+                                    "color": "#{:06x}".format(random.randint(0, 0xFFFFFF)),
+                                    "size": 25,
+                                    "font": {"size": 12},
+                                    "borderWidth": 2,
+                                    "borderWidthSelected": 4
+                                })
                             
-                            # Save and display
                             html_path = os.path.join(store_path, "graph_visualization.html")
                             net.save_graph(html_path)
                             
-                            # Display the saved HTML
                             with open(html_path, 'r', encoding='utf-8') as f:
                                 html_content = f.read()
+                                html_content = html_content.replace(
+                                    '</head>',
+                                    '''<style>
+                                    .vis-network {
+                                        border: 1px solid #ddd;
+                                        border-radius: 4px;
+                                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                                    }
+                                    </style>
+                                    </head>'''
+                                )
                             st.components.v1.html(html_content, height=600)
-                                
+                    
                     except ImportError:
                         st.error("⚠️ Please install pyvis to enable graph visualization: `pip install pyvis`")
                     except Exception as e:
                         st.error(f"❌ Error generating visualization: {str(e)}")
         
         except Exception as e:
-            st.error(f"❌ Error getting graph stats: {str(e)}")
-            
-        # Add button to hide graph
-        if st.button("Hide Knowledge Graph"):
-            st.session_state["show_graph"] = False
-            st.rerun()
+            st.error(f"❌ Error analyzing graph: {str(e)}")
+            logger.error(f"Graph analysis error: {str(e)}")
+        
+        # Add button to hide graph with proper styling
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col2:
+            if st.button("Hide Knowledge Graph", type="secondary"):
+                st.session_state["show_graph"] = False
+                st.rerun()
     
