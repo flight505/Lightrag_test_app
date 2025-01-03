@@ -5,9 +5,12 @@ from pathlib import Path
 
 import streamlit as st
 import pandas as pd
+from stqdm import stqdm
 
 from src.file_manager import create_store_directory, DB_ROOT
 from src.file_processor import FileProcessor
+
+logger = logging.getLogger(__name__)
 
 # Page configuration
 st.set_page_config(
@@ -89,43 +92,84 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
     )
     
     if uploaded_files:
-        for uploaded_file in uploaded_files:
-            # Save the uploaded file
-            file_path = os.path.join(store_path, uploaded_file.name)
-            with open(file_path, "wb") as f:
-                f.write(uploaded_file.getvalue())
-            st.success(f"Uploaded: {uploaded_file.name}")
-        
-        # Process the new files
-        if st.session_state["file_processor"]:
-            with st.status("Processing uploaded files...", expanded=True):
-                results = st.session_state["file_processor"].scan_and_convert_store()
-                if results:
-                    st.write("Processing Results:")
-                    for filename, status in results.items():
-                        if status == "converted":
-                            st.success(f"✅ {filename}: Converted to text")
-                        elif status == "skipped":
-                            st.info(f"ℹ️ {filename}: Already processed")
+        status = st.status("Processing uploaded files...", expanded=True)
+        for uploaded_file in stqdm(
+            uploaded_files, 
+            desc="Uploading files",
+            total=len(uploaded_files),
+            unit="file",
+            bar_format="{desc}: {percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]"
+        ):
+            try:
+                # Save the uploaded file
+                file_path = os.path.join(store_path, uploaded_file.name)
+                with open(file_path, "wb") as f:
+                    f.write(uploaded_file.getvalue())
+                status.update(label=f"Uploaded: {uploaded_file.name}")
+                
+                # Process the file with Marker
+                try:
+                    if st.session_state["file_processor"]:
+                        result = st.session_state["file_processor"].process_pdf_with_marker(file_path)
+                        if result:
+                            status.update(label=f"✅ {uploaded_file.name}: Converted and indexed")
                         else:
-                            st.error(f"❌ {filename}: {status}")
+                            status.update(label=f"❌ {uploaded_file.name}: Conversion failed", state="error")
+                except Exception as e:
+                    status.update(label=f"❌ {uploaded_file.name}: Processing error - {str(e)}", state="error")
+                    logger.error(f"Error processing {uploaded_file.name}: {str(e)}", exc_info=True)
+                    
+            except Exception as e:
+                status.update(label=f"❌ {uploaded_file.name}: Upload error - {str(e)}", state="error")
+                logger.error(f"Error uploading {uploaded_file.name}: {str(e)}", exc_info=True)
+        
+        status.update(label="File processing complete!", state="complete")
     
     # Document list section
     st.markdown("### Manage Documents")
     
-    # Create two columns for the action buttons
-    action_col1, action_col2 = st.columns(2)
+    # Create three columns for the action buttons
+    action_col1, action_col2, action_col3 = st.columns(3)
     with action_col1:
         if st.button("🔄 Refresh Document List", use_container_width=True):
             st.rerun()
     with action_col2:
         if st.button("🧹 Clean Unused Files", use_container_width=True):
             if st.session_state["file_processor"]:
-                removed = st.session_state["file_processor"].cleanup_unused()
+                removed = st.session_state["file_processor"].clean_unused_files()
                 if removed:
                     st.info(f"Removed {len(removed)} unused files")
                 else:
                     st.info("No unused files found")
+    with action_col3:
+        if st.button("⚡ Convert Pending", use_container_width=True):
+            if st.session_state["file_processor"]:
+                status = st.status("Converting pending documents...", expanded=True)
+                # Get list of pending PDFs
+                pending_files = [str(f) for f in Path(store_path).glob("*.pdf") 
+                               if not (Path(store_path) / f"{f.stem}.txt").exists()]
+                
+                if not pending_files:
+                    status.update(label="No pending documents to convert", state="complete")
+                    st.rerun()
+                
+                def update_progress(message: str):
+                    status.update(label=message)
+                
+                try:
+                    results = st.session_state["file_processor"].process_pdf_with_marker(
+                        pending_files,
+                        progress_callback=update_progress
+                    )
+                    if results:
+                        status.update(label=f"✅ Successfully converted {len(results)} documents", state="complete")
+                    else:
+                        status.update(label="No documents were converted successfully", state="error")
+                except Exception as e:
+                    status.update(label=f"❌ Error during conversion: {str(e)}", state="error")
+                    logger.error(f"Error during batch conversion: {str(e)}", exc_info=True)
+                
+                st.rerun()
     
     try:
         # Get list of PDF and text files
@@ -140,93 +184,140 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
         
         txt_files = [f for f in txt_files if f.name not in system_files]
         
-        if pdf_files or txt_files:
-            # Create DataFrame with file information
-            files_data = []
-            
-            # Add PDF files
-            for file in pdf_files:
-                file_stat = file.stat()
-                txt_file = file.with_suffix(".txt")
-                files_data.append({
-                    "selected": False,
-                    "name": file.name,
-                    "type": "PDF",
-                    "size": f"{file_stat.st_size / 1024:.1f} KB",
-                    "modified": datetime.fromtimestamp(file_stat.st_mtime).strftime("%Y-%m-%d %H:%M"),
-                    "status": "Processed" if txt_file.exists() else "Pending"
-                })
-            
-            # Add text files
-            for file in txt_files:
-                file_stat = file.stat()
-                pdf_file = file.with_suffix(".pdf")
-                files_data.append({
-                    "selected": False,
-                    "name": file.name,
-                    "type": "Text",
-                    "size": f"{file_stat.st_size / 1024:.1f} KB",
-                    "modified": datetime.fromtimestamp(file_stat.st_mtime).strftime("%Y-%m-%d %H:%M"),
-                    "status": "Source" if pdf_file.exists() else "Standalone"
-                })
-            
-            # Create DataFrame
-            df = pd.DataFrame(files_data)
-            
-            # Display the DataFrame with data editor
-            edited_df = st.data_editor(
-                data=df,
-                key="document_editor",
-                column_config={
-                    "selected": st.column_config.CheckboxColumn(
-                        "Select",
-                        default=False,
-                        width="small"
-                    ),
-                    "name": st.column_config.TextColumn(
-                        "File Name",
-                        width="large"
-                    ),
-                    "type": st.column_config.TextColumn(
-                        "Type",
-                        width="small"
-                    ),
-                    "size": st.column_config.TextColumn(
-                        "Size",
-                        width="small"
-                    ),
-                    "modified": st.column_config.TextColumn(
-                        "Modified",
-                        width="medium"
-                    ),
-                    "status": st.column_config.TextColumn(
-                        "Status",
-                        width="small"
-                    ),
-                },
-                hide_index=True,
-                use_container_width=True,
-            )
-            
-            # Add delete button for selected files
-            if edited_df["selected"].any():
-                if st.button("🗑️ Delete Selected Files", type="primary"):
-                    selected_files = edited_df[edited_df["selected"]]["name"].tolist()
-                    for file_name in selected_files:
-                        file_path = os.path.join(store_path, file_name)
+        if not pdf_files and not txt_files:
+            st.info("No documents found in this store. Upload some PDF files to get started.")
+            st.stop()
+        
+        # Create DataFrame with file information
+        files_data = []
+        
+        # Add PDF files
+        for file in pdf_files:
+            file_stat = file.stat()
+            txt_file = file.with_suffix(".txt")
+            files_data.append({
+                "selected": False,
+                "name": file.name,
+                "type": "PDF",
+                "size": f"{file_stat.st_size / 1024:.1f} KB",
+                "modified": datetime.fromtimestamp(file_stat.st_mtime).strftime("%Y-%m-%d %H:%M"),
+                "status": "Processed" if txt_file.exists() else "Pending"
+            })
+        
+        # Add text files
+        for file in txt_files:
+            file_stat = file.stat()
+            pdf_file = file.with_suffix(".pdf")
+            files_data.append({
+                "selected": False,
+                "name": file.name,
+                "type": "Text",
+                "size": f"{file_stat.st_size / 1024:.1f} KB",
+                "modified": datetime.fromtimestamp(file_stat.st_mtime).strftime("%Y-%m-%d %H:%M"),
+                "status": "Source" if pdf_file.exists() else "Standalone"
+            })
+        
+        # Create DataFrame
+        df = pd.DataFrame(files_data)
+        
+        # Display the DataFrame with data editor
+        edited_df = st.data_editor(
+            data=df,
+            key="document_editor",
+            column_config={
+                "selected": st.column_config.CheckboxColumn(
+                    "Select",
+                    default=False,
+                    width="small"
+                ),
+                "name": st.column_config.TextColumn(
+                    "File Name",
+                    width="large"
+                ),
+                "type": st.column_config.TextColumn(
+                    "Type",
+                    width="small"
+                ),
+                "size": st.column_config.TextColumn(
+                    "Size",
+                    width="small"
+                ),
+                "modified": st.column_config.TextColumn(
+                    "Modified",
+                    width="medium"
+                ),
+                "status": st.column_config.TextColumn(
+                    "Status",
+                    width="small"
+                ),
+            },
+            hide_index=True,
+            use_container_width=True,
+        )
+        
+        # Add delete button for selected files
+        if edited_df["selected"].any():
+            if st.button("🗑️ Delete Selected Files", type="primary"):
+                selected_files = edited_df[edited_df["selected"]]["name"].tolist()
+                
+                # Initialize RAG if needed
+                if "rag" not in st.session_state or st.session_state.rag is None:
+                    st.error("Please initialize LightRAG in the Search page first.")
+                    st.stop()
+                
+                for file_name in selected_files:
+                    file_path = os.path.join(store_path, file_name)
+                    try:
+                        # Get document ID (using file name without extension as ID)
+                        doc_id = Path(file_name).stem
+                        
+                        # Delete from LightRAG first
                         try:
-                            # Remove PDF file
-                            os.remove(file_path)
-                            # Remove corresponding text file if it exists
-                            txt_path = os.path.splitext(file_path)[0] + ".txt"
+                            st.session_state.rag.delete_by_doc_id(doc_id)
+                            logger.info(f"Deleted document {doc_id} from LightRAG")
+                        except Exception as e:
+                            logger.error(f"Error deleting document {doc_id} from LightRAG: {str(e)}")
+                            st.warning(f"Could not delete {file_name} from LightRAG: {str(e)}")
+                        
+                        # Remove the file
+                        os.remove(file_path)
+                        
+                        # Remove corresponding files based on type
+                        base_path = os.path.splitext(file_path)[0]
+                        
+                        # If it's a PDF, remove corresponding .txt and .json
+                        if file_name.lower().endswith('.pdf'):
+                            txt_path = base_path + ".txt"
+                            json_path = base_path + ".json"
                             if os.path.exists(txt_path):
                                 os.remove(txt_path)
-                            st.success(f"Deleted: {file_name}")
-                        except Exception as e:
-                            st.error(f"Error deleting {file_name}: {str(e)}")
-                    st.rerun()
-        else:
-            st.info("No documents found in this store. Upload some PDF files to get started.")
+                            if os.path.exists(json_path):
+                                os.remove(json_path)
+                        
+                        # If it's a text file, remove corresponding .json and check PDF
+                        elif file_name.lower().endswith('.txt'):
+                            json_path = base_path + ".json"
+                            pdf_path = base_path + ".pdf"
+                            if os.path.exists(json_path):
+                                os.remove(json_path)
+                            # Only remove PDF if it exists and is selected
+                            if os.path.exists(pdf_path) and os.path.basename(pdf_path) in selected_files:
+                                os.remove(pdf_path)
+                        
+                        st.success(f"Deleted: {file_name}")
+                        
+                    except Exception as e:
+                        st.error(f"Error deleting {file_name}: {str(e)}")
+                        logger.error(f"Error deleting {file_name}: {str(e)}", exc_info=True)
+                
+                # Run cleanup to ensure no orphaned files
+                if st.session_state["file_processor"]:
+                    removed = st.session_state["file_processor"].clean_unused_files()
+                    if any(removed.values()):
+                        st.info("Cleaned up associated files")
+                
+                st.rerun()
+                
     except Exception as e:
         st.error(f"Error loading document list: {str(e)}")
         logger.error(f"Error in document list: {str(e)}", exc_info=True) 
