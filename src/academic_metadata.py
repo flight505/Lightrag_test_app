@@ -212,7 +212,8 @@ class ReferenceValidator:
 
 class MetadataExtractor:
     """Extracts academic metadata from document text."""
-    def __init__(self):
+    def __init__(self, debug: bool = False):
+        self.debug = debug
         # Check if anystyle is available via command line
         try:
             result = subprocess.run(['anystyle', '--version'], 
@@ -226,33 +227,201 @@ class MetadataExtractor:
         except FileNotFoundError:
             print(colored("⚠️ Anystyle not found in PATH", "yellow"))
             self.anystyle_available = False
-    
+
+    def _debug_print(self, message: str, color: str = "blue") -> None:
+        """Print debug message if debug mode is enabled."""
+        if self.debug:
+            print(colored(f"[DEBUG] {message}", color))
+
     def extract_metadata(self, text: str, doc_id: str) -> AcademicMetadata:
         """Extract academic metadata from document text."""
-        # Extract title (first non-empty line)
-        lines = text.split('\n')
-        title = next((line.strip() for line in lines if line.strip()), "Untitled Document")
+        if self.debug:
+            print(colored("\n=== Starting Metadata Extraction ===", "blue"))
+            
+        lines = [line.strip() for line in text.split('\n') if line.strip()]
         
-        # Extract authors (look for common patterns)
-        author_line = next((line.strip() for line in lines[1:] 
-                          if "author" in line.lower() or "@" in line), "")
-        authors = self._parse_authors(author_line.split(','))
+        if self.debug:
+            print(colored("\nFirst 20 lines:", "blue"))
+            for i, line in enumerate(lines[:20]):
+                print(colored(f"Line {i}: {line}", "cyan"))
         
+        # Extract title - handle markdown headers and common patterns
+        title = "Untitled Document"
+        title_index = -1
+        
+        # Common patterns to skip
+        skip_patterns = [
+            'open', '## open', '## **open**',
+            'contents lists available',
+            'image', 'figure', 'table',
+            'received:', 'accepted:', 'published:', 'doi:', '@', 'university',
+            'available online', 'sciencedirect', 'elsevier',
+            'journal', 'volume', 'issue'
+        ]
+        
+        self._debug_print("\nLooking for markdown title...")
+        # First try to find a markdown title with #
+        for i, line in enumerate(lines):
+            if line.startswith(('#', '##')):
+                clean_line = re.sub(r'[#*]', '', line).strip()
+                self._debug_print(f"Found markdown line {i}: {line}")
+                
+                if any(skip in clean_line.lower() for skip in skip_patterns):
+                    self._debug_print(f"Skipping - matches skip pattern", "yellow")
+                    continue
+                    
+                if re.match(r'^[\d\.]+\s', clean_line):
+                    self._debug_print(f"Skipping - appears to be section number", "yellow")
+                    continue
+                
+                title = clean_line
+                title_index = i
+                self._debug_print(f"Selected as title!", "green")
+                break
+        
+        # If no markdown title found, look for other title patterns
+        if title_index == -1:
+            self._debug_print("\nNo markdown title found, looking for title-like text...")
+            for i, line in enumerate(lines[:20]):
+                self._debug_print(f"\nAnalyzing line {i}: {line}")
+                
+                # Skip lines that are too short or too long
+                if len(line) < 20 or len(line) > 250:
+                    self._debug_print("Skipping - length out of range", "yellow")
+                    continue
+                    
+                # Skip lines that match skip patterns
+                if any(skip in line.lower() for skip in skip_patterns):
+                    self._debug_print(f"Skipping - matches skip pattern", "yellow")
+                    continue
+                    
+                # Skip lines that look like image descriptions
+                if re.match(r'^(?:image|figure|fig\.?)\s+\d', line.lower()):
+                    self._debug_print("Skipping - appears to be image description", "yellow")
+                    continue
+                    
+                # Skip lines that are dates or metadata
+                if re.match(r'^(?:\d{1,2}\s+\w+\s+\d{4}|doi:|https?://)', line.lower()):
+                    self._debug_print("Skipping - appears to be date or metadata", "yellow")
+                    continue
+                
+                # Check title criteria
+                if not line[0].isupper():
+                    self._debug_print("Skipping - doesn't start with capital letter", "yellow")
+                    continue
+                    
+                if len(line.split()) <= 3:
+                    self._debug_print("Skipping - too few words", "yellow")
+                    continue
+                    
+                digit_ratio = sum(c.isdigit() for c in line) / len(line)
+                if digit_ratio >= 0.2:
+                    self._debug_print(f"Skipping - too many digits ({digit_ratio:.2f})", "yellow")
+                    continue
+                    
+                special_char_ratio = sum(not c.isalnum() and not c.isspace() for c in line) / len(line)
+                if special_char_ratio >= 0.1:
+                    self._debug_print(f"Skipping - too many special characters ({special_char_ratio:.2f})", "yellow")
+                    continue
+                
+                title = line
+                title_index = i
+                self._debug_print("Selected as title!", "green")
+                break
+        
+        self._debug_print(f"\nFinal title: {title}", "green")
+        
+        # Extract authors - look for patterns after title
+        authors = []
+        if title_index != -1:
+            self._debug_print("\nLooking for authors after title...")
+            # Look at next few lines for authors
+            for i in range(title_index + 1, min(title_index + 5, len(lines))):
+                line = lines[i]
+                self._debug_print(f"\nAnalyzing line {i}: {line}")
+                
+                # Skip empty lines and non-author content
+                if not line or any(skip in line.lower() for skip in ['abstract', 'introduction', 'keywords', 'received']):
+                    self._debug_print("Skipping - empty or non-author content", "yellow")
+                    continue
+                    
+                # Look for lines with author-like patterns
+                if (',' in line or ' & ' in line or ' and ' in line.lower() or '**' in line):
+                    self._debug_print("Found potential author line")
+                    # Clean the line
+                    author_line = line.replace('**', '').strip()
+                    # Split on common separators
+                    for sep in [' and ', ' & ', ',']:
+                        author_line = author_line.replace(sep, '|')
+                    author_names = [name.strip() for name in author_line.split('|') if name.strip()]
+                    
+                    self._debug_print(f"Split into names: {author_names}")
+                    
+                    for name in author_names:
+                        if len(name) < 3:
+                            self._debug_print(f"Skipping '{name}' - too short", "yellow")
+                            continue
+                            
+                        if '@' in name:
+                            self._debug_print(f"Skipping '{name}' - contains email", "yellow")
+                            continue
+                            
+                        if any(word in name.lower() for word in ['university', 'department']):
+                            self._debug_print(f"Skipping '{name}' - looks like institution", "yellow")
+                            continue
+                        
+                        # Clean the name
+                        name = re.sub(r'[\(\)\[\]\{\}\d]', '', name).strip()
+                        parts = [p for p in name.split() if len(p) > 1]
+                        
+                        if parts:
+                            author = Author(
+                                full_name=name,
+                                first_name=parts[0],
+                                last_name=parts[-1]
+                            )
+                            authors.append(author)
+                            self._debug_print(f"Added author: {author.full_name}", "green")
+                    
+                    if authors:  # If we found authors, stop looking
+                        break
+
         # Extract abstract
-        abstract_start = text.lower().find('abstract')
         abstract = ""
+        abstract_start = -1
+        for i, line in enumerate(lines):
+            # Look for abstract header
+            if re.match(r'^(?:abstract|summary)[\s:]*$', line.lower()):
+                abstract_start = i
+                break
+            # Also check for bold/markdown abstract headers
+            elif re.match(r'^[\*#\s]*(?:abstract|summary)[\*\s:]*$', line.lower()):
+                abstract_start = i
+                break
+        
         if abstract_start != -1:
-            abstract_end = text.lower().find('introduction', abstract_start)
-            if abstract_end != -1:
-                abstract = text[abstract_start:abstract_end].strip()
+            abstract_lines = []
+            for line in lines[abstract_start + 1:]:
+                if any(marker in line.lower() for marker in ['introduction', 'keywords', '1.', 'background']):
+                    break
+                if line.strip():
+                    abstract_lines.append(line.strip())
+            abstract = ' '.join(abstract_lines)
         
         # Extract references
-        references_start = text.lower().find('references')
+        references_start = -1
+        for i, line in enumerate(lines):
+            if re.match(r'^[\*#\s]*references[\*\s]*$', line.lower()):
+                references_start = i
+                break
+        
+        references = []
         if references_start != -1:
-            references_text = text[references_start:].split('\n')
+            # Skip the "References" header line
+            references_text = lines[references_start + 1:]
             references = self._parse_references(references_text)
-        else:
-            references = []
+            # Remove any reference where the author's name is "References"
+            references = [ref for ref in references if not (ref.authors and ref.authors[0].full_name == "References")]
         
         # Extract equations
         equations = self._extract_equations(text)

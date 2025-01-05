@@ -1,5 +1,6 @@
 import streamlit as st
 from pathlib import Path
+from src.academic_metadata import MetadataExtractor
 
 # Page configuration
 st.set_page_config(
@@ -9,6 +10,13 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
     menu_items=None  # This hides the burger menu
 )
+
+# Add this near the top of your app, in the sidebar
+st.sidebar.write("### Debug Settings")
+debug_mode = st.sidebar.checkbox("Enable Debug Mode", value=False)
+
+# Modify where you create the MetadataExtractor
+extractor = MetadataExtractor(debug=debug_mode)
 
 # Main layout
 left_col, right_col = st.columns([2, 1], gap="large")
