@@ -5,52 +5,29 @@ description = "A Streamlit-based LightRAG application for academic research."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "lightrag-hku",
+    # Core packages
     "streamlit",
     "watchdog",
-    "python-pptx",
-    "python-docx",
-    "openpyxl",
-    "pillow",
     "termcolor",
-    "marker-pdf",
-    "aioboto3",
-    "python-dotenv",
-    "ollama",
+    "networkx",
     "openai",
     "pandas",
     "numpy",
-    "uv",
-    "accelerate",
-    "aioboto3",
-    "aiohttp",
-    "graspologic",
-    "hnswlib",
-    "nano-vectordb",
-    "neo4j",
-    "networkx",
-    "ollama",
-    "openai",
-    "oracledb",
-    "psycopg[binary,pool]",
-    "pymilvus",
-    "pymongo",
-    "pymysql",
-    "pyvis",
-    "sqlalchemy",
-    "tenacity",
-    "tiktoken",
-    "torch",
-    "transformers",
-    "xxhash",
-    "pdfminer.six",
-    "beautifulsoup4",
-    "nest_asyncio",
-    "pydantic-ai",
-    "httpx",
-    "pytest-asyncio",
+    "marker-pdf>=1.2.3",
+    "matplotlib",
+    "requests",
     "stqdm",
-    "fastapi",
+    "uv",
+    # PDF processing
+    "pymupdf",  # fitz
+    "PyPDF2",
+    "scholarly",
+    
+    # RAG packages
+    "lightrag-hku>=1.0.9",
+    
+    # Development
+    "python-dotenv",
 ]
 
 [build-system]

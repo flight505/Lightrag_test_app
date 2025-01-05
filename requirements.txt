@@ -1,47 +1,24 @@
-# RAG packages
-lightrag-hku
-# Streamlit
+# Core packages
 streamlit
 watchdog
-# preprocessing
-python-pptx
-python-docx
-openpyxl
-pillow
-accelerate
-aioboto3
-aiohttp
 termcolor
-# database packages
-graspologic
-hnswlib
-nano-vectordb
-neo4j
 networkx
-ollama
 openai
-oracledb
-pymilvus
-pymongo
-pyvis
-tenacity
-fastapi
-nest_asyncio
-# lmdeploy[all]
-# LLM packages
-tiktoken
-torch
-transformers
-xxhash
-python-dotenv
 pandas
 numpy
-pydantic-ai
-pytest
-pytest-asyncio
-httpx
-beautifulsoup4
-marker-pdf
+marker-pdf>=1.2.3
 matplotlib
-stqdm
 requests
+stqdm  # Progress bars for Streamlit
+uv
+
+# PDF processing
+PyMuPDF  # fitz
+PyPDF2
+scholarly
+
+# RAG packages
+lightrag-hku>=1.0.9
+
+# Development
+python-dotenv

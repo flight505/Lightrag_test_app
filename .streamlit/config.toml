@@ -7,12 +7,20 @@ textColor="#f8f8f2"
 [server]
 fileWatcherType = "poll"
 enableXsrfProtection = true
+runOnSave = true
 
 [browser]
 gatherUsageStats = false
 
 [client]
 showSidebarNavigation = false
+showErrorDetails = false
 
 [runner]
 fastReruns = true
+
+[global]
+showWarningOnDirectExecution = false
+
+[logger]
+level = "error"
