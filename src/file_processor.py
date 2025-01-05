@@ -198,7 +198,8 @@ class FileProcessor:
                     
                     metadata = self.metadata_extractor.extract_metadata(
                         text=text,
-                        doc_id=Path(pdf_path).stem
+                        doc_id=Path(pdf_path).stem,
+                        pdf_path=pdf_path
                     )
                     
                     # Save metadata

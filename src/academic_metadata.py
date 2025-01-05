@@ -241,6 +241,7 @@ class MetadataExtractor:
     def extract_metadata_from_pdf(self, pdf_path: str) -> Optional[Tuple[str, List[Author], str, str]]:
         """Extract metadata directly from PDF using multiple methods."""
         self._debug_print(f"Attempting to extract metadata from PDF: {pdf_path}")
+        extraction_method = "none"
         
         try:
             # Try PyMuPDF (fitz) first
@@ -267,6 +268,8 @@ class MetadataExtractor:
                     if response.status_code == 200:
                         data = response.json()['message']
                         self._debug_print("Successfully retrieved CrossRef data")
+                        extraction_method = "crossref"
+                        print(colored("✓ Using CrossRef API metadata", "green"))
                         
                         # Extract title
                         title = data.get('title', [None])[0]
@@ -297,47 +300,55 @@ class MetadataExtractor:
                 author_str = metadata.get('author', '')
                 authors = []
                 
-                if author_str:
-                    # Split authors on common separators
-                    for name in re.split(r'[,;&]', author_str):
-                        name = name.strip()
-                        if name:
-                            parts = name.split()
-                            if len(parts) > 1:
-                                authors.append(Author(
-                                    full_name=name,
-                                    first_name=parts[0],
-                                    last_name=parts[-1]
-                                ))
-                
-                return title, authors, metadata.get('subject', ''), None
+                if title or author_str:  # Only use if we got something useful
+                    extraction_method = "pymupdf"
+                    print(colored("✓ Using PyMuPDF metadata", "green"))
+                    
+                    if author_str:
+                        # Split authors on common separators
+                        for name in re.split(r'[,;&]', author_str):
+                            name = name.strip()
+                            if name:
+                                parts = name.split()
+                                if len(parts) > 1:
+                                    authors.append(Author(
+                                        full_name=name,
+                                        first_name=parts[0],
+                                        last_name=parts[-1]
+                                    ))
+                    
+                    return title, authors, metadata.get('subject', ''), None
             
             # Try PyPDF2 as last resort
             reader = PdfReader(pdf_path)
             if reader.metadata:
-                self._debug_print("Found PyPDF2 metadata")
                 meta = reader.metadata
                 title = meta.get('/Title', '')
                 author_str = meta.get('/Author', '')
-                authors = []
                 
-                if author_str:
-                    for name in re.split(r'[,;&]', author_str):
-                        name = name.strip()
-                        if name:
-                            parts = name.split()
-                            if len(parts) > 1:
-                                authors.append(Author(
-                                    full_name=name,
-                                    first_name=parts[0],
-                                    last_name=parts[-1]
-                                ))
-                
-                return title, authors, meta.get('/Subject', ''), None
+                if title or author_str:  # Only use if we got something useful
+                    extraction_method = "pypdf2"
+                    print(colored("✓ Using PyPDF2 metadata", "green"))
+                    authors = []
+                    
+                    if author_str:
+                        for name in re.split(r'[,;&]', author_str):
+                            name = name.strip()
+                            if name:
+                                parts = name.split()
+                                if len(parts) > 1:
+                                    authors.append(Author(
+                                        full_name=name,
+                                        first_name=parts[0],
+                                        last_name=parts[-1]
+                                    ))
+                    
+                    return title, authors, meta.get('/Subject', ''), None
             
         except Exception as e:
             self._debug_print(f"Error extracting PDF metadata: {str(e)}", "red")
         
+        print(colored("⚠️ No PDF metadata found, will fall back to text parsing", "yellow"))
         return None
 
     def extract_metadata(self, text: str, doc_id: str, pdf_path: Optional[str] = None) -> AcademicMetadata:
@@ -345,49 +356,50 @@ class MetadataExtractor:
         if self.debug:
             print(colored("\n=== Starting Metadata Extraction ===", "blue"))
         
+        metadata = None
+        extraction_method = "none"
+        
         # Try PDF metadata extraction first if path is provided
-        pdf_metadata = None
         if pdf_path:
+            self._debug_print(f"Attempting PDF metadata extraction from: {pdf_path}")
             pdf_metadata = self.extract_metadata_from_pdf(pdf_path)
+            
+            if pdf_metadata:
+                title, authors, abstract, doi = pdf_metadata
+                self._debug_print("Successfully extracted metadata from PDF")
+                
+                # If we have a DOI but no abstract, try scholarly
+                if doi and not abstract:
+                    try:
+                        search_query = scholarly.search_pubs(title)
+                        pub = next(search_query)
+                        if pub:
+                            abstract = pub.get('bib', {}).get('abstract', '')
+                            self._debug_print("Found abstract from scholarly")
+                    except Exception as e:
+                        self._debug_print(f"Scholarly lookup failed: {str(e)}", "yellow")
+                
+                # Parse references from text since they're not in PDF metadata
+                references = self._parse_references(text.split('\n'))
+                equations = self._extract_equations(text)
+                
+                metadata = AcademicMetadata(
+                    title=title or "Untitled Document",
+                    authors=authors or [],
+                    abstract=abstract,
+                    references=references,
+                    equations=equations
+                )
         
-        if pdf_metadata:
-            title, authors, abstract, doi = pdf_metadata
-            self._debug_print("Using metadata from PDF")
-            
-            # If we have a DOI but no abstract, try scholarly
-            if doi and not abstract:
-                try:
-                    search_query = scholarly.search_pubs(title)
-                    pub = next(search_query)
-                    if pub:
-                        abstract = pub.get('bib', {}).get('abstract', '')
-                        self._debug_print("Found abstract from scholarly")
-                except Exception as e:
-                    self._debug_print(f"Scholarly lookup failed: {str(e)}", "yellow")
-            
-            # Only fall back to text parsing for missing fields
-            if not title or not authors:
-                self._debug_print("Falling back to text parsing for missing fields")
-                parsed = self._parse_from_text(text)
-                title = title or parsed.title
-                authors = authors or parsed.authors
-                abstract = abstract or parsed.abstract
-            
-            # Always parse references from text
-            references = self._parse_references(text.split('\n'))
-            equations = self._extract_equations(text)
-            
-            return AcademicMetadata(
-                title=title,
-                authors=authors,
-                abstract=abstract,
-                references=references,
-                equations=equations
-            )
+        # Fall back to text parsing only if PDF metadata extraction failed
+        if not metadata or not metadata.title or not metadata.authors:
+            print(colored("⚠️ Falling back to text parsing", "yellow"))
+            extraction_method = "text"
+            metadata = self._parse_from_text(text)
         
-        # Fall back to text parsing if no PDF metadata
-        self._debug_print("No PDF metadata found, falling back to text parsing")
-        return self._parse_from_text(text)
+        # Log final extraction method used
+        print(colored(f"✓ Final metadata extraction method: {extraction_method}", "green"))
+        return metadata
 
     def _parse_from_text(self, text: str) -> AcademicMetadata:
         """Parse metadata from text content."""
@@ -401,6 +413,7 @@ class MetadataExtractor:
         # Extract title - handle markdown headers and common patterns
         title = "Untitled Document"
         title_index = -1
+        subtitle = None
         
         # Common patterns to skip
         skip_patterns = [
@@ -429,6 +442,9 @@ class MetadataExtractor:
                 
                 title = clean_line
                 title_index = i
+                # Check for subtitle in italics on next line
+                if i + 1 < len(lines) and lines[i + 1].startswith('*'):
+                    subtitle = re.sub(r'[*]', '', lines[i + 1]).strip()
                 self._debug_print(f"Selected as title!", "green")
                 break
         
@@ -482,6 +498,10 @@ class MetadataExtractor:
                 self._debug_print("Selected as title!", "green")
                 break
         
+        # Add subtitle to title if found
+        if subtitle:
+            title = f"{title}: {subtitle}"
+        
         self._debug_print(f"\nFinal title: {title}", "green")
         
         # Extract authors - look for patterns after title
@@ -497,12 +517,19 @@ class MetadataExtractor:
                 if not line or any(skip in line.lower() for skip in ['abstract', 'introduction', 'keywords', 'received']):
                     self._debug_print("Skipping - empty or non-author content", "yellow")
                     continue
-                    
+                
                 # Look for lines with author-like patterns
-                if (',' in line or ' & ' in line or ' and ' in line.lower() or '**' in line):
+                if (',' in line or ' & ' in line or ' and ' in line.lower() or '**' in line or 'M.D.' in line):
                     self._debug_print("Found potential author line")
                     # Clean the line
                     author_line = line.replace('**', '').strip()
+                    
+                    # Handle affiliations marked with numbers
+                    author_line = re.sub(r'\d+\s*$', '', author_line)
+                    author_line = re.sub(r'\s*,\s*M\.D\.', '', author_line)
+                    author_line = re.sub(r'\s*,\s*Ph\.D\.', '', author_line)
+                    author_line = re.sub(r'\s*,\s*M\.P\.H\.', '', author_line)
+                    
                     # Split on common separators
                     for sep in [' and ', ' & ', ',']:
                         author_line = author_line.replace(sep, '|')
@@ -519,12 +546,14 @@ class MetadataExtractor:
                             self._debug_print(f"Skipping '{name}' - contains email", "yellow")
                             continue
                             
-                        if any(word in name.lower() for word in ['university', 'department']):
+                        if any(word in name.lower() for word in ['university', 'department', 'division']):
                             self._debug_print(f"Skipping '{name}' - looks like institution", "yellow")
                             continue
                         
                         # Clean the name
                         name = re.sub(r'[\(\)\[\]\{\}\d]', '', name).strip()
+                        # Remove degrees and titles
+                        name = re.sub(r'\s*(?:M\.D\.|Ph\.D\.|M\.P\.H\.|Professor|Dr\.|Prof\.)\s*', '', name)
                         parts = [p for p in name.split() if len(p) > 1]
                         
                         if parts:

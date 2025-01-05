@@ -3,10 +3,12 @@ import logging
 from datetime import datetime
 from pathlib import Path
 import json
+import threading
 
 import streamlit as st
 import pandas as pd
 from termcolor import colored
+from streamlit.runtime.scriptrunner import add_script_run_ctx
 
 from src.file_manager import create_store_directory, DB_ROOT
 from src.file_processor import FileProcessor
@@ -14,47 +16,52 @@ from src.academic_metadata import AcademicMetadata
 
 logger = logging.getLogger(__name__)
 
+# Initialize session state at the top of the script
+if 'initialized' not in st.session_state:
+    st.session_state['initialized'] = True
+
+def init_session_state():
+    """Initialize session state variables"""
+    if 'file_processor' not in st.session_state:
+        st.session_state['file_processor'] = None
+    if 'current_store' not in st.session_state:
+        st.session_state['current_store'] = None
+
+def run_with_context(func, *args, **kwargs):
+    """Run a function with proper Streamlit context"""
+    thread = threading.current_thread()
+    add_script_run_ctx(thread)
+    return func(*args, **kwargs)
+
+# Initialize session state
+init_session_state()
+
 def process_files(uploaded_files, file_processor, status):
-    """Process uploaded files with progress updates."""
-    total = len(uploaded_files)
-    for i, uploaded_file in enumerate(uploaded_files, 1):
-        try:
-            # Save the uploaded file
-            file_path = os.path.join(file_processor.store_path, uploaded_file.name)
-            with open(file_path, "wb") as f:
-                f.write(uploaded_file.getvalue())
-            status.update(label=f"Uploaded: {uploaded_file.name} ({i}/{total})")
+    """Process uploaded files with progress tracking"""
+    try:
+        for uploaded_file in uploaded_files:
+            status.update(label=f"Processing {uploaded_file.name}...")
             
-            # Process the file with Marker
-            try:
-                # Check if file is already processed
-                txt_path = Path(file_path).with_suffix('.txt')
-                if txt_path.exists():
-                    status.update(label=f"✓ {uploaded_file.name}: Already converted ({i}/{total})", state="complete")
-                    continue
-                
-                def update_progress(message: str):
-                    status.update(label=f"{message} ({i}/{total})")
-                
-                result = file_processor.process_pdf_with_marker(
-                    file_path,
-                    progress_callback=update_progress
-                )
-                
-                if result:
-                    status.update(label=f"✅ {uploaded_file.name}: Converted and indexed ({i}/{total})")
-                else:
-                    status.update(label=f"❌ {uploaded_file.name}: Conversion failed ({i}/{total})", state="error")
-                    
-            except Exception as e:
-                status.update(label=f"❌ {uploaded_file.name}: Processing error - {str(e)} ({i}/{total})", state="error")
-                logger.error(f"Error processing {uploaded_file.name}: {str(e)}", exc_info=True)
-                
-        except Exception as e:
-            status.update(label=f"❌ {uploaded_file.name}: Upload error - {str(e)} ({i}/{total})", state="error")
-            logger.error(f"Error uploading {uploaded_file.name}: {str(e)}", exc_info=True)
-    
-    status.update(label="File processing complete!", state="complete")
+            # Save uploaded file
+            pdf_path = Path(file_processor.store_path) / uploaded_file.name
+            with open(pdf_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+            
+            # Process the file with context
+            run_with_context(
+                file_processor.process_pdf_with_marker,
+                str(pdf_path),
+                cleanup_pdfs=True,
+                progress_callback=lambda msg: status.update(label=msg)
+            )
+            
+        status.update(label="✅ All files processed successfully", state="complete")
+        return True
+        
+    except Exception as e:
+        status.update(label=f"❌ Error processing files: {str(e)}", state="error")
+        logger.error(f"Error processing files: {str(e)}", exc_info=True)
+        return False
 
 # Page configuration
 st.set_page_config(
