@@ -22,7 +22,7 @@ with left_col:
     """)
     
     # Navigation cards in sub-columns
-    nav_col1, nav_col2 = st.columns(2, gap="medium")
+    nav_col1, nav_col2, nav_col3 = st.columns(3, gap="medium")
     
     with nav_col1:
         st.markdown("### 📚 Manage Documents")
@@ -37,6 +37,13 @@ with left_col:
         search_btn = st.button("Go to Search", use_container_width=True)
         if search_btn:
             st.switch_page("pages/Search.py")
+    
+    with nav_col3:
+        st.markdown("### 📊 Academic Analysis")
+        st.markdown("Analyze citations and equations")
+        academic_btn = st.button("Go to Academic Analysis", use_container_width=True)
+        if academic_btn:
+            st.switch_page("pages/Academic.py")
     
     # System status
     st.divider()
@@ -67,10 +74,11 @@ with right_col:
         - Local mode: Context-focused search
         - Global mode: Broad relationship search
 
-        **Academic Integration**
-        - Source tracking for citations
-        - Equation handling
-        - Reference management
+        **Academic Analysis**
+        - Citation network visualization
+        - Reference validation and DOI checking
+        - Equation analysis and classification
+        - Academic metadata extraction
         """)
     
     # Quick tips in an expander
@@ -84,6 +92,10 @@ with right_col:
            - **Hybrid**: General questions
            - **Local**: Specific details
            - **Global**: Broad themes
+        5. Explore academic features:
+           - View citation networks
+           - Validate references
+           - Analyze equations
         """)
 
 # Footer
