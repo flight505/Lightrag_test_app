@@ -43,3 +43,5 @@ httpx
 beautifulsoup4
 marker-pdf
 matplotlib
+stqdm
+requests
