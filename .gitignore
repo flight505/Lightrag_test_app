@@ -39,7 +39,6 @@ chat.log
 
 # Database and document stores
 DB/
-*.db
 
 # Cache
 .cache/
@@ -48,7 +47,3 @@ DB/
 # OS
 .DS_Store
 Thumbs.db
-DB/Timeseries/
-DB/serie/
-DB/timeseries/
-DB/test/
