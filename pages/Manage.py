@@ -110,6 +110,12 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
                 # Process the file with Marker
                 try:
                     if st.session_state["file_processor"]:
+                        # Check if file is already processed
+                        txt_path = Path(store_path) / f"{Path(file_path).stem}.txt"
+                        if txt_path.exists():
+                            status.update(label=f"✓ {uploaded_file.name}: Already converted", state="complete")
+                            continue
+                            
                         result = st.session_state["file_processor"].process_pdf_with_marker(file_path)
                         if result:
                             status.update(label=f"✅ {uploaded_file.name}: Converted and indexed")
@@ -145,9 +151,14 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
         if st.button("⚡ Convert Pending", use_container_width=True):
             if st.session_state["file_processor"]:
                 status = st.status("Converting pending documents...", expanded=True)
-                # Get list of pending PDFs
-                pending_files = [str(f) for f in Path(store_path).glob("*.pdf") 
-                               if not (Path(store_path) / f"{f.stem}.txt").exists()]
+                # Get list of pending PDFs (those without corresponding txt files)
+                pdf_files = list(Path(store_path).glob("*.pdf"))
+                pending_files = []
+                
+                for pdf_file in pdf_files:
+                    txt_path = pdf_file.with_suffix(".txt")
+                    if not txt_path.exists():
+                        pending_files.append(str(pdf_file))
                 
                 if not pending_files:
                     status.update(label="No pending documents to convert", state="complete")

@@ -24,7 +24,16 @@ class FileProcessor:
         self.metadata = self._load_metadata()
         self.pdf_converter = None
         self.equation_pattern = re.compile(r'\$\$(.*?)\$\$', re.DOTALL)
-        self.reference_pattern = re.compile(r'\[@(.*?)\]', re.DOTALL)
+        # Enhanced reference pattern to catch more citation styles
+        self.reference_pattern = re.compile(
+            r'(?:'
+            r'\[@([^\]]+)\]|'  # [@Author2023]
+            r'\[([^\]]+?), *\d{4}\]|'  # [Author, 2023]
+            r'\(([^,]+?), *\d{4}\)|'  # (Author, 2023)
+            r'(?:^|\s)([A-Z][a-z]+(?:\s+et\s+al\.)?(?:\s+\(\d{4}\)))'  # Author et al. (2023)
+            r')',
+            re.MULTILINE
+        )
         logger.info(f"FileProcessor initialized for store: {store_path}")
 
     def _extract_equations(self, text: str) -> List[tuple[str, str]]:
@@ -37,12 +46,25 @@ class FileProcessor:
         return equations
 
     def _extract_references(self, text: str) -> List[str]:
-        """Extract academic references from the text"""
-        return [ref.group(1) for ref in self.reference_pattern.finditer(text)]
+        """Extract academic references from the text with enhanced pattern matching"""
+        references = []
+        for match in self.reference_pattern.finditer(text):
+            # Get the first non-None group (the actual reference)
+            ref = next((g for g in match.groups() if g is not None), None)
+            if ref:
+                # Clean up the reference
+                ref = ref.strip()
+                # Add to list if not already present
+                if ref not in references:
+                    references.append(ref)
+        return references
 
     def _initialize_marker(self):
         """Initialize Marker converter with configuration"""
         try:
+            # Disable tokenizers warning
+            os.environ["TOKENIZERS_PARALLELISM"] = "false"
+            
             from marker.converters.pdf import PdfConverter
             from marker.models import create_model_dict
             from marker.config.parser import ConfigParser
@@ -50,25 +72,46 @@ class FileProcessor:
             # Configure marker with optimizations for M3 Max
             config = {
                 "output_format": "markdown",
-                "force_ocr": True,  # Ensure consistent text extraction
+                "force_ocr": False,  # Only use OCR when needed
                 "extract_images": False,  # Skip image extraction for speed
-                "batch_multiplier": 12,  # Larger batches for M3 Max (40 cores)
-                "num_workers": 8,  # Parallel workers for processing
-                "langs": ["English"],  # Optimize for English only
+                "batch_multiplier": 12,  # Larger batches for M3 Max
+                "num_workers": 8,  # Parallel workers
+                "langs": ["English"],  # Optimize for English
                 "device": "mps",  # Use Metal Performance Shaders
-                "model_precision": "float16",  # Use half precision for better performance
-                "max_batch_size": 16,  # Larger batch size for faster processing
-                "debug": False,  # Disable debug output for speed
+                "model_precision": "float16",  # Use half precision
+                "max_batch_size": 16,  # Larger batch size
+                
+                # Layout detection settings
+                "layout_coverage_min_lines": 2,
+                "layout_coverage_threshold": 0.4,
+                "document_ocr_threshold": 0.7,
+                "error_model_segment_length": 1024,
+                
+                # OCR settings
+                "detection_batch_size": 8,
+                "recognition_batch_size": 8,
+                
+                # LLM settings
+                "use_llm": True,
+                "google_api_key": os.getenv("GEMINI_API_KEY"),
+                "model_name": "gemini-1.5-flash",
+                "max_retries": 3,
+                "max_concurrency": 3,
+                "timeout": 60,
+                "confidence_threshold": 0.75,
             }
             
-            config_parser = ConfigParser(config)
-            
+            # Initialize the converter with default processor list
             self.pdf_converter = PdfConverter(
-                config=config_parser.generate_config_dict(),
                 artifact_dict=create_model_dict(),
-                processor_list=config_parser.get_processors(),
-                renderer=config_parser.get_renderer()
+                config=config,
+                renderer="marker.renderers.markdown.MarkdownRenderer"  # Use string path instead of class
             )
+            
+            # Enable LLM if configured
+            if config["use_llm"]:
+                self.pdf_converter.use_llm = True
+            
             logger.info("Initialized Marker PDF converter with M3 Max optimized configuration")
             logger.info(f"Using configuration: {config}")
         except ImportError as e:
