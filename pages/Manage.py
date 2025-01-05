@@ -2,15 +2,59 @@ import os
 import logging
 from datetime import datetime
 from pathlib import Path
+import json
 
 import streamlit as st
 import pandas as pd
-from stqdm import stqdm
+from termcolor import colored
 
 from src.file_manager import create_store_directory, DB_ROOT
 from src.file_processor import FileProcessor
+from src.academic_metadata import AcademicMetadata
 
 logger = logging.getLogger(__name__)
+
+def process_files(uploaded_files, file_processor, status):
+    """Process uploaded files with progress updates."""
+    total = len(uploaded_files)
+    for i, uploaded_file in enumerate(uploaded_files, 1):
+        try:
+            # Save the uploaded file
+            file_path = os.path.join(file_processor.store_path, uploaded_file.name)
+            with open(file_path, "wb") as f:
+                f.write(uploaded_file.getvalue())
+            status.update(label=f"Uploaded: {uploaded_file.name} ({i}/{total})")
+            
+            # Process the file with Marker
+            try:
+                # Check if file is already processed
+                txt_path = Path(file_path).with_suffix('.txt')
+                if txt_path.exists():
+                    status.update(label=f"✓ {uploaded_file.name}: Already converted ({i}/{total})", state="complete")
+                    continue
+                
+                def update_progress(message: str):
+                    status.update(label=f"{message} ({i}/{total})")
+                
+                result = file_processor.process_pdf_with_marker(
+                    file_path,
+                    progress_callback=update_progress
+                )
+                
+                if result:
+                    status.update(label=f"✅ {uploaded_file.name}: Converted and indexed ({i}/{total})")
+                else:
+                    status.update(label=f"❌ {uploaded_file.name}: Conversion failed ({i}/{total})", state="error")
+                    
+            except Exception as e:
+                status.update(label=f"❌ {uploaded_file.name}: Processing error - {str(e)} ({i}/{total})", state="error")
+                logger.error(f"Error processing {uploaded_file.name}: {str(e)}", exc_info=True)
+                
+        except Exception as e:
+            status.update(label=f"❌ {uploaded_file.name}: Upload error - {str(e)} ({i}/{total})", state="error")
+            logger.error(f"Error uploading {uploaded_file.name}: {str(e)}", exc_info=True)
+    
+    status.update(label="File processing complete!", state="complete")
 
 # Page configuration
 st.set_page_config(
@@ -93,49 +137,13 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
     
     if uploaded_files:
         status = st.status("Processing uploaded files...", expanded=True)
-        for uploaded_file in stqdm(
-            uploaded_files, 
-            desc="Uploading files",
-            total=len(uploaded_files),
-            unit="file",
-            bar_format="{desc}: {percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]"
-        ):
-            try:
-                # Save the uploaded file
-                file_path = os.path.join(store_path, uploaded_file.name)
-                with open(file_path, "wb") as f:
-                    f.write(uploaded_file.getvalue())
-                status.update(label=f"Uploaded: {uploaded_file.name}")
-                
-                # Process the file with Marker
-                try:
-                    if st.session_state["file_processor"]:
-                        # Check if file is already processed
-                        txt_path = Path(store_path) / f"{Path(file_path).stem}.txt"
-                        if txt_path.exists():
-                            status.update(label=f"✓ {uploaded_file.name}: Already converted", state="complete")
-                            continue
-                            
-                        result = st.session_state["file_processor"].process_pdf_with_marker(file_path)
-                        if result:
-                            status.update(label=f"✅ {uploaded_file.name}: Converted and indexed")
-                        else:
-                            status.update(label=f"❌ {uploaded_file.name}: Conversion failed", state="error")
-                except Exception as e:
-                    status.update(label=f"❌ {uploaded_file.name}: Processing error - {str(e)}", state="error")
-                    logger.error(f"Error processing {uploaded_file.name}: {str(e)}", exc_info=True)
-                    
-            except Exception as e:
-                status.update(label=f"❌ {uploaded_file.name}: Upload error - {str(e)}", state="error")
-                logger.error(f"Error uploading {uploaded_file.name}: {str(e)}", exc_info=True)
-        
-        status.update(label="File processing complete!", state="complete")
+        process_files(uploaded_files, st.session_state["file_processor"], status)
     
     # Document list section
     st.markdown("### Manage Documents")
     
     # Create three columns for the action buttons
-    action_col1, action_col2, action_col3 = st.columns(3)
+    action_col1, action_col2, action_col3, action_col4 = st.columns(4)
     with action_col1:
         if st.button("🔄 Refresh Document List", use_container_width=True):
             st.rerun()
@@ -181,6 +189,9 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
                     logger.error(f"Error during batch conversion: {str(e)}", exc_info=True)
                 
                 st.rerun()
+    with action_col4:
+        if st.button("📊 View Academic Metadata", use_container_width=True):
+            st.switch_page("pages/Academic.py")
     
     try:
         # Get list of PDF and text files
@@ -206,26 +217,54 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
         for file in pdf_files:
             file_stat = file.stat()
             txt_file = file.with_suffix(".txt")
+            metadata_file = Path(store_path) / f"{file.stem}_metadata.json"
+            
+            # Get academic metadata if available
+            academic_info = ""
+            if metadata_file.exists():
+                try:
+                    with open(metadata_file, 'r', encoding='utf-8') as f:
+                        metadata = AcademicMetadata.from_dict(json.load(f))
+                        academic_info = f"📚 {len(metadata.references)} refs, {len(metadata.equations)} eqs"
+                except Exception as e:
+                    logger.error(f"Error loading metadata for {file.name}: {e}")
+                    academic_info = "❌ Metadata error"
+            
             files_data.append({
                 "selected": False,
                 "name": file.name,
                 "type": "PDF",
                 "size": f"{file_stat.st_size / 1024:.1f} KB",
                 "modified": datetime.fromtimestamp(file_stat.st_mtime).strftime("%Y-%m-%d %H:%M"),
-                "status": "Processed" if txt_file.exists() else "Pending"
+                "status": "Processed" if txt_file.exists() else "Pending",
+                "academic": academic_info
             })
         
         # Add text files
         for file in txt_files:
             file_stat = file.stat()
             pdf_file = file.with_suffix(".pdf")
+            metadata_file = Path(store_path) / f"{file.stem}_metadata.json"
+            
+            # Get academic metadata if available
+            academic_info = ""
+            if metadata_file.exists():
+                try:
+                    with open(metadata_file, 'r', encoding='utf-8') as f:
+                        metadata = AcademicMetadata.from_dict(json.load(f))
+                        academic_info = f"📚 {len(metadata.references)} refs, {len(metadata.equations)} eqs"
+                except Exception as e:
+                    logger.error(f"Error loading metadata for {file.name}: {e}")
+                    academic_info = "❌ Metadata error"
+            
             files_data.append({
                 "selected": False,
                 "name": file.name,
                 "type": "Text",
                 "size": f"{file_stat.st_size / 1024:.1f} KB",
                 "modified": datetime.fromtimestamp(file_stat.st_mtime).strftime("%Y-%m-%d %H:%M"),
-                "status": "Source" if pdf_file.exists() else "Standalone"
+                "status": "Source" if pdf_file.exists() else "Standalone",
+                "academic": academic_info
             })
         
         # Create DataFrame
@@ -261,74 +300,60 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
                     "Status",
                     width="small"
                 ),
+                "academic": st.column_config.TextColumn(
+                    "Academic Info",
+                    width="medium"
+                )
             },
-            hide_index=True,
-            use_container_width=True,
+            hide_index=True
         )
         
-        # Add delete button for selected files
-        if edited_df["selected"].any():
-            if st.button("🗑️ Delete Selected Files", type="primary"):
-                selected_files = edited_df[edited_df["selected"]]["name"].tolist()
-                
-                # Initialize RAG if needed
-                if "rag" not in st.session_state or st.session_state.rag is None:
-                    st.error("Please initialize LightRAG in the Search page first.")
-                    st.stop()
-                
-                for file_name in selected_files:
-                    file_path = os.path.join(store_path, file_name)
-                    try:
-                        # Get document ID (using file name without extension as ID)
-                        doc_id = Path(file_name).stem
-                        
-                        # Delete from LightRAG first
+        # Handle selected files
+        selected_files = edited_df[edited_df["selected"]]["name"].tolist()
+        if selected_files:
+            st.markdown("### Selected Files")
+            
+            # Action buttons for selected files
+            selected_col1, selected_col2 = st.columns(2)
+            with selected_col1:
+                if st.button("🗑️ Delete Selected", use_container_width=True):
+                    for file in selected_files:
+                        file_path = Path(store_path) / file
                         try:
-                            st.session_state.rag.delete_by_doc_id(doc_id)
-                            logger.info(f"Deleted document {doc_id} from LightRAG")
+                            # Remove the file and its associated files
+                            if file_path.exists():
+                                file_path.unlink()
+                            txt_path = file_path.with_suffix(".txt")
+                            if txt_path.exists():
+                                txt_path.unlink()
+                            metadata_path = Path(store_path) / f"{file_path.stem}_metadata.json"
+                            if metadata_path.exists():
+                                metadata_path.unlink()
+                            st.success(f"Deleted {file}")
                         except Exception as e:
-                            logger.error(f"Error deleting document {doc_id} from LightRAG: {str(e)}")
-                            st.warning(f"Could not delete {file_name} from LightRAG: {str(e)}")
-                        
-                        # Remove the file
-                        os.remove(file_path)
-                        
-                        # Remove corresponding files based on type
-                        base_path = os.path.splitext(file_path)[0]
-                        
-                        # If it's a PDF, remove corresponding .txt and .json
-                        if file_name.lower().endswith('.pdf'):
-                            txt_path = base_path + ".txt"
-                            json_path = base_path + ".json"
-                            if os.path.exists(txt_path):
-                                os.remove(txt_path)
-                            if os.path.exists(json_path):
-                                os.remove(json_path)
-                        
-                        # If it's a text file, remove corresponding .json and check PDF
-                        elif file_name.lower().endswith('.txt'):
-                            json_path = base_path + ".json"
-                            pdf_path = base_path + ".pdf"
-                            if os.path.exists(json_path):
-                                os.remove(json_path)
-                            # Only remove PDF if it exists and is selected
-                            if os.path.exists(pdf_path) and os.path.basename(pdf_path) in selected_files:
-                                os.remove(pdf_path)
-                        
-                        st.success(f"Deleted: {file_name}")
-                        
-                    except Exception as e:
-                        st.error(f"Error deleting {file_name}: {str(e)}")
-                        logger.error(f"Error deleting {file_name}: {str(e)}", exc_info=True)
-                
-                # Run cleanup to ensure no orphaned files
-                if st.session_state["file_processor"]:
-                    removed = st.session_state["file_processor"].clean_unused_files()
-                    if any(removed.values()):
-                        st.info("Cleaned up associated files")
-                
-                st.rerun()
-                
+                            st.error(f"Error deleting {file}: {str(e)}")
+                    st.rerun()
+            
+            with selected_col2:
+                if st.button("🔄 Reprocess Selected", use_container_width=True):
+                    status = st.status("Reprocessing selected files...", expanded=True)
+                    for file in selected_files:
+                        if file.lower().endswith(".pdf"):
+                            file_path = Path(store_path) / file
+                            try:
+                                results = st.session_state["file_processor"].process_pdf_with_marker(
+                                    str(file_path),
+                                    cleanup_pdfs=False
+                                )
+                                if results:
+                                    status.update(label=f"✅ Reprocessed {file}")
+                                else:
+                                    status.update(label=f"❌ Failed to reprocess {file}", state="error")
+                            except Exception as e:
+                                status.update(label=f"❌ Error reprocessing {file}: {str(e)}", state="error")
+                    status.update(label="Reprocessing complete", state="complete")
+                    st.rerun()
+    
     except Exception as e:
-        st.error(f"Error loading document list: {str(e)}")
-        logger.error(f"Error in document list: {str(e)}", exc_info=True) 
+        st.error(f"Error managing documents: {str(e)}")
+        logger.error(f"Error in document management: {str(e)}", exc_info=True) 

@@ -1,19 +1,96 @@
 import os
 import logging
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Union, Optional, Callable
 from pathlib import Path
 from datetime import datetime
 import hashlib
 import json
 import re
-import streamlit as st
-from stqdm import stqdm
 from threading import RLock
-
-# Set lock for stqdm to prevent issues
-stqdm.set_lock(RLock())
+from src.academic_metadata import MetadataExtractor, AcademicMetadata
+from termcolor import colored
+from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
+
+@dataclass
+class ChunkingConfig:
+    """Configuration for text chunking"""
+    chunk_size: int = 500
+    chunk_overlap: int = 50
+    min_chunk_size: int = 100
+    max_chunk_size: int = 1000
+    
+    def validate(self) -> None:
+        """Validate chunking configuration"""
+        if self.chunk_size < self.min_chunk_size:
+            raise ValueError(f"Chunk size must be at least {self.min_chunk_size}")
+        if self.chunk_size > self.max_chunk_size:
+            raise ValueError(f"Chunk size must be at most {self.max_chunk_size}")
+        if self.chunk_overlap >= self.chunk_size:
+            raise ValueError("Chunk overlap must be less than chunk size")
+        if self.chunk_overlap < 0:
+            raise ValueError("Chunk overlap must be non-negative")
+
+@dataclass
+class BatchInserter:
+    """Handles batch insertion of documents with progress tracking"""
+    batch_size: int = 10
+    max_retries: int = 3
+    timeout: int = 60
+    
+    def __init__(self):
+        self.lock = RLock()
+        self.current_batch = []
+        self.failed_items = []
+    
+    def add_item(self, item: Any) -> None:
+        """Add item to current batch"""
+        with self.lock:
+            self.current_batch.append(item)
+            if len(self.current_batch) >= self.batch_size:
+                self.flush()
+    
+    def flush(self) -> None:
+        """Process and clear current batch"""
+        with self.lock:
+            if not self.current_batch:
+                return
+            
+            try:
+                # Process batch
+                for item in self.current_batch:
+                    try:
+                        self._process_item(item)
+                    except Exception as e:
+                        print(colored(f"⚠️ Failed to process item: {e}", "yellow"))
+                        self.failed_items.append((item, str(e)))
+                
+                self.current_batch.clear()
+                
+            except Exception as e:
+                print(colored(f"❌ Batch processing error: {e}", "red"))
+                self.failed_items.extend((item, "Batch error") for item in self.current_batch)
+                self.current_batch.clear()
+    
+    def _process_item(self, item: Any) -> None:
+        """Process individual item with retries"""
+        for attempt in range(self.max_retries):
+            try:
+                # Implement actual processing logic here
+                return
+            except Exception as e:
+                if attempt == self.max_retries - 1:
+                    raise
+                print(colored(f"⚠️ Retry {attempt + 1}/{self.max_retries}: {e}", "yellow"))
+    
+    def get_failed_items(self) -> List[tuple]:
+        """Get list of failed items and their error messages"""
+        return self.failed_items.copy()
+    
+    def clear_failed_items(self) -> None:
+        """Clear the list of failed items"""
+        self.failed_items.clear()
 
 class FileProcessor:
     """Handles file preprocessing and tracking with enhanced equation support"""
@@ -23,41 +100,8 @@ class FileProcessor:
         self.metadata_file = self.store_path / "metadata.json"
         self.metadata = self._load_metadata()
         self.pdf_converter = None
-        self.equation_pattern = re.compile(r'\$\$(.*?)\$\$', re.DOTALL)
-        # Enhanced reference pattern to catch more citation styles
-        self.reference_pattern = re.compile(
-            r'(?:'
-            r'\[@([^\]]+)\]|'  # [@Author2023]
-            r'\[([^\]]+?), *\d{4}\]|'  # [Author, 2023]
-            r'\(([^,]+?), *\d{4}\)|'  # (Author, 2023)
-            r'(?:^|\s)([A-Z][a-z]+(?:\s+et\s+al\.)?(?:\s+\(\d{4}\)))'  # Author et al. (2023)
-            r')',
-            re.MULTILINE
-        )
+        self.metadata_extractor = MetadataExtractor()
         logger.info(f"FileProcessor initialized for store: {store_path}")
-
-    def _extract_equations(self, text: str) -> List[tuple[str, str]]:
-        """Extract LaTeX equations and generate unique identifiers"""
-        equations = []
-        for idx, match in enumerate(self.equation_pattern.finditer(text)):
-            equation = match.group(1).strip()
-            equation_id = f"eq_{hashlib.md5(equation.encode()).hexdigest()[:8]}"
-            equations.append((equation_id, equation))
-        return equations
-
-    def _extract_references(self, text: str) -> List[str]:
-        """Extract academic references from the text with enhanced pattern matching"""
-        references = []
-        for match in self.reference_pattern.finditer(text):
-            # Get the first non-None group (the actual reference)
-            ref = next((g for g in match.groups() if g is not None), None)
-            if ref:
-                # Clean up the reference
-                ref = ref.strip()
-                # Add to list if not already present
-                if ref not in references:
-                    references.append(ref)
-        return references
 
     def _initialize_marker(self):
         """Initialize Marker converter with configuration"""
@@ -105,7 +149,7 @@ class FileProcessor:
             self.pdf_converter = PdfConverter(
                 artifact_dict=create_model_dict(),
                 config=config,
-                renderer="marker.renderers.markdown.MarkdownRenderer"  # Use string path instead of class
+                renderer="marker.renderers.markdown.MarkdownRenderer"
             )
             
             # Enable LLM if configured
@@ -114,120 +158,80 @@ class FileProcessor:
             
             logger.info("Initialized Marker PDF converter with M3 Max optimized configuration")
             logger.info(f"Using configuration: {config}")
+            
+            print(colored("✓ Initialized Marker PDF converter", "green"))
+            
         except ImportError as e:
-            logger.error(f"Failed to initialize Marker: {e}")
+            error_msg = f"Failed to initialize Marker: {e}"
+            logger.error(error_msg)
+            print(colored(f"❌ {error_msg}", "red"))
             raise
 
-    def process_pdf_with_marker(self, file_paths: List[str], progress_callback=None, cleanup_pdfs: bool = True) -> List[Dict[str, Any]]:
-        """Process PDFs using Marker's Python API"""
+    def process_pdf_with_marker(self, file_path: Union[str, List[str]], cleanup_pdfs: bool = True, progress_callback: Optional[Callable] = None) -> bool:
+        """Process PDF file(s) with Marker."""
         try:
-            if isinstance(file_paths, str):
-                file_paths = [file_paths]
+            # Handle single file or list of files
+            if isinstance(file_path, str):
+                files_to_process = [file_path]
+            else:
+                files_to_process = file_path
             
             results = []
-            total_files = len(file_paths)
-            
-            # Initialize marker if needed
-            if self.pdf_converter is None:
-                with st.spinner("Initializing Marker..."):
-                    self._initialize_marker()
-            
-            # Process each file with progress bar
-            for idx, file_path in enumerate(stqdm(
-                file_paths, 
-                desc="Converting documents",
-                total=total_files,
-                unit="file",
-                bar_format="{desc}: {percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]"
-            ), 1):
-                base_name = Path(file_path).stem
-                
+            for pdf_path in files_to_process:
                 try:
+                    # Convert PDF to text
+                    txt_path = Path(pdf_path).with_suffix('.txt')
                     if progress_callback:
-                        progress_callback(f"Processing {base_name} ({idx}/{total_files})")
+                        progress_callback(f"Converting {Path(pdf_path).name}...")
                     
-                    # Progress placeholder for file info
-                    info_ph = st.empty()
-                    info_ph.info(f"Converting {base_name}...")
-                    
-                    # Convert using marker's Python API
-                    rendered = self.pdf_converter(str(file_path))
-                    text_content = rendered.markdown
-                    
-                    if not text_content:
-                        info_ph.error(f"❌ No text extracted from {base_name}")
+                    text = self._convert_pdf_with_marker(pdf_path)
+                    if not text:
                         continue
                     
-                    # Save the text content
-                    txt_path = self.store_path / f"{base_name}.txt"
+                    # Save text content
                     with open(txt_path, 'w', encoding='utf-8') as f:
-                        f.write(text_content)
+                        f.write(text)
                     
-                    # Create metadata
-                    metadata = {
-                        "table_of_contents": rendered.toc if hasattr(rendered, 'toc') else [],
-                        "page_stats": rendered.page_stats if hasattr(rendered, 'page_stats') else [],
-                        "equations": self._extract_equations(text_content),
-                        "references": self._extract_references(text_content)
-                    }
+                    # Extract academic metadata
+                    if progress_callback:
+                        progress_callback(f"Extracting metadata from {Path(pdf_path).name}...")
+                    
+                    metadata = self.metadata_extractor.extract_metadata(
+                        text=text,
+                        doc_id=Path(pdf_path).stem
+                    )
                     
                     # Save metadata
-                    json_path = self.store_path / f"{base_name}.json"
-                    with open(json_path, 'w', encoding='utf-8') as f:
-                        json.dump(metadata, f, indent=2)
+                    metadata.save(Path(pdf_path).parent)
                     
-                    # Update metadata in memory
-                    self.metadata["files"][base_name] = {
-                        "source": os.path.basename(txt_path),
-                        "original_source": os.path.basename(file_path),
-                        "created": datetime.fromtimestamp(os.path.getctime(file_path)).isoformat(),
-                        "modified": datetime.fromtimestamp(os.path.getmtime(file_path)).isoformat(),
-                        "file_type": "txt",
-                        "original_type": "pdf",
-                        "marker_metadata": {
-                            "toc": metadata["table_of_contents"],
-                            "page_stats": metadata["page_stats"]
-                        },
-                        "equations": metadata["equations"],
-                        "references": metadata["references"]
+                    # Update metadata store
+                    self.metadata["files"][Path(pdf_path).name] = {
+                        "path": str(pdf_path),
+                        "txt_path": str(txt_path),
+                        "academic_metadata": metadata.to_dict()
                     }
-                    
-                    results.append({
-                        "content": text_content,
-                        "metadata": self.metadata["files"][base_name]
-                    })
+                    self._save_metadata()
                     
                     # Cleanup PDF if requested
                     if cleanup_pdfs:
                         try:
-                            Path(file_path).unlink()
-                            info_ph.success(f"✅ Completed processing {base_name} and removed PDF")
-                            logger.info(f"Removed PDF after successful conversion: {file_path}")
+                            Path(pdf_path).unlink()
+                            print(colored(f"✓ Removed PDF after successful conversion: {Path(pdf_path).name}", "green"))
                         except Exception as e:
-                            info_ph.warning(f"✅ Completed processing {base_name} but failed to remove PDF: {e}")
-                            logger.warning(f"Failed to remove PDF {file_path}: {e}")
-                    else:
-                        info_ph.success(f"✅ Completed processing {base_name}")
-                
+                            print(colored(f"⚠️ Failed to remove PDF {Path(pdf_path).name}: {e}", "yellow"))
+                    
+                    results.append(True)
+                    print(colored(f"✓ Successfully processed {Path(pdf_path).name}", "green"))
+                    
                 except Exception as e:
-                    error_msg = f"Error processing {base_name}: {str(e)}"
-                    if progress_callback:
-                        progress_callback(f"❌ {error_msg}")
-                    logger.error(error_msg)
-                    st.error(error_msg)
-                    continue
+                    print(colored(f"❌ Error processing {pdf_path}: {str(e)}", "red"))
+                    results.append(False)
             
-            # Save all metadata at once
-            self._save_metadata()
-            return results
+            return any(results)
             
         except Exception as e:
-            error_msg = f"Error in processing: {str(e)}"
-            if progress_callback:
-                progress_callback(f"❌ {error_msg}")
-            logger.error(error_msg)
-            st.error(error_msg)
-            raise
+            print(colored(f"❌ Error in process_pdf_with_marker: {str(e)}", "red"))
+            return False
 
     def _load_metadata(self) -> Dict:
         """Load metadata from file or create new if not exists"""
@@ -256,9 +260,13 @@ class FileProcessor:
                         if "source" in doc_info:
                             txt_file = self.store_path / doc_info["source"]
                             used_files.add(txt_file)
+                            # Keep both metadata files
                             json_file = txt_file.with_suffix('.json')
+                            academic_json = self.store_path / f"{txt_file.stem}_metadata.json"
                             if json_file.exists():
                                 used_files.add(json_file)
+                            if academic_json.exists():
+                                used_files.add(academic_json)
                         if "original_source" in doc_info:
                             used_files.add(self.store_path / doc_info["original_source"])
             
@@ -270,69 +278,30 @@ class FileProcessor:
                         category = suffix[1:] if suffix in ['.txt', '.json'] else 'other'
                         removed_files[category].append(str(file_path))
                         file_path.unlink()
-                        logger.info(f"Removed unused file: {file_path}")
+                        print(colored(f"✓ Removed unused file: {file_path.name}", "green"))
                     except Exception as e:
-                        logger.error(f"Error removing file {file_path}: {str(e)}")
+                        print(colored(f"❌ Error removing file {file_path.name}: {str(e)}", "red"))
             
             return removed_files
             
         except Exception as e:
-            logger.error(f"Error cleaning unused files: {str(e)}")
+            error_msg = f"Error cleaning unused files: {str(e)}"
+            logger.error(error_msg)
+            print(colored(f"❌ {error_msg}", "red"))
             raise
-
-    def search_equations(self, query: str) -> List[Dict[str, Any]]:
-        """Search for equations across all documents using pattern matching"""
-        results = []
-        for doc_name, doc_info in self.metadata["files"].items():
-            if "equations" in doc_info:
-                for eq_id, equation in doc_info["equations"]:
-                    if query.lower() in equation.lower():
-                        results.append({
-                            "document": doc_name,
-                            "equation_id": eq_id,
-                            "equation": equation,
-                            "source": doc_info.get("original_source", "")
-                        })
-        return results
-
-    def get_equation_by_id(self, equation_id: str) -> Dict[str, Any]:
-        """Retrieve specific equation by its ID"""
-        for doc_name, doc_info in self.metadata["files"].items():
-            if "equations" in doc_info:
-                for eq_id, equation in doc_info["equations"]:
-                    if eq_id == equation_id:
-                        return {
-                            "document": doc_name,
-                            "equation": equation,
-                            "source": doc_info.get("original_source", ""),
-                            "context": self._get_equation_context(doc_name, equation)
-                        }
-        return None
 
     def get_citation_network(self) -> Dict[str, List[str]]:
         """Build citation network from document references"""
         network = {}
         for doc_name, doc_info in self.metadata["files"].items():
-            if "references" in doc_info:
-                network[doc_name] = doc_info["references"]
+            if "academic_metadata" in doc_info:
+                academic_metadata = AcademicMetadata.from_dict(doc_info["academic_metadata"])
+                citations = []
+                for ref in academic_metadata.references:
+                    if ref.citation_key:
+                        citations.append(ref.citation_key)
+                network[doc_name] = citations
         return network
-
-    def _get_equation_context(self, doc_name: str, equation: str) -> str:
-        """Get surrounding text context for an equation"""
-        try:
-            txt_path = self.store_path / f"{doc_name}.txt"
-            if txt_path.exists():
-                with open(txt_path, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                    # Find equation position and extract surrounding context
-                    pos = content.find(equation)
-                    if pos >= 0:
-                        start = max(0, pos - 200)
-                        end = min(len(content), pos + len(equation) + 200)
-                        return content[start:end].strip()
-        except Exception as e:
-            logger.error(f"Error getting equation context: {e}")
-        return ""
 
     def analyze_equations(self) -> Dict[str, Any]:
         """Analyze equations across all documents"""
@@ -340,27 +309,43 @@ class FileProcessor:
             "total_equations": 0,
             "documents_with_equations": 0,
             "equation_types": {
-                "algebraic": 0,
                 "differential": 0,
                 "matrix": 0,
-                "statistical": 0
+                "statistical": 0,
+                "algebraic": 0
             }
         }
         
         for doc_info in self.metadata["files"].values():
-            if "equations" in doc_info and doc_info["equations"]:
-                stats["documents_with_equations"] += 1
-                stats["total_equations"] += len(doc_info["equations"])
-                
-                # Classify equations
-                for _, eq in doc_info["equations"]:
-                    if any(term in eq.lower() for term in ["\\frac{d", "\\partial"]):
-                        stats["equation_types"]["differential"] += 1
-                    elif any(term in eq.lower() for term in ["\\matrix", "\\begin{bmatrix}"]):
-                        stats["equation_types"]["matrix"] += 1
-                    elif any(term in eq.lower() for term in ["\\sum", "\\prod", "\\mathbb{E}", "\\mathbb{P}"]):
-                        stats["equation_types"]["statistical"] += 1
-                    else:
-                        stats["equation_types"]["algebraic"] += 1
+            if "academic_metadata" in doc_info:
+                academic_metadata = AcademicMetadata.from_dict(doc_info["academic_metadata"])
+                if academic_metadata.equations:
+                    stats["documents_with_equations"] += 1
+                    stats["total_equations"] += len(academic_metadata.equations)
+                    
+                    for equation in academic_metadata.equations:
+                        if equation.equation_type:
+                            stats["equation_types"][equation.equation_type] += 1
         
         return stats
+
+    def _convert_pdf_with_marker(self, pdf_path: str) -> Optional[str]:
+        """Convert PDF to text using Marker."""
+        try:
+            # Initialize marker if needed
+            if self.pdf_converter is None:
+                self._initialize_marker()
+            
+            # Convert using marker's Python API
+            rendered = self.pdf_converter(str(pdf_path))
+            text_content = rendered.markdown
+            
+            if not text_content:
+                print(colored(f"❌ No text extracted from {Path(pdf_path).name}", "red"))
+                return None
+            
+            return text_content
+            
+        except Exception as e:
+            print(colored(f"❌ Error converting PDF {Path(pdf_path).name}: {str(e)}", "red"))
+            return None
