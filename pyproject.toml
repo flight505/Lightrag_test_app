@@ -49,6 +49,8 @@ dependencies = [
     "pydantic-ai",
     "httpx",
     "pytest-asyncio",
+    "stqdm",
+    "fastapi",
 ]
 
 [build-system]

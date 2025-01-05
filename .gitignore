@@ -48,3 +48,7 @@ DB/
 # OS
 .DS_Store
 Thumbs.db
+DB/Timeseries/
+DB/serie/
+DB/timeseries/
+DB/test/
