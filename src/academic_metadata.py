@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import List, Dict, Set, Optional, Any
+from typing import List, Dict, Set, Optional, Any, Tuple
 import json
 import subprocess
 import tempfile
@@ -9,6 +9,11 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from termcolor import colored
 import re
+import fitz  # PyMuPDF
+from PyPDF2 import PdfReader
+import requests
+from scholarly import scholarly
+import time
 
 # Enums and Constants
 class ValidationLevel(str, Enum):
@@ -233,11 +238,159 @@ class MetadataExtractor:
         if self.debug:
             print(colored(f"[DEBUG] {message}", color))
 
-    def extract_metadata(self, text: str, doc_id: str) -> AcademicMetadata:
-        """Extract academic metadata from document text."""
+    def extract_metadata_from_pdf(self, pdf_path: str) -> Optional[Tuple[str, List[Author], str, str]]:
+        """Extract metadata directly from PDF using multiple methods."""
+        self._debug_print(f"Attempting to extract metadata from PDF: {pdf_path}")
+        
+        try:
+            # Try PyMuPDF (fitz) first
+            doc = fitz.open(pdf_path)
+            metadata = doc.metadata
+            self._debug_print(f"PyMuPDF metadata: {metadata}")
+            
+            # Try to get DOI
+            doi = None
+            for page in doc:
+                text = page.get_text()
+                doi_match = re.search(r'10\.\d{4,}/[-._;()/:\w]+', text)
+                if doi_match:
+                    doi = doi_match.group()
+                    self._debug_print(f"Found DOI: {doi}")
+                    break
+            
+            doc.close()
+            
+            if doi:
+                # Try CrossRef API
+                try:
+                    response = requests.get(f"https://api.crossref.org/works/{doi}")
+                    if response.status_code == 200:
+                        data = response.json()['message']
+                        self._debug_print("Successfully retrieved CrossRef data")
+                        
+                        # Extract title
+                        title = data.get('title', [None])[0]
+                        
+                        # Extract authors
+                        authors = []
+                        for author in data.get('author', []):
+                            given = author.get('given', '')
+                            family = author.get('family', '')
+                            full_name = f"{given} {family}".strip()
+                            if full_name:
+                                authors.append(Author(
+                                    full_name=full_name,
+                                    first_name=given,
+                                    last_name=family
+                                ))
+                        
+                        # Extract abstract
+                        abstract = data.get('abstract', '')
+                        
+                        return title, authors, abstract, doi
+                except Exception as e:
+                    self._debug_print(f"CrossRef API error: {str(e)}", "yellow")
+            
+            # Fallback to PDF metadata
+            if metadata:
+                title = metadata.get('title', '')
+                author_str = metadata.get('author', '')
+                authors = []
+                
+                if author_str:
+                    # Split authors on common separators
+                    for name in re.split(r'[,;&]', author_str):
+                        name = name.strip()
+                        if name:
+                            parts = name.split()
+                            if len(parts) > 1:
+                                authors.append(Author(
+                                    full_name=name,
+                                    first_name=parts[0],
+                                    last_name=parts[-1]
+                                ))
+                
+                return title, authors, metadata.get('subject', ''), None
+            
+            # Try PyPDF2 as last resort
+            reader = PdfReader(pdf_path)
+            if reader.metadata:
+                self._debug_print("Found PyPDF2 metadata")
+                meta = reader.metadata
+                title = meta.get('/Title', '')
+                author_str = meta.get('/Author', '')
+                authors = []
+                
+                if author_str:
+                    for name in re.split(r'[,;&]', author_str):
+                        name = name.strip()
+                        if name:
+                            parts = name.split()
+                            if len(parts) > 1:
+                                authors.append(Author(
+                                    full_name=name,
+                                    first_name=parts[0],
+                                    last_name=parts[-1]
+                                ))
+                
+                return title, authors, meta.get('/Subject', ''), None
+            
+        except Exception as e:
+            self._debug_print(f"Error extracting PDF metadata: {str(e)}", "red")
+        
+        return None
+
+    def extract_metadata(self, text: str, doc_id: str, pdf_path: Optional[str] = None) -> AcademicMetadata:
+        """Extract academic metadata from document text and PDF if available."""
         if self.debug:
             print(colored("\n=== Starting Metadata Extraction ===", "blue"))
+        
+        # Try PDF metadata extraction first if path is provided
+        pdf_metadata = None
+        if pdf_path:
+            pdf_metadata = self.extract_metadata_from_pdf(pdf_path)
+        
+        if pdf_metadata:
+            title, authors, abstract, doi = pdf_metadata
+            self._debug_print("Using metadata from PDF")
             
+            # If we have a DOI but no abstract, try scholarly
+            if doi and not abstract:
+                try:
+                    search_query = scholarly.search_pubs(title)
+                    pub = next(search_query)
+                    if pub:
+                        abstract = pub.get('bib', {}).get('abstract', '')
+                        self._debug_print("Found abstract from scholarly")
+                except Exception as e:
+                    self._debug_print(f"Scholarly lookup failed: {str(e)}", "yellow")
+            
+            # Only fall back to text parsing for missing fields
+            if not title or not authors:
+                self._debug_print("Falling back to text parsing for missing fields")
+                parsed = self._parse_from_text(text)
+                title = title or parsed.title
+                authors = authors or parsed.authors
+                abstract = abstract or parsed.abstract
+            
+            # Always parse references from text
+            references = self._parse_references(text.split('\n'))
+            equations = self._extract_equations(text)
+            
+            return AcademicMetadata(
+                title=title,
+                authors=authors,
+                abstract=abstract,
+                references=references,
+                equations=equations
+            )
+        
+        # Fall back to text parsing if no PDF metadata
+        self._debug_print("No PDF metadata found, falling back to text parsing")
+        return self._parse_from_text(text)
+
+    def _parse_from_text(self, text: str) -> AcademicMetadata:
+        """Parse metadata from text content."""
         lines = [line.strip() for line in text.split('\n') if line.strip()]
         
         if self.debug:
@@ -433,7 +586,7 @@ class MetadataExtractor:
             references=references,
             equations=equations
         )
-    
+
     def _extract_equations(self, text: str) -> List[Equation]:
         """Extract equations from text."""
         equations = []

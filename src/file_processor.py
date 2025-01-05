@@ -349,3 +349,36 @@ class FileProcessor:
         except Exception as e:
             print(colored(f"❌ Error converting PDF {Path(pdf_path).name}: {str(e)}", "red"))
             return None
+
+    def process_file(self, file_path: Path) -> None:
+        """Process a single file."""
+        try:
+            # Convert PDF to text
+            txt_path = self._get_txt_path(file_path)
+            if not txt_path.exists():
+                print(colored(f"Converting {file_path} to text...", "blue"))
+                self._convert_to_text(file_path, txt_path)
+            
+            # Read text content
+            with open(txt_path, 'r', encoding='utf-8') as f:
+                text = f.read()
+            
+            # Extract metadata
+            print(colored(f"Extracting metadata from {file_path}...", "blue"))
+            metadata = self.metadata_extractor.extract_metadata(
+                text=text,
+                doc_id=str(file_path),
+                pdf_path=str(file_path)  # Add PDF path here
+            )
+            
+            # Save metadata
+            if metadata:
+                metadata_path = self._get_metadata_path(file_path)
+                metadata.save(metadata_path.parent)
+                print(colored(f"✓ Processed {file_path}", "green"))
+            else:
+                print(colored(f"⚠️ No metadata extracted from {file_path}", "yellow"))
+                
+        except Exception as e:
+            print(colored(f"❌ Error processing {file_path}: {str(e)}", "red"))
+            raise
