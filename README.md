@@ -1,66 +1,148 @@
-# Easy GraphRAG Queries 💡
+# LightRAG: Advanced Academic Research Assistant 🎓
 
-This app came about to make a research project a little tidier and for people more comfortable with their browser than a Python IDE 🐍.
+A sophisticated academic research tool combining knowledge graph capabilities with retrieval-augmented generation (RAG), optimized for academic paper analysis and research assistance.
 
-It wraps the Global and Local search methods of [GraphRAG v0.3.6](https://pypi.org/project/graphrag/0.3.6/) in a Streamlit UI. It was made for exploring a [GraphRAG knowledge graph](https://microsoft.github.io/graphrag/) in a local (private) directory, from the comfort of a browser. It works with the [OpenAI API](https://platform.openai.com/docs/overview) 🤖.
+## Architecture Overview 🏗️
 
-You can select and configure the Global and Local search engines, submit queries, and view  the results in your browser. You can also view and download supporting AI-generated reports, source document references, as well as the results object.
+<p align="center">
+  <img src="https://private-user-images.githubusercontent.com/20601200/400261737-d59098dc-c84c-4c3d-b902-fb2215fa9f91.png" alt="LightRAG Architecture" width="100%">
+</p>
 
-### Why bother?
-- **User-friendliness**: Streamline querying and saving the outputs of research projects from a browser.
-- **Referencing**: Approximate conventional referencing for academic or professional research projects.
+Our system enhances the core LightRAG framework with specialized academic components:
 
-### Key features:
-- **Search configuration**: Select a search method, the preferred OpenAI model, and how the response should be presented.
-- **References**: The generated response references the most-used source documents for exploration and corroboration.
-- **Supporting analyses**: Get AI-generated reports to support the response.
-- **Download results**: Download query results, analyses, and sources.
+### Academic Enhancement Layer
+- **Academic Metadata Processor**: Handles author tracking, citation management, DOI extraction, and equation processing with robust validation
+- **Enhanced File Processor**: Optimized for academic PDFs with LaTeX equation extraction and pattern recognition
+- **Academic Response Processor**: Generates responses in academic style with proper citations and source attribution
 
-### How to use it:
-1. **Clone the repo**: Clone this repo to your local GraphRAG project directory.
-2. **GraphRAG pipeline**: If you haven't already, follow the [GraphRAG docs](https://microsoft.github.io/graphrag/get_started/) to initiate your project environment and create your knowledge graph.
-3. **Install requirements**: Install any requirements you might need in a virtual environment.
+### Core LightRAG Integration
+The academic components seamlessly integrate with LightRAG's:
+- Document ingestion pipeline for processing academic papers
+- Multi-modal storage layer (Vector DB, Knowledge Graph, KV Store)
+- Sophisticated retrieval pipeline with multiple query modes
 
-4. **Initialize GraphRAG**: Initialize your workspace by running the following command:
+## Key Features 🌟
 
+- **Advanced PDF Processing**: Optimized PDF conversion on Apple Silicon and Marker
+- **Academic Metadata Extraction**: Comprehensive tracking of authors, references, equations and citations
+- **Multi-Mode Search**: Naive, Local, Global, Hybrid, and Mix search strategies
+- **LaTeX Support**: Advanced equation extraction and processing with context preservation
+- **Citation Management**: Multiple citation styles (APA, MLA, Chicago, IEEE)
+- **Academic Response Generation**: Structured responses with source tracking
+
+## Installation 🔧
+
+1. Clone the repository:
 ```bash
-python -m graphrag.index --init --root ./ragtest
+git clone https://github.com/yourusername/lightrag.git
+cd lightrag
 ```
 
-This command creates two files in the `./ragtest` directory:
-
-- `.env`: Contains environment variables required to run the GraphRAG pipeline.
-
-5. **Test text**:
-Create the necessary directories and download a sample text (A Christmas Carol by Charles Dickens) to ./ragtest/input and reduce to 700 lines
-
+2. Create and activate a Python virtual environment:
 ```bash
-mkdir -p ./ragtest/input
-curl https://www.gutenberg.org/cache/epub/24022/pg24022.txt > ./ragtest/input/book.txt
-head -n 700 ./ragtest/input/book.txt > ./ragtest/input/book_temp.txt && mv ./ragtest/input/book_temp.txt ./ragtest/input/book.txt
-```
-6. **Run the app**: Run the app in your GraphRAG project directory:
-
-```shell
-streamlit run Graph_query.py
+python -m venv venv
+source venv/bin/activate  # On Windows: .\venv\Scripts\activate
 ```
 
-5. **Configure search**: Enter your API key, choose a model, and specify the data source (a GraphRAG pipeline output folder).
-6. **Submit query**: Type your query and submit it.
-7. **View results**: Click on the expanders to see the response, supporting analyses, and sources.
-8. **Download**: Download the results for your research records or to explore later.
-
-### Requirements
-Install the required dependencies in a virtual environment if needed:
-
-```shell
-pip install -r requirements.txt
+3. Install dependencies using uv:
+```bash
+pip install uv
+uv pip install -r requirements.txt
 ```
 
-### Acknowledgements
-This app was inspired by the [Microsoft GraphRAG project](https://www.microsoft.com/en-us/research/blog/graphrag-unlocking-llm-discovery-on-narrative-private-data/).
+4. Set up environment variables:
+```bash
+export OPENAI_API_KEY="your-api-key"
+```
 
-### License
-This app is open source and published under the MIT License. There will be no maintenance but look forward to people improving it!
+## Usage 🚀
 
-Happy searching! ✨
+1. Initialize the workspace:
+```bash
+python src/lightrag_init.py --init
+```
+
+2. Run the Streamlit interface:
+```bash
+streamlit run main.py
+```
+
+## Search Modes 🔍
+
+- **Naive**: Basic document search
+- **Local**: Context-aware document analysis
+- **Global**: Broad knowledge base search
+- **Hybrid**: Combined local and global search
+- **Mix**: Adaptive search strategy
+
+## Academic Features 📚
+
+### Metadata Processing
+- Multiple validation levels (Basic, Standard, Strict)
+- Equation type classification
+- Author affiliation tracking
+- DOI and venue extraction
+- Citation network analysis
+
+### Document Processing
+- LaTeX equation extraction
+- Reference pattern matching
+- Batch processing with progress tracking
+- Source preservation and validation
+
+## Configuration ⚙️
+
+Default settings optimized for academic papers:
+- Chunk size: 500
+- Chunk overlap: 50
+- Temperature: Configurable per use case
+- Sentence-based chunking
+
+## Models 🤖
+
+Supported models:
+- gpt-4o (recommended for complex analysis)
+- gpt-4o-mini (default)
+- o1-mini
+- o1
+
+## Error Handling and Logging 📝
+
+- Comprehensive try-except blocks
+- Color-coded terminal output
+- Progress tracking
+- Detailed error context
+
+## Best Practices 💡
+
+- UTF-8 encoding throughout
+- Environment variable configuration
+- Parallel processing where applicable
+- Separation of concerns
+- Comprehensive error handling
+
+## Contributing 🤝
+
+We welcome contributions! Please read our contributing guidelines and submit pull requests. Our academic enhancements focus on:
+
+1. Improving academic metadata extraction
+2. Enhancing LaTeX and equation handling
+3. Expanding citation style support
+4. Optimizing academic response generation
+
+## License 📄
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments 🙏
+
+- Built upon GraphRAG concepts
+- Optimized for academic research
+- Enhanced with advanced metadata processing
+- Special thanks to the academic research community
+
+---
+
+For detailed documentation, visit our [Wiki](https://github.com/yourusername/lightrag/wiki).
+
+Happy Researching! 📚✨

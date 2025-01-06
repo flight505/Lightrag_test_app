@@ -2,45 +2,55 @@
 The LightRAG application is a sophisticated academic research tool that combines knowledge graph capabilities with retrieval-augmented generation (RAG). Key features include:
 
 - **Advanced PDF Processing**: Uses Marker with M3 Max optimizations for high-quality PDF conversion
-- **Equation Handling**: Extracts and processes LaTeX equations with unique identifiers
-- **Reference Management**: Advanced citation pattern matching and reference tracking
+- **Equation Handling**: Extracts and processes LaTeX equations with unique identifiers and context
+- **Reference Management**: Advanced citation pattern matching and reference tracking with validation
 - **Multi-Mode Search**: Supports Naive, Local, Global, Hybrid, and Mix search modes
 - **Academic Response Processing**: Formats responses in academic style with source tracking
 - **Metadata Management**: Comprehensive tracking of document metadata, equations, and references
 
 ## Core Components
 
-1. **FileProcessor** (`src/file_processor.py`):
+1. **AcademicMetadata** (`src/academic_metadata.py`):
+   - Structured metadata extraction from PDFs
+   - Author, reference, and equation tracking
+   - Multiple citation style support (APA, MLA, Chicago, IEEE)
+   - Validation system with configurable levels
+   - Equation context and symbol tracking
+   - JSON serialization and persistence
+
+2. **FileProcessor** (`src/file_processor.py`):
    - PDF conversion with Marker optimization for M3 Max
    - LaTeX equation extraction and identification
    - Academic reference pattern matching
    - Metadata management and file tracking
    - Batch processing with progress tracking
 
-2. **FileManager** (`src/file_manager.py`):
+3. **FileManager** (`src/file_manager.py`):
    - Database directory structure management
    - Store creation and organization
    - DB root directory gitignore management
    - Metadata file initialization
    - Directory movement and cleanup utilities
 
-3. **LightRAGManager** (`src/lightrag_init.py`):
+4. **LightRAGManager** (`src/lightrag_init.py`):
    - Core RAG functionality with OpenAI integration
    - Multiple model support (gpt-4o, gpt-4o-mini, o1-mini, o1)
    - Configurable chunking strategies
    - Document validation and indexing
    - Query processing with temperature control
 
-4. **DocumentValidator** (`src/document_validator.py`):
+5. **DocumentValidator** (`src/document_validator.py`):
    - File and content validation
    - Store structure verification
    - Error reporting and logging
 
-5. **AcademicResponseProcessor** (`src/academic_response_processor.py`):
+6. **AcademicResponseProcessor** (`src/academic_response_processor.py`):
    - Academic formatting of responses
    - Source tracking and citation management
+   - Structured response generation
+   - Context-aware reference handling
 
-6. **LightRAG Helpers** (`src/lightrag_helpers.py`):
+7. **LightRAG Helpers** (`src/lightrag_helpers.py`):
    - Helper functions for response processing
    - Source management utilities
    - LaTeX equation handling
@@ -57,6 +67,13 @@ The LightRAG application is a sophisticated academic research tool that combines
   - Global: Broad knowledge base search
   - Hybrid: Combined local and global search
   - Mix: Adaptive search strategy
+
+- **Metadata Processing**:
+  - Multiple validation levels (Basic, Standard, Strict)
+  - Equation type classification (Inline, Display, Definition, Theorem)
+  - Author affiliation tracking
+  - DOI and venue extraction
+  - Citation network analysis
 
 - **Configuration**:
   - Default chunk size: 500
