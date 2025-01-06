@@ -11,6 +11,12 @@ matplotlib
 requests
 stqdm  # Progress bars for Streamlit
 uv
+xxhash
+pyvis
+aioboto3
+ruff
+ollama
+tiktoken
 
 # PDF processing
 PyMuPDF  # fitz
@@ -22,3 +28,5 @@ lightrag-hku>=1.0.9
 
 # Development
 python-dotenv
+python-docx
+pytest

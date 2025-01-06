@@ -7,12 +7,12 @@ import threading
 
 import streamlit as st
 import pandas as pd
-from termcolor import colored
 from streamlit.runtime.scriptrunner import add_script_run_ctx
 
 from src.file_manager import create_store_directory, DB_ROOT
 from src.file_processor import FileProcessor
 from src.academic_metadata import AcademicMetadata
+from src.config_manager import ConfigManager
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +26,8 @@ def init_session_state():
         st.session_state['file_processor'] = None
     if 'current_store' not in st.session_state:
         st.session_state['current_store'] = None
+    if 'config_manager' not in st.session_state:
+        st.session_state['config_manager'] = ConfigManager()
 
 def run_with_context(func, *args, **kwargs):
     """Run a function with proper Streamlit context"""
@@ -39,6 +41,9 @@ init_session_state()
 def process_files(uploaded_files, file_processor, status):
     """Process uploaded files with progress tracking"""
     try:
+        if not file_processor or not file_processor.store_path:
+            raise ValueError("File processor not properly initialized with store path")
+            
         for uploaded_file in uploaded_files:
             status.update(label=f"Processing {uploaded_file.name}...")
             
@@ -49,10 +54,8 @@ def process_files(uploaded_files, file_processor, status):
             
             # Process the file with context
             run_with_context(
-                file_processor.process_pdf_with_marker,
-                str(pdf_path),
-                cleanup_pdfs=True,
-                progress_callback=lambda msg: status.update(label=msg)
+                file_processor.process_file,
+                str(pdf_path)
             )
             
         status.update(label="✅ All files processed successfully", state="complete")
@@ -116,7 +119,9 @@ with store_col2:
                 store_path = create_store_directory(new_store)
                 if store_path:
                     st.session_state["active_store"] = new_store
-                    st.session_state["file_processor"] = FileProcessor(store_path)
+                    file_processor = FileProcessor(st.session_state["config_manager"])
+                    file_processor.set_store_path(store_path)
+                    st.session_state["file_processor"] = file_processor
                     st.success(f"Created store: {new_store}")
                     st.rerun()
     else:
@@ -124,7 +129,9 @@ with store_col2:
         if selected_store != st.session_state.get("active_store"):
             store_path = os.path.join(DB_ROOT, selected_store)
             st.session_state["active_store"] = selected_store
-            st.session_state["file_processor"] = FileProcessor(store_path)
+            file_processor = FileProcessor(st.session_state["config_manager"])
+            file_processor.set_store_path(store_path)
+            st.session_state["file_processor"] = file_processor
             st.rerun()
 
 st.divider()
@@ -132,6 +139,14 @@ st.divider()
 # Document management interface
 if "active_store" in st.session_state and st.session_state["active_store"]:
     store_path = os.path.join(DB_ROOT, st.session_state["active_store"])
+    
+    # Ensure file processor is initialized with store path
+    if not st.session_state["file_processor"]:
+        file_processor = FileProcessor(st.session_state["config_manager"])
+        file_processor.set_store_path(store_path)
+        st.session_state["file_processor"] = file_processor
+    elif not st.session_state["file_processor"].store_path:
+        st.session_state["file_processor"].set_store_path(store_path)
     
     # File upload section
     st.markdown("### Upload Documents")
@@ -179,18 +194,16 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
                     status.update(label="No pending documents to convert", state="complete")
                     st.rerun()
                 
-                def update_progress(message: str):
-                    status.update(label=message)
-                
                 try:
-                    results = st.session_state["file_processor"].process_pdf_with_marker(
-                        pending_files,
-                        progress_callback=update_progress
-                    )
-                    if results:
-                        status.update(label=f"✅ Successfully converted {len(results)} documents", state="complete")
-                    else:
-                        status.update(label="No documents were converted successfully", state="error")
+                    for file_path in pending_files:
+                        status.update(label=f"Processing {os.path.basename(file_path)}...")
+                        result = st.session_state["file_processor"].process_file(file_path)
+                        if "error" not in result:
+                            status.update(label=f"✅ Successfully processed {os.path.basename(file_path)}")
+                        else:
+                            status.update(label=f"❌ Failed to process {os.path.basename(file_path)}: {result['error']}")
+                    
+                    status.update(label=f"✅ Finished processing {len(pending_files)} documents", state="complete")
                 except Exception as e:
                     status.update(label=f"❌ Error during conversion: {str(e)}", state="error")
                     logger.error(f"Error during batch conversion: {str(e)}", exc_info=True)
@@ -348,14 +361,11 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
                         if file.lower().endswith(".pdf"):
                             file_path = Path(store_path) / file
                             try:
-                                results = st.session_state["file_processor"].process_pdf_with_marker(
-                                    str(file_path),
-                                    cleanup_pdfs=False
-                                )
-                                if results:
-                                    status.update(label=f"✅ Reprocessed {file}")
+                                result = st.session_state["file_processor"].process_file(str(file_path))
+                                if "error" not in result:
+                                    status.update(label=f"✅ Successfully reprocessed {file}")
                                 else:
-                                    status.update(label=f"❌ Failed to reprocess {file}", state="error")
+                                    status.update(label=f"❌ Failed to reprocess {file}: {result['error']}", state="error")
                             except Exception as e:
                                 status.update(label=f"❌ Error reprocessing {file}: {str(e)}", state="error")
                     status.update(label="Reprocessing complete", state="complete")

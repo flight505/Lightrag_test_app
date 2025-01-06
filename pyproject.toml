@@ -18,6 +18,16 @@ dependencies = [
     "requests",
     "stqdm",
     "uv",
+    "xxhash",
+    "pyvis",
+    "aioboto3",
+    "ruff",
+    "ollama",
+    "openai",
+    "tiktoken",
+    "nano-vectordb",
+
+
     # PDF processing
     "pymupdf",  # fitz
     "PyPDF2",
@@ -28,6 +38,8 @@ dependencies = [
     
     # Development
     "python-dotenv",
+    "python-docx",
+    "pytest"
 ]
 
 [build-system]

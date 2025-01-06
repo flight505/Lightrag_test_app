@@ -9,9 +9,15 @@ class FileProcessor:
     """Handles file processing and conversion with configurable settings"""
     
     def __init__(self, config_manager: Optional[ConfigManager] = None):
+        """Initialize with configuration manager"""
         self.config_manager = config_manager or ConfigManager()
         self.pdf_converter = PDFConverterFactory.create_converter(self.config_manager)
         self.metadata_extractor = MetadataExtractor(debug=self.config_manager.get_config().debug_mode)
+        self.store_path = None  # Will be set when processing files
+    
+    def set_store_path(self, store_path: str) -> None:
+        """Set the store path for file processing"""
+        self.store_path = store_path
     
     def process_file(self, file_path: str) -> Dict[str, Any]:
         """Process a file and extract its content and metadata"""

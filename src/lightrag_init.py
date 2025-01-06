@@ -2,18 +2,15 @@ import logging
 import os
 from typing import Optional, Dict, Any, List
 from datetime import datetime
-import time
-import re
-from concurrent import futures
 
 from lightrag import LightRAG, QueryParam
 from lightrag.llm import gpt_4o_complete, gpt_4o_mini_complete, openai_embedding
 from lightrag.utils import EmbeddingFunc
 from termcolor import colored
-from src.file_manager import DB_ROOT
 from src.document_validator import DocumentValidator
 from src.academic_response_processor import AcademicResponseProcessor
-from src.file_processor import FileProcessor, ChunkingConfig, BatchInserter
+from src.file_processor import FileProcessor
+from src.config_manager import ConfigManager
 
 # Constants
 DEFAULT_MODEL = "gpt-4o-mini"
@@ -49,7 +46,9 @@ class LightRAGManager:
         
         self.input_dir = input_dir
         self.model_name = model_name
-        self.chunking_config = ChunkingConfig(
+        
+        # Initialize configuration
+        self.config_manager = ConfigManager(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap,
             chunk_strategy=chunk_strategy
@@ -57,7 +56,7 @@ class LightRAGManager:
         
         # Initialize components
         self.validator = DocumentValidator(input_dir)
-        self.file_processor = FileProcessor(input_dir, self.chunking_config)
+        self.file_processor = FileProcessor(self.config_manager)
         self.response_processor = AcademicResponseProcessor()
         
         # Configure LightRAG
@@ -222,7 +221,7 @@ class LightRAGManager:
                 "total_documents": len(self.file_processor.metadata["files"]),
                 "last_updated": self.file_processor.metadata["last_updated"],
                 "model": self.model_name,
-                "chunk_config": self.chunking_config.__dict__,
+                "chunk_config": self.config_manager.get_config().__dict__,
                 "store_size": self._get_store_size()
             }
         except Exception as e:
