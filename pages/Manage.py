@@ -39,32 +39,33 @@ def run_with_context(func, *args, **kwargs):
 init_session_state()
 
 def process_files(uploaded_files, file_processor, status):
-    """Process uploaded files with progress tracking"""
+    """Save uploaded files without processing"""
     try:
         if not file_processor or not file_processor.store_path:
             raise ValueError("File processor not properly initialized with store path")
             
         for uploaded_file in uploaded_files:
-            status.update(label=f"Processing {uploaded_file.name}...")
+            status.update(label=f"Saving {uploaded_file.name}...")
             
             # Save uploaded file
             pdf_path = Path(file_processor.store_path) / uploaded_file.name
             with open(pdf_path, "wb") as f:
                 f.write(uploaded_file.getbuffer())
             
-            # Process the file with context
-            run_with_context(
-                file_processor.process_file,
-                str(pdf_path)
-            )
-            
-        status.update(label="✅ All files processed successfully", state="complete")
+        status.update(label="✅ All files saved successfully. Click 'Convert Pending' to process them.", state="complete")
         return True
         
     except Exception as e:
-        status.update(label=f"❌ Error processing files: {str(e)}", state="error")
-        logger.error(f"Error processing files: {str(e)}", exc_info=True)
+        status.update(label=f"❌ Error saving files: {str(e)}", state="error")
+        logger.error(f"Error saving files: {str(e)}", exc_info=True)
         return False
+
+def reinit_file_processor(store_path: str) -> FileProcessor:
+    """Reinitialize the file processor with the current store path"""
+    file_processor = FileProcessor(st.session_state["config_manager"])
+    file_processor.set_store_path(store_path)
+    st.session_state["file_processor"] = file_processor
+    return file_processor
 
 # Page configuration
 st.set_page_config(
@@ -142,24 +143,25 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
     
     # Ensure file processor is initialized with store path
     if not st.session_state["file_processor"]:
-        file_processor = FileProcessor(st.session_state["config_manager"])
-        file_processor.set_store_path(store_path)
-        st.session_state["file_processor"] = file_processor
+        file_processor = reinit_file_processor(store_path)
     elif not st.session_state["file_processor"].store_path:
-        st.session_state["file_processor"].set_store_path(store_path)
+        file_processor = reinit_file_processor(store_path)
+    else:
+        file_processor = st.session_state["file_processor"]
     
     # File upload section
     st.markdown("### Upload Documents")
+    st.info("Upload your PDF files here. After uploading, click 'Convert Pending' to process them.")
     uploaded_files = st.file_uploader(
         "Upload PDF documents",
         type=["pdf"],
         accept_multiple_files=True,
-        help="Select one or more PDF files to upload"
+        help="Select one or more PDF files to upload. Files will be saved but not processed immediately."
     )
     
     if uploaded_files:
-        status = st.status("Processing uploaded files...", expanded=True)
-        process_files(uploaded_files, st.session_state["file_processor"], status)
+        status = st.status("Saving uploaded files...", expanded=True)
+        process_files(uploaded_files, file_processor, status)
     
     # Document list section
     st.markdown("### Manage Documents")
@@ -171,16 +173,19 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
             st.rerun()
     with action_col2:
         if st.button("🧹 Clean Unused Files", use_container_width=True):
-            if st.session_state["file_processor"]:
-                removed = st.session_state["file_processor"].clean_unused_files()
+            if file_processor:
+                removed = file_processor.clean_unused_files()
                 if removed:
                     st.info(f"Removed {len(removed)} unused files")
                 else:
                     st.info("No unused files found")
     with action_col3:
         if st.button("⚡ Convert Pending", use_container_width=True):
-            if st.session_state["file_processor"]:
-                status = st.status("Converting pending documents...", expanded=True)
+            if file_processor:
+                # Reinitialize file processor to ensure it has the latest methods
+                file_processor = reinit_file_processor(store_path)
+                
+                status = st.status("Checking for pending documents...", expanded=True)
                 # Get list of pending PDFs (those without corresponding txt files)
                 pdf_files = list(Path(store_path).glob("*.pdf"))
                 pending_files = []
@@ -194,16 +199,34 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
                     status.update(label="No pending documents to convert", state="complete")
                     st.rerun()
                 
+                status.update(label=f"Found {len(pending_files)} document(s) to process")
+                progress_text = "Converting documents..."
+                progress_bar = st.progress(0, text=progress_text)
+                
                 try:
-                    for file_path in pending_files:
-                        status.update(label=f"Processing {os.path.basename(file_path)}...")
-                        result = st.session_state["file_processor"].process_file(file_path)
+                    for idx, file_path in enumerate(pending_files, 1):
+                        file_name = os.path.basename(file_path)
+                        
+                        def update_status(msg: str):
+                            status.update(label=f"[{idx}/{len(pending_files)}] {msg}")
+                            progress = idx / len(pending_files)
+                            progress_bar.progress(progress, text=f"{progress_text} ({idx}/{len(pending_files)})")
+                        
+                        result = file_processor.process_file(
+                            file_path,
+                            progress_callback=update_status
+                        )
+                        
                         if "error" not in result:
-                            status.update(label=f"✅ Successfully processed {os.path.basename(file_path)}")
+                            status.update(label=f"✅ Successfully processed {file_name}")
                         else:
-                            status.update(label=f"❌ Failed to process {os.path.basename(file_path)}: {result['error']}")
+                            status.update(label=f"❌ Failed to process {file_name}: {result['error']}", state="error")
+                        
+                        # Update progress
+                        progress = idx / len(pending_files)
+                        progress_bar.progress(progress, text=f"{progress_text} ({idx}/{len(pending_files)})")
                     
-                    status.update(label=f"✅ Finished processing {len(pending_files)} documents", state="complete")
+                    status.update(label=f"✅ Finished processing {len(pending_files)} document(s)", state="complete")
                 except Exception as e:
                     status.update(label=f"❌ Error during conversion: {str(e)}", state="error")
                     logger.error(f"Error during batch conversion: {str(e)}", exc_info=True)
@@ -356,18 +379,42 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
             
             with selected_col2:
                 if st.button("🔄 Reprocess Selected", use_container_width=True):
+                    # Reinitialize file processor to ensure it has the latest methods
+                    file_processor = reinit_file_processor(store_path)
+                    
                     status = st.status("Reprocessing selected files...", expanded=True)
+                    progress_text = "Reprocessing documents..."
+                    progress_bar = st.progress(0, text=progress_text)
+                    
+                    total = len([f for f in selected_files if f.lower().endswith(".pdf")])
+                    current = 0
+                    
                     for file in selected_files:
                         if file.lower().endswith(".pdf"):
+                            current += 1
                             file_path = Path(store_path) / file
+                            
+                            def update_status(msg: str):
+                                status.update(label=f"[{current}/{total}] {msg}")
+                                progress = current / total
+                                progress_bar.progress(progress, text=f"{progress_text} ({current}/{total})")
+                            
                             try:
-                                result = st.session_state["file_processor"].process_file(str(file_path))
+                                result = file_processor.process_file(
+                                    str(file_path),
+                                    progress_callback=update_status
+                                )
                                 if "error" not in result:
                                     status.update(label=f"✅ Successfully reprocessed {file}")
                                 else:
                                     status.update(label=f"❌ Failed to reprocess {file}: {result['error']}", state="error")
                             except Exception as e:
                                 status.update(label=f"❌ Error reprocessing {file}: {str(e)}", state="error")
+                            
+                            # Update progress
+                            progress = current / total
+                            progress_bar.progress(progress, text=f"{progress_text} ({current}/{total})")
+                    
                     status.update(label="Reprocessing complete", state="complete")
                     st.rerun()
     

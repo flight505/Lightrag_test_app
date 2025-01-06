@@ -3,10 +3,14 @@ from enum import Enum
 from typing import Optional
 import os
 from termcolor import colored
+import logging
+
+logger = logging.getLogger(__name__)
 
 class PDFEngine(str, Enum):
     PYMUPDF = "pymupdf"
     PYPDF2 = "pypdf2"
+    MARKER = "marker"
     AUTO = "auto"
 
 @dataclass
@@ -18,22 +22,39 @@ class ProcessingConfig:
     debug_mode: bool = False
     max_file_size_mb: int = 50
     timeout_seconds: int = 30
+    chunk_size: int = 500
+    chunk_overlap: int = 50
+    chunk_strategy: str = "sentence"
 
 class ConfigManager:
     """Manages configuration settings for file processing"""
     
-    def __init__(self):
+    def __init__(self, **kwargs):
         try:
+            # Initialize with environment variables first
             self.config = ProcessingConfig(
                 pdf_engine=PDFEngine(os.getenv("PDF_ENGINE", PDFEngine.AUTO)),
                 enable_crossref=os.getenv("ENABLE_CROSSREF", "1") == "1",
                 enable_scholarly=os.getenv("ENABLE_SCHOLARLY", "1") == "1",
                 debug_mode=os.getenv("DEBUG_MODE", "0") == "1",
                 max_file_size_mb=int(os.getenv("MAX_FILE_SIZE_MB", "50")),
-                timeout_seconds=int(os.getenv("TIMEOUT_SECONDS", "30"))
+                timeout_seconds=int(os.getenv("TIMEOUT_SECONDS", "30")),
+                chunk_size=int(os.getenv("CHUNK_SIZE", "500")),
+                chunk_overlap=int(os.getenv("CHUNK_OVERLAP", "50")),
+                chunk_strategy=os.getenv("CHUNK_STRATEGY", "sentence")
             )
+            
+            # Override with any provided kwargs
+            for key, value in kwargs.items():
+                if hasattr(self.config, key):
+                    setattr(self.config, key, value)
+                    logger.info(f"Config override: {key}={value}")
+            
+            logger.info("Configuration loaded successfully")
             print(colored("✓ Configuration loaded successfully", "green"))
+            
         except Exception as e:
+            logger.error(f"Error loading configuration: {str(e)}")
             print(colored(f"⚠️ Error loading configuration: {str(e)}", "yellow"))
             self.config = ProcessingConfig()
     
@@ -45,12 +66,20 @@ class ConfigManager:
         """Validate file against configuration settings"""
         try:
             if not os.path.exists(file_path):
-                return "File does not exist"
+                error = "File does not exist"
+                logger.error(error)
+                return error
                 
             size_mb = os.path.getsize(file_path) / (1024 * 1024)
             if size_mb > self.config.max_file_size_mb:
-                return f"File size ({size_mb:.1f}MB) exceeds limit ({self.config.max_file_size_mb}MB)"
+                error = f"File size ({size_mb:.1f}MB) exceeds limit ({self.config.max_file_size_mb}MB)"
+                logger.error(error)
+                return error
             
+            logger.info(f"File validation passed for: {file_path}")
             return None
+            
         except Exception as e:
-            return f"Error validating file: {str(e)}" 
+            error = f"Error validating file: {str(e)}"
+            logger.error(error)
+            return error 

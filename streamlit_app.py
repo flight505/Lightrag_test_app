@@ -1,5 +1,4 @@
 import streamlit as st
-from pathlib import Path
 from src.academic_metadata import MetadataExtractor
 
 # Page configuration
