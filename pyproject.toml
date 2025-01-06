@@ -13,7 +13,7 @@ dependencies = [
     "openai",
     "pandas",
     "numpy",
-    "marker-pdf>=1.2.3",
+    "marker-pdf>=1.2.3",    
     "matplotlib",
     "requests",
     "stqdm",
@@ -23,23 +23,21 @@ dependencies = [
     "aioboto3",
     "ruff",
     "ollama",
-    "openai",
     "tiktoken",
     "nano-vectordb",
 
-
     # PDF processing
-    "pymupdf",  # fitz
+    "PyMuPDF",
     "PyPDF2",
     "scholarly",
-    
+
     # RAG packages
     "lightrag-hku>=1.0.9",
-    
+
     # Development
     "python-dotenv",
     "python-docx",
-    "pytest"
+    "pytest",
 ]
 
 [build-system]

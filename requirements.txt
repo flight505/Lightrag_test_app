@@ -6,7 +6,7 @@ networkx
 openai
 pandas
 numpy
-marker-pdf>=1.2.3
+marker-pdf==1.2.2
 matplotlib
 requests
 stqdm  # Progress bars for Streamlit
