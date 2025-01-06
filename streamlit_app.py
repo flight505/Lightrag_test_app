@@ -34,21 +34,21 @@ with left_col:
     with nav_col1:
         st.markdown("### 📚 Manage Documents")
         st.markdown("Upload and organize your academic papers")
-        manage_btn = st.button("Go to Document Manager", use_container_width=True)
+        manage_btn = st.button("Go to Document Manager", key="manage_btn", use_container_width=True)
         if manage_btn:
             st.switch_page("pages/Manage.py")
     
     with nav_col2:
         st.markdown("### 🔍 Search Papers")
         st.markdown("Search and analyze your documents")
-        search_btn = st.button("Go to Search", use_container_width=True)
+        search_btn = st.button("Go to Search", key="search_btn", use_container_width=True)
         if search_btn:
             st.switch_page("pages/Search.py")
     
     with nav_col3:
         st.markdown("### 📊 Academic Analysis")
         st.markdown("Analyze citations and equations")
-        academic_btn = st.button("Go to Academic Analysis", use_container_width=True)
+        academic_btn = st.button("Go to Academic Analysis", key="academic_btn", use_container_width=True)
         if academic_btn:
             st.switch_page("pages/Academic.py")
     
