@@ -3,7 +3,7 @@ name = "lightrag-test"
 version = "0.1.0"
 description = "A Streamlit-based LightRAG application for academic research."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10.16"
 dependencies = [
     # Core packages
     "streamlit",
@@ -13,6 +13,7 @@ dependencies = [
     "openai",
     "pandas",
     "numpy",
+    "plotly",
     "marker-pdf>=1.2.3",    
     "matplotlib",
     "requests",
@@ -25,21 +26,21 @@ dependencies = [
     "ollama",
     "tiktoken",
     "nano-vectordb",
-
+    
     # PDF processing
-    "PyMuPDF",
+    "pymupdf",  # PDF processing library
     "PyPDF2",
     "pdf2doi",
     "crossrefapi",
     "scholarly",
-
+    
     # RAG packages
     "lightrag-hku>=1.0.9",
-
+    
     # Development
     "python-dotenv",
     "python-docx",
-    "pytest",
+    "pytest"
 ]
 
 [build-system]
