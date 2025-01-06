@@ -1,12 +1,9 @@
 import streamlit as st
 from pathlib import Path
-import networkx as nx
 from src.academic_metadata import (
     AcademicMetadata, CitationGraphAnalyzer, 
-    ValidationLevel, ReferenceValidator,
-    CitationStyle, AnystyleParser
+    ValidationLevel, ReferenceValidator
 )
-from termcolor import colored
 
 # Page configuration
 st.set_page_config(
@@ -189,10 +186,18 @@ def show_equation_analysis():
             placeholder="e.g., sigma, alpha"
         )
     with filter_cols[2]:
-        sort_by = st.selectbox(
+        selected_sort = st.selectbox(
             "Sort By",
             options=["Type", "Complexity", "Document"]
         )
+        if selected_sort:
+            # Sort equations based on selection
+            if selected_sort == "Type":
+                all_equations.sort(key=lambda x: x.type)
+            elif selected_sort == "Complexity":
+                all_equations.sort(key=lambda x: x.complexity)
+            elif selected_sort == "Document":
+                all_equations.sort(key=lambda x: x.document_id)
     
     # Filter equations
     filtered_equations = all_equations

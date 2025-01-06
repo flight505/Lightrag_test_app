@@ -3,9 +3,7 @@ import logging
 from typing import Dict, List, Any, Union, Optional, Callable
 from pathlib import Path
 from datetime import datetime
-import hashlib
 import json
-import re
 from threading import RLock
 from src.academic_metadata import MetadataExtractor, AcademicMetadata
 from termcolor import colored
@@ -111,56 +109,57 @@ class FileProcessor:
             
             from marker.converters.pdf import PdfConverter
             from marker.models import create_model_dict
-            from marker.config.parser import ConfigParser
+            from importlib.util import find_spec
             
             # Configure marker with optimizations for M3 Max
-            config = {
-                "output_format": "markdown",
-                "force_ocr": False,  # Only use OCR when needed
-                "extract_images": False,  # Skip image extraction for speed
-                "batch_multiplier": 12,  # Larger batches for M3 Max
-                "num_workers": 8,  # Parallel workers
-                "langs": ["English"],  # Optimize for English
-                "device": "mps",  # Use Metal Performance Shaders
-                "model_precision": "float16",  # Use half precision
-                "max_batch_size": 16,  # Larger batch size
+            if find_spec("marker") is not None:
+                config = {
+                    "output_format": "markdown",
+                    "force_ocr": False,  # Only use OCR when needed
+                    "extract_images": False,  # Skip image extraction for speed
+                    "batch_multiplier": 12,  # Larger batches for M3 Max
+                    "num_workers": 8,  # Parallel workers
+                    "langs": ["English"],  # Optimize for English
+                    "device": "mps",  # Use Metal Performance Shaders
+                    "model_precision": "float16",  # Use half precision
+                    "max_batch_size": 16,  # Larger batch size
+                    
+                    # Layout detection settings
+                    "layout_coverage_min_lines": 2,
+                    "layout_coverage_threshold": 0.4,
+                    "document_ocr_threshold": 0.7,
+                    "error_model_segment_length": 1024,
+                    
+                    # OCR settings
+                    "detection_batch_size": 8,
+                    "recognition_batch_size": 8,
+                    
+                    # LLM settings
+                    "use_llm": True,
+                    "google_api_key": os.getenv("GEMINI_API_KEY"),
+                    "model_name": "gemini-1.5-flash",
+                    "max_retries": 3,
+                    "max_concurrency": 3,
+                    "timeout": 60,
+                    "confidence_threshold": 0.75,
+                }
                 
-                # Layout detection settings
-                "layout_coverage_min_lines": 2,
-                "layout_coverage_threshold": 0.4,
-                "document_ocr_threshold": 0.7,
-                "error_model_segment_length": 1024,
+                # Initialize the converter with default processor list
+                self.pdf_converter = PdfConverter(
+                    artifact_dict=create_model_dict(),
+                    config=config,
+                    renderer="marker.renderers.markdown.MarkdownRenderer"
+                )
                 
-                # OCR settings
-                "detection_batch_size": 8,
-                "recognition_batch_size": 8,
+                # Enable LLM if configured
+                if config["use_llm"]:
+                    self.pdf_converter.use_llm = True
                 
-                # LLM settings
-                "use_llm": True,
-                "google_api_key": os.getenv("GEMINI_API_KEY"),
-                "model_name": "gemini-1.5-flash",
-                "max_retries": 3,
-                "max_concurrency": 3,
-                "timeout": 60,
-                "confidence_threshold": 0.75,
-            }
-            
-            # Initialize the converter with default processor list
-            self.pdf_converter = PdfConverter(
-                artifact_dict=create_model_dict(),
-                config=config,
-                renderer="marker.renderers.markdown.MarkdownRenderer"
-            )
-            
-            # Enable LLM if configured
-            if config["use_llm"]:
-                self.pdf_converter.use_llm = True
-            
-            logger.info("Initialized Marker PDF converter with M3 Max optimized configuration")
-            logger.info(f"Using configuration: {config}")
-            
-            print(colored("✓ Initialized Marker PDF converter", "green"))
-            
+                logger.info("Initialized Marker PDF converter with M3 Max optimized configuration")
+                logger.info(f"Using configuration: {config}")
+                
+                print(colored("✓ Initialized Marker PDF converter", "green"))
+                
         except ImportError as e:
             error_msg = f"Failed to initialize Marker: {e}"
             logger.error(error_msg)

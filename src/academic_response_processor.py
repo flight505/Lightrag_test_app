@@ -1,10 +1,10 @@
 import logging
 import os
 import re
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Optional, Any
 import pandas as pd
 from termcolor import colored
-from src.academic_metadata import AcademicMetadata, Author, Reference
+from src.academic_metadata import AcademicMetadata, Reference
 
 # Configure logging
 logging.basicConfig(

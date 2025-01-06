@@ -5,15 +5,12 @@ from typing import List, Dict, Set, Optional, Any, Tuple
 import json
 import subprocess
 import tempfile
-import networkx as nx
-import matplotlib.pyplot as plt
-from termcolor import colored
 import re
 import fitz  # PyMuPDF
 from PyPDF2 import PdfReader
 import requests
 from scholarly import scholarly
-import time
+from termcolor import colored
 
 # Enums and Constants
 class ValidationLevel(str, Enum):
@@ -241,7 +238,6 @@ class MetadataExtractor:
     def extract_metadata_from_pdf(self, pdf_path: str) -> Optional[Tuple[str, List[Author], str, str]]:
         """Extract metadata directly from PDF using multiple methods."""
         self._debug_print(f"Attempting to extract metadata from PDF: {pdf_path}")
-        extraction_method = "none"
         
         try:
             # Try PyMuPDF (fitz) first
@@ -268,7 +264,6 @@ class MetadataExtractor:
                     if response.status_code == 200:
                         data = response.json()['message']
                         self._debug_print("Successfully retrieved CrossRef data")
-                        extraction_method = "crossref"
                         print(colored("✓ Using CrossRef API metadata", "green"))
                         
                         # Extract title
@@ -301,8 +296,8 @@ class MetadataExtractor:
                 authors = []
                 
                 if title or author_str:  # Only use if we got something useful
-                    extraction_method = "pymupdf"
-                    print(colored("✓ Using PyMuPDF metadata", "green"))
+                    print(colored("✓ Using PyPDF2 metadata", "green"))
+                    authors = []
                     
                     if author_str:
                         # Split authors on common separators
@@ -327,7 +322,6 @@ class MetadataExtractor:
                 author_str = meta.get('/Author', '')
                 
                 if title or author_str:  # Only use if we got something useful
-                    extraction_method = "pypdf2"
                     print(colored("✓ Using PyPDF2 metadata", "green"))
                     authors = []
                     
@@ -390,6 +384,7 @@ class MetadataExtractor:
                     references=references,
                     equations=equations
                 )
+                print(colored("✓ Using PDF metadata", "green"))
         
         # Fall back to text parsing only if PDF metadata extraction failed
         if not metadata or not metadata.title or not metadata.authors:
@@ -433,11 +428,11 @@ class MetadataExtractor:
                 self._debug_print(f"Found markdown line {i}: {line}")
                 
                 if any(skip in clean_line.lower() for skip in skip_patterns):
-                    self._debug_print(f"Skipping - matches skip pattern", "yellow")
+                    self._debug_print("Skipping - matches skip pattern", "yellow")
                     continue
                     
                 if re.match(r'^[\d\.]+\s', clean_line):
-                    self._debug_print(f"Skipping - appears to be section number", "yellow")
+                    self._debug_print("Skipping - appears to be section number", "yellow")
                     continue
                 
                 title = clean_line
@@ -445,7 +440,7 @@ class MetadataExtractor:
                 # Check for subtitle in italics on next line
                 if i + 1 < len(lines) and lines[i + 1].startswith('*'):
                     subtitle = re.sub(r'[*]', '', lines[i + 1]).strip()
-                self._debug_print(f"Selected as title!", "green")
+                self._debug_print("Selected as title!", "green")
                 break
         
         # If no markdown title found, look for other title patterns
@@ -461,17 +456,17 @@ class MetadataExtractor:
                     
                 # Skip lines that match skip patterns
                 if any(skip in line.lower() for skip in skip_patterns):
-                    self._debug_print(f"Skipping - matches skip pattern", "yellow")
+                    self._debug_print("Skipping - matches skip pattern", "yellow")
                     continue
                     
                 # Skip lines that look like image descriptions
                 if re.match(r'^(?:image|figure|fig\.?)\s+\d', line.lower()):
-                    self._debug_print("Skipping - appears to be image description", "yellow")
+                    self._debug_print("Skipping - appears to be image description")
                     continue
                     
                 # Skip lines that are dates or metadata
                 if re.match(r'^(?:\d{1,2}\s+\w+\s+\d{4}|doi:|https?://)', line.lower()):
-                    self._debug_print("Skipping - appears to be date or metadata", "yellow")
+                    self._debug_print("Skipping - appears to be date or metadata")
                     continue
                 
                 # Check title criteria
@@ -480,17 +475,17 @@ class MetadataExtractor:
                     continue
                     
                 if len(line.split()) <= 3:
-                    self._debug_print("Skipping - too few words", "yellow")
+                    self._debug_print("Skipping - too few words")
                     continue
                     
                 digit_ratio = sum(c.isdigit() for c in line) / len(line)
                 if digit_ratio >= 0.2:
-                    self._debug_print(f"Skipping - too many digits ({digit_ratio:.2f})", "yellow")
+                    self._debug_print("Skipping - too many digits")
                     continue
                     
                 special_char_ratio = sum(not c.isalnum() and not c.isspace() for c in line) / len(line)
                 if special_char_ratio >= 0.1:
-                    self._debug_print(f"Skipping - too many special characters ({special_char_ratio:.2f})", "yellow")
+                    self._debug_print("Skipping - too many special characters")
                     continue
                 
                 title = line
