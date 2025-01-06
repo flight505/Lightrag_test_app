@@ -1,0 +1,670 @@
+#Chat elements
+Streamlit provides a few commands to help you build conversational apps. These chat elements are designed to be used in conjunction with each other, but you can also use them separately.
+
+st.chat_message lets you insert a chat message container into the app so you can display messages from the user or the app. Chat containers can contain other Streamlit elements, including charts, tables, text, and more. st.chat_input lets you display a chat input widget so the user can type in a message. Remember to check out st.status to display output from long-running processes and external API calls.
+
+screenshot
+Chat input
+Display a chat input widget.
+
+prompt = st.chat_input("Say something")
+if prompt:
+    st.write(f"The user has sent: {prompt}")
+screenshot
+Chat message
+Insert a chat message container.
+
+import numpy as np
+with st.chat_message("user"):
+    st.write("Hello 👋")
+    st.line_chart(np.random.randn(30, 3))
+screenshot
+Status container
+Display output of long-running tasks in a container.
+
+with st.status('Running'):
+  do_something_slow()
+st.write_stream
+Write generators or streams to the app with a typewriter effect.
+
+st.write_stream(my_generator)
+st.write_stream(my_llm_stream)
+
+
+
+# st.chat_input
+Streamlit Version
+Version 1.40.0
+Display a chat input widget.
+
+Function signature[source]
+st.chat_input(placeholder="Your message", *, key=None, max_chars=None, disabled=False, on_submit=None, args=None, kwargs=None)
+
+Parameters
+placeholder (str)
+
+A placeholder text shown when the chat input is empty. Defaults to "Your message". For accessibility reasons, you should not use an empty string.
+
+key (str or int)
+
+An optional string or integer to use as the unique key for the widget. If this is omitted, a key will be generated for the widget based on its content. No two widgets may have the same key.
+
+max_chars (int or None)
+
+The maximum number of characters that can be entered. If None (default), there will be no maximum.
+
+disabled (bool)
+
+Whether the chat input should be disabled. Defaults to False.
+
+on_submit (callable)
+
+An optional callback invoked when the chat input's value is submitted.
+
+args (tuple)
+
+An optional tuple of args to pass to the callback.
+
+kwargs (dict)
+
+An optional dict of kwargs to pass to the callback.
+
+Returns
+(str or None)
+
+The current (non-empty) value of the text input widget on the last run of the app. Otherwise, None.
+
+Examples
+When st.chat_input is used in the main body of an app, it will be pinned to the bottom of the page.
+
+import streamlit as st
+
+prompt = st.chat_input("Say something")
+if prompt:
+    st.write(f"User has sent the following prompt: {prompt}")
+Copy
+
+Built with Streamlit 🎈
+Fullscreen
+open_in_new
+The chat input can also be used inline by nesting it inside any layout container (container, columns, tabs, sidebar, etc) or fragment. Create chat interfaces embedded next to other content or have multiple chatbots!
+
+import streamlit as st
+
+with st.sidebar:
+    messages = st.container(height=300)
+    if prompt := st.chat_input("Say something"):
+        messages.chat_message("user").write(prompt)
+        messages.chat_message("assistant").write(f"Echo: {prompt}")
+
+
+---
+st.chat_message
+Streamlit Version
+Version 1.40.0
+Insert a chat message container.
+
+To add elements to the returned container, you can use with notation (preferred) or just call methods directly on the returned object. See the examples below.
+
+Function signature[source]
+st.chat_message(name, *, avatar=None)
+
+Parameters
+name ("user", "assistant", "ai", "human", or str)
+
+The name of the message author. Can be "human"/"user" or "ai"/"assistant" to enable preset styling and avatars.
+
+Currently, the name is not shown in the UI but is only set as an accessibility label. For accessibility reasons, you should not use an empty string.
+
+avatar (Anything supported by st.image, str, or None)
+
+The avatar shown next to the message.
+
+If avatar is None (default), the icon will be determined from name as follows:
+
+If name is "user" or "human", the message will have a default user icon.
+If name is "ai" or "assistant", the message will have a default bot icon.
+For all other values of name, the message will show the first letter of the name.
+In addition to the types supported by st.image (like URLs or numpy arrays), the following strings are valid:
+
+A single-character emoji. For example, you can set avatar="🧑‍💻" or avatar="🦖". Emoji short codes are not supported.
+
+An icon from the Material Symbols library (rounded style) in the format ":material/icon_name:" where "icon_name" is the name of the icon in snake case.
+
+For example, icon=":material/thumb_up:" will display the Thumb Up icon. Find additional icons in the Material Symbols font library.
+
+Returns
+(Container)
+
+A single container that can hold multiple elements.
+
+Examples
+You can use with notation to insert any element into an expander
+
+import streamlit as st
+import numpy as np
+
+with st.chat_message("user"):
+    st.write("Hello 👋")
+    st.line_chart(np.random.randn(30, 3))
+
+---
+st.status
+Streamlit Version
+Version 1.40.0
+Insert a status container to display output from long-running tasks.
+
+Inserts a container into your app that is typically used to show the status and details of a process or task. The container can hold multiple elements and can be expanded or collapsed by the user similar to st.expander. When collapsed, all that is visible is the status icon and label.
+
+The label, state, and expanded state can all be updated by calling .update() on the returned object. To add elements to the returned container, you can use with notation (preferred) or just call methods directly on the returned object.
+
+By default, st.status() initializes in the "running" state. When called using with notation, it automatically updates to the "complete" state at the end of the "with" block. See examples below for more details.
+
+Function signature[source]
+st.status(label, *, expanded=False, state="running")
+
+Parameters
+label (str)
+
+The initial label of the status container. The label can optionally contain GitHub-flavored Markdown of the following types: Bold, Italics, Strikethroughs, Inline Code, Links, and Images. Images display like icons, with a max height equal to the font height.
+
+Unsupported Markdown elements are unwrapped so only their children (text contents) render. Display unsupported elements as literal characters by backslash-escaping them. E.g., "1\. Not an ordered list".
+
+See the body parameter of st.markdown for additional, supported Markdown directives.
+
+expanded (bool)
+
+If True, initializes the status container in "expanded" state. Defaults to False (collapsed).
+
+state ("running", "complete", or "error")
+
+The initial state of the status container which determines which icon is shown:
+
+running (default): A spinner icon is shown.
+complete: A checkmark icon is shown.
+error: An error icon is shown.
+Returns
+(StatusContainer)
+
+A mutable status container that can hold multiple elements. The label, state, and expanded state can be updated after creation via .update().
+
+Examples
+You can use the with notation to insert any element into an status container:
+
+import time
+import streamlit as st
+
+with st.status("Downloading data..."):
+    st.write("Searching for data...")
+    time.sleep(2)
+    st.write("Found URL.")
+    time.sleep(1)
+    st.write("Downloading data...")
+    time.sleep(1)
+
+st.button("Rerun")
+
+---
+
+# st.status
+Streamlit Version
+Version 1.40.0
+Insert a status container to display output from long-running tasks.
+
+Inserts a container into your app that is typically used to show the status and details of a process or task. The container can hold multiple elements and can be expanded or collapsed by the user similar to st.expander. When collapsed, all that is visible is the status icon and label.
+
+The label, state, and expanded state can all be updated by calling .update() on the returned object. To add elements to the returned container, you can use with notation (preferred) or just call methods directly on the returned object.
+
+By default, st.status() initializes in the "running" state. When called using with notation, it automatically updates to the "complete" state at the end of the "with" block. See examples below for more details.
+
+Function signature[source]
+st.status(label, *, expanded=False, state="running")
+
+Parameters
+label (str)
+
+The initial label of the status container. The label can optionally contain GitHub-flavored Markdown of the following types: Bold, Italics, Strikethroughs, Inline Code, Links, and Images. Images display like icons, with a max height equal to the font height.
+
+Unsupported Markdown elements are unwrapped so only their children (text contents) render. Display unsupported elements as literal characters by backslash-escaping them. E.g., "1\. Not an ordered list".
+
+See the body parameter of st.markdown for additional, supported Markdown directives.
+
+expanded (bool)
+
+If True, initializes the status container in "expanded" state. Defaults to False (collapsed).
+
+state ("running", "complete", or "error")
+
+The initial state of the status container which determines which icon is shown:
+
+running (default): A spinner icon is shown.
+complete: A checkmark icon is shown.
+error: An error icon is shown.
+Returns
+(StatusContainer)
+
+A mutable status container that can hold multiple elements. The label, state, and expanded state can be updated after creation via .update().
+
+Examples
+You can use the with notation to insert any element into an status container:
+
+import time
+import streamlit as st
+
+with st.status("Downloading data..."):
+    st.write("Searching for data...")
+    time.sleep(2)
+    st.write("Found URL.")
+    time.sleep(1)
+    st.write("Downloading data...")
+    time.sleep(1)
+
+st.button("Rerun")
+
+---
+# Add statefulness to apps
+What is State?
+We define access to a Streamlit app in a browser tab as a session. For each browser tab that connects to the Streamlit server, a new session is created. Streamlit reruns your script from top to bottom every time you interact with your app. Each reruns takes place in a blank slate: no variables are shared between runs.
+
+Session State is a way to share variables between reruns, for each user session. In addition to the ability to store and persist state, Streamlit also exposes the ability to manipulate state using Callbacks. Session state also persists across pages inside a multipage app.
+
+In this guide, we will illustrate the usage of Session State and Callbacks as we build a stateful Counter app.
+
+For details on the Session State and Callbacks API, please refer to our Session State API Reference Guide.
+
+Also, check out this Session State basics tutorial video by Streamlit Developer Advocate Dr. Marisa Smith to get started:
+
+
+Build a Counter
+Let's call our script counter.py. It initializes a count variable and has a button to increment the value stored in the count variable:
+
+import streamlit as st
+
+st.title('Counter Example')
+count = 0
+
+increment = st.button('Increment')
+if increment:
+    count += 1
+
+st.write('Count = ', count)
+No matter how many times we press the Increment button in the above app, the count remains at 1. Let's understand why:
+
+Each time we press the Increment button, Streamlit reruns counter.py from top to bottom, and with every run, count gets initialized to 0 .
+Pressing Increment subsequently adds 1 to 0, thus count=1 no matter how many times we press Increment.
+As we'll see later, we can avoid this issue by storing count as a Session State variable. By doing so, we're indicating to Streamlit that it should maintain the value stored inside a Session State variable across app reruns.
+
+Let's learn more about the API to use Session State.
+
+Initialization
+The Session State API follows a field-based API, which is very similar to Python dictionaries:
+
+import streamlit as st
+
+# Check if 'key' already exists in session_state
+# If not, then initialize it
+if 'key' not in st.session_state:
+    st.session_state['key'] = 'value'
+
+# Session State also supports the attribute based syntax
+if 'key' not in st.session_state:
+    st.session_state.key = 'value'
+Reads and updates
+Read the value of an item in Session State by passing the item to st.write :
+
+import streamlit as st
+
+if 'key' not in st.session_state:
+    st.session_state['key'] = 'value'
+
+# Reads
+st.write(st.session_state.key)
+
+# Outputs: value
+Update an item in Session State by assigning it a value:
+
+import streamlit as st
+
+if 'key' not in st.session_state:
+    st.session_state['key'] = 'value'
+
+# Updates
+st.session_state.key = 'value2'     # Attribute API
+st.session_state['key'] = 'value2'  # Dictionary like API
+Streamlit throws an exception if an uninitialized variable is accessed:
+
+import streamlit as st
+
+st.write(st.session_state['value'])
+
+# Throws an exception!
+state-uninitialized-exception
+Let's now take a look at a few examples that illustrate how to add Session State to our Counter app.
+
+Example 1: Add Session State
+Now that we've got a hang of the Session State API, let's update our Counter app to use Session State:
+
+import streamlit as st
+
+st.title('Counter Example')
+if 'count' not in st.session_state:
+    st.session_state.count = 0
+
+increment = st.button('Increment')
+if increment:
+    st.session_state.count += 1
+
+st.write('Count = ', st.session_state.count)
+As you can see in the above example, pressing the Increment button updates the count each time.
+
+Example 2: Session State and Callbacks
+Now that we've built a basic Counter app using Session State, let's move on to something a little more complex. The next example uses Callbacks with Session State.
+
+Callbacks: A callback is a Python function which gets called when an input widget changes. Callbacks can be used with widgets using the parameters on_change (or on_click), args, and kwargs. The full Callbacks API can be found in our Session State API Reference Guide.
+
+import streamlit as st
+
+st.title('Counter Example using Callbacks')
+if 'count' not in st.session_state:
+    st.session_state.count = 0
+
+def increment_counter():
+    st.session_state.count += 1
+
+st.button('Increment', on_click=increment_counter)
+
+st.write('Count = ', st.session_state.count)
+Now, pressing the Increment button updates the count each time by calling the increment_counter() function.
+
+Example 3: Use args and kwargs in Callbacks
+Callbacks also support passing arguments using the args parameter in a widget:
+
+import streamlit as st
+
+st.title('Counter Example using Callbacks with args')
+if 'count' not in st.session_state:
+    st.session_state.count = 0
+
+increment_value = st.number_input('Enter a value', value=0, step=1)
+
+def increment_counter(increment_value):
+    st.session_state.count += increment_value
+
+increment = st.button('Increment', on_click=increment_counter,
+    args=(increment_value, ))
+
+st.write('Count = ', st.session_state.count)
+Additionally, we can also use the kwargs parameter in a widget to pass named arguments to the callback function as shown below:
+
+import streamlit as st
+
+st.title('Counter Example using Callbacks with kwargs')
+if 'count' not in st.session_state:
+    st.session_state.count = 0
+
+def increment_counter(increment_value=0):
+    st.session_state.count += increment_value
+
+def decrement_counter(decrement_value=0):
+    st.session_state.count -= decrement_value
+
+st.button('Increment', on_click=increment_counter,
+	kwargs=dict(increment_value=5))
+
+st.button('Decrement', on_click=decrement_counter,
+	kwargs=dict(decrement_value=1))
+
+st.write('Count = ', st.session_state.count)
+Example 4: Forms and Callbacks
+Say we now want to not only increment the count, but also store when it was last updated. We illustrate doing this using Callbacks and st.form:
+
+import streamlit as st
+import datetime
+
+st.title('Counter Example')
+if 'count' not in st.session_state:
+    st.session_state.count = 0
+    st.session_state.last_updated = datetime.time(0,0)
+
+def update_counter():
+    st.session_state.count += st.session_state.increment_value
+    st.session_state.last_updated = st.session_state.update_time
+
+with st.form(key='my_form'):
+    st.time_input(label='Enter the time', value=datetime.datetime.now().time(), key='update_time')
+    st.number_input('Enter a value', value=0, step=1, key='increment_value')
+    submit = st.form_submit_button(label='Update', on_click=update_counter)
+
+st.write('Current Count = ', st.session_state.count)
+st.write('Last Updated = ', st.session_state.last_updated)
+Advanced concepts
+Session State and Widget State association
+Session State provides the functionality to store variables across reruns. Widget state (i.e. the value of a widget) is also stored in a session.
+
+For simplicity, we have unified this information in one place. i.e. the Session State. This convenience feature makes it super easy to read or write to the widget's state anywhere in the app's code. Session State variables mirror the widget value using the key argument.
+
+We illustrate this with the following example. Let's say we have an app with a slider to represent temperature in Celsius. We can set and get the value of the temperature widget by using the Session State API, as follows:
+
+import streamlit as st
+
+if "celsius" not in st.session_state:
+    # set the initial default value of the slider widget
+    st.session_state.celsius = 50.0
+
+st.slider(
+    "Temperature in Celsius",
+    min_value=-100.0,
+    max_value=100.0,
+    key="celsius"
+)
+
+# This will get the value of the slider widget
+st.write(st.session_state.celsius)
+There is a limitation to setting widget values using the Session State API.
+
+priority_high
+Important
+Streamlit does not allow setting widget values via the Session State API for st.button and st.file_uploader.
+
+The following example will raise a StreamlitAPIException on trying to set the state of st.button via the Session State API:
+
+import streamlit as st
+
+if 'my_button' not in st.session_state:
+    st.session_state.my_button = True
+    # Streamlit will raise an Exception on trying to set the state of button
+
+st.button('Submit', key='my_button')
+state-button-exception
+Serializable Session State
+Serialization refers to the process of converting an object or data structure into a format that can be persisted and shared, and allowing you to recover the data’s original structure. Python’s built-in pickle module serializes Python objects to a byte stream ("pickling") and deserializes the stream into an object ("unpickling").
+
+By default, Streamlit’s Session State allows you to persist any Python object for the duration of the session, irrespective of the object’s pickle-serializability. This property lets you store Python primitives such as integers, floating-point numbers, complex numbers and booleans, dataframes, and even lambdas returned by functions. However, some execution environments may require serializing all data in Session State, so it may be useful to detect incompatibility during development, or when the execution environment will stop supporting it in the future.
+
+To that end, Streamlit provides a runner.enforceSerializableSessionState configuration option that, when set to true, only allows pickle-serializable objects in Session State. To enable the option, either create a global or project config file with the following or use it as a command-line flag:
+
+# .streamlit/config.toml
+[runner]
+enforceSerializableSessionState = true
+By "pickle-serializable", we mean calling pickle.dumps(obj) should not raise a PicklingError exception. When the config option is enabled, adding unserializable data to session state should result in an exception. E.g.,
+
+import streamlit as st
+
+def unserializable_data():
+		return lambda x: x
+
+#👇 results in an exception when enforceSerializableSessionState is on
+st.session_state.unserializable = unserializable_data()
+UnserializableSessionStateError
+priority_high
+Warning
+When runner.enforceSerializableSessionState is set to true, Session State implicitly uses the pickle module, which is known to be insecure. Ensure all data saved and retrieved from Session State is trusted because it is possible to construct malicious pickle data that will execute arbitrary code during unpickling. Never load data that could have come from an untrusted source in an unsafe mode or that could have been tampered with. Only load data you trust.
+
+Caveats and limitations
+Here are some limitations to keep in mind when using Session State:
+
+Session State exists for as long as the tab is open and connected to the Streamlit server. As soon as you close the tab, everything stored in Session State is lost.
+Session State is not persisted. If the Streamlit server crashes, then everything stored in Session State gets wiped
+For caveats and limitations with the Session State API, please see the API limitations.
+
+---
+# Session State
+Session State is a way to share variables between reruns, for each user session. In addition to the ability to store and persist state, Streamlit also exposes the ability to manipulate state using Callbacks. Session state also persists across apps inside a multipage app.
+
+Check out this Session State basics tutorial video by Streamlit Developer Advocate Dr. Marisa Smith to get started:
+
+
+Initialize values in Session State
+The Session State API follows a field-based API, which is very similar to Python dictionaries:
+
+# Initialization
+if 'key' not in st.session_state:
+    st.session_state['key'] = 'value'
+
+# Session State also supports attribute based syntax
+if 'key' not in st.session_state:
+    st.session_state.key = 'value'
+Reads and updates
+Read the value of an item in Session State and display it by passing to st.write :
+
+# Read
+st.write(st.session_state.key)
+
+# Outputs: value
+Update an item in Session State by assigning it a value:
+
+st.session_state.key = 'value2'     # Attribute API
+st.session_state['key'] = 'value2'  # Dictionary like API
+Curious about what is in Session State? Use st.write or magic:
+
+st.write(st.session_state)
+
+# With magic:
+st.session_state
+Streamlit throws a handy exception if an uninitialized variable is accessed:
+
+st.write(st.session_state['value'])
+
+# Throws an exception!
+state-uninitialized-exception
+Delete items
+Delete items in Session State using the syntax to delete items in any Python dictionary:
+
+# Delete a single key-value pair
+del st.session_state[key]
+
+# Delete all the items in Session state
+for key in st.session_state.keys():
+    del st.session_state[key]
+Session State can also be cleared by going to Settings → Clear Cache, followed by Rerunning the app.
+
+state-clear-cache
+Session State and Widget State association
+Every widget with a key is automatically added to Session State:
+
+st.text_input("Your name", key="name")
+
+# This exists now:
+st.session_state.name
+Use Callbacks to update Session State
+A callback is a python function which gets called when an input widget changes.
+
+Order of execution: When updating Session state in response to events, a callback function gets executed first, and then the app is executed from top to bottom.
+
+Callbacks can be used with widgets using the parameters on_change (or on_click), args, and kwargs:
+
+Parameters
+
+on_change or on_click - The function name to be used as a callback
+args (tuple) - List of arguments to be passed to the callback function
+kwargs (dict) - Named arguments to be passed to the callback function
+Widgets which support the on_change event:
+
+st.checkbox
+st.color_picker
+st.date_input
+st.data_editor
+st.file_uploader
+st.multiselect
+st.number_input
+st.radio
+st.select_slider
+st.selectbox
+st.slider
+st.text_area
+st.text_input
+st.time_input
+st.toggle
+Widgets which support the on_click event:
+
+st.button
+st.download_button
+st.form_submit_button
+To add a callback, define a callback function above the widget declaration and pass it to the widget via the on_change (or on_click ) parameter.
+
+Forms and Callbacks
+Widgets inside a form can have their values be accessed and set via the Session State API. st.form_submit_button can have a callback associated with it. The callback gets executed upon clicking on the submit button. For example:
+
+def form_callback():
+    st.write(st.session_state.my_slider)
+    st.write(st.session_state.my_checkbox)
+
+with st.form(key='my_form'):
+    slider_input = st.slider('My slider', 0, 10, 5, key='my_slider')
+    checkbox_input = st.checkbox('Yes or No', key='my_checkbox')
+    submit_button = st.form_submit_button(label='Submit', on_click=form_callback)
+Serializable Session State
+Serialization refers to the process of converting an object or data structure into a format that can be persisted and shared, and allowing you to recover the data’s original structure. Python’s built-in pickle module serializes Python objects to a byte stream ("pickling") and deserializes the stream into an object ("unpickling").
+
+By default, Streamlit’s Session State allows you to persist any Python object for the duration of the session, irrespective of the object’s pickle-serializability. This property lets you store Python primitives such as integers, floating-point numbers, complex numbers and booleans, dataframes, and even lambdas returned by functions. However, some execution environments may require serializing all data in Session State, so it may be useful to detect incompatibility during development, or when the execution environment will stop supporting it in the future.
+
+To that end, Streamlit provides a runner.enforceSerializableSessionState configuration option that, when set to true, only allows pickle-serializable objects in Session State. To enable the option, either create a global or project config file with the following or use it as a command-line flag:
+
+# .streamlit/config.toml
+[runner]
+enforceSerializableSessionState = true
+By "pickle-serializable", we mean calling pickle.dumps(obj) should not raise a PicklingError exception. When the config option is enabled, adding unserializable data to session state should result in an exception. E.g.,
+
+import streamlit as st
+
+def unserializable_data():
+		return lambda x: x
+
+#👇 results in an exception when enforceSerializableSessionState is on
+st.session_state.unserializable = unserializable_data()
+UnserializableSessionStateError
+priority_high
+Warning
+When runner.enforceSerializableSessionState is set to true, Session State implicitly uses the pickle module, which is known to be insecure. Ensure all data saved and retrieved from Session State is trusted because it is possible to construct malicious pickle data that will execute arbitrary code during unpickling. Never load data that could have come from an untrusted source in an unsafe mode or that could have been tampered with. Only load data you trust.
+
+Caveats and limitations
+Only the st.form_submit_button has a callback in forms. Other widgets inside a form are not allowed to have callbacks.
+
+on_change and on_click events are only supported on input type widgets.
+
+Modifying the value of a widget via the Session state API, after instantiating it, is not allowed and will raise a StreamlitAPIException. For example:
+
+slider = st.slider(
+    label='My Slider', min_value=1,
+    max_value=10, value=5, key='my_slider')
+
+st.session_state.my_slider = 7
+
+# Throws an exception!
+state-modified-instantiated-exception
+Setting the widget state via the Session State API and using the value parameter in the widget declaration is not recommended, and will throw a warning on the first run. For example:
+
+st.session_state.my_slider = 7
+
+slider = st.slider(
+    label='Choose a Value', min_value=1,
+    max_value=10, value=5, key='my_slider')
+state-value-api-exception
+Setting the state of button-like widgets: st.button, st.download_button, and st.file_uploader via the Session State API is not allowed. Such type of widgets are by default False and have ephemeral True states which are only valid for a single run. For example:
+
+if 'my_button' not in st.session_state:
+    st.session_state.my_button = True
+
+st.button('My button', key='my_button')
+
+# Throws an exception!
