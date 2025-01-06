@@ -8,6 +8,14 @@ The LightRAG application is a sophisticated academic research tool that combines
 - **Academic Response Processing**: Formats responses in academic style with source tracking
 - **Metadata Management**: Comprehensive tracking of document metadata, equations, and references
 
+### Important Notes
+- Anystyle is a critical component for reference extraction - DO NOT REMOVE OR REPLACE IT
+- Anystyle is a Ruby gem, must be installed on the system. do not treat it as a python package.
+- Marker should be used with its official Python API from marker.converters.pdf
+- PDFs are preserved in the store directory until explicit deletion
+- All text processing preserves semantic structure and layout
+
+
 ## Core Components
 
 1. **AcademicMetadata** (`src/academic_metadata.py`):
@@ -69,6 +77,31 @@ The LightRAG application is a sophisticated academic research tool that combines
    - Source management utilities
    - LaTeX equation handling
 
+## Citation and Reference Processing
+
+1. **Citation Extraction and Linking**:
+   - Multi-reference citation support (e.g., [29, 38], [32, 42])
+   - Context-aware citation linking to references
+   - Pattern matching for various citation styles:
+     - Numeric citations (e.g., [1], [1,2], [1-3])
+     - Author-year citations (e.g., Smith et al., 2023)
+     - Cross-references (e.g., cf. Author, 2023)
+   - Automatic reference resolution and validation
+
+2. **Reference Processing Pipeline**:
+   - Primary extraction using Anystyle for accurate reference parsing
+   - DOI lookup and validation using pdf2doi and CrossRef
+   - Author name normalization and affiliation tracking
+   - Venue and publication metadata enrichment
+   - Citation context preservation and analysis
+
+3. **Integration with Document Processing**:
+   - Unified processing flow between test and application environments
+   - Consistent Marker configuration for text extraction
+   - Standardized citation and reference extraction
+   - Shared metadata handling across contexts
+   - Common configuration for both test and production use
+
 ## Technical Specifications
 
 - **Models**: 
@@ -121,25 +154,3 @@ The LightRAG application is a sophisticated academic research tool that combines
 - Parallel document processing
 - Efficient metadata management
 - Caching mechanisms for frequent operations
-
-## PDF Processing Pipeline
-
-## Components
-
-### FileProcessor (`src/file_processor.py`)
-Handles the complete PDF processing workflow:
-1. Metadata Extraction: Uses PyMuPDF (primary) and PyPDF2 (fallback) to extract native PDF metadata (title, authors, creation date)
-2. Text Extraction: Uses Marker (optimized for M3) to convert PDFs while preserving layout, equations, and figures
-3. Academic Metadata Processing: Analyzes extracted text to identify and structure:
-   - References (using Anystyle - a critical tool for accurate reference extraction)
-   - Citations
-   - LaTeX equations
-   - Author affiliations
-   - Abstract
-4. Results Integration: Combines all extracted data into a unified document representation
-
-### Important Notes
-- Anystyle is a critical component for reference extraction - DO NOT REMOVE OR REPLACE IT
-- Marker should be used with its official Python API from marker.converters.pdf
-- PDFs are preserved in the store directory until explicit deletion
-- All text processing preserves semantic structure and layout
