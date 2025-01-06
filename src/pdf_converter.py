@@ -1,11 +1,14 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 import fitz
 from PyPDF2 import PdfReader
 from termcolor import colored
 import logging
 import os
 from .config_manager import PDFEngine, ConfigManager
+
+# Disable tokenizers warning
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 logger = logging.getLogger(__name__)
 
@@ -23,11 +26,51 @@ class PDFConverter(ABC):
         pass
 
 class MarkerConverter(PDFConverter):
-    """PDF converter using Marker with optimized settings for M3 Max"""
+    """PDF converter using Marker with optimized settings"""
     
     def __init__(self):
-        self._marker = None
-        self._text_from_rendered = None
+        """Initialize Marker with optimized settings"""
+        try:
+            from marker.converters.pdf import PdfConverter
+            from marker.models import create_model_dict
+            from marker.config.parser import ConfigParser
+            
+            # Configure Marker settings with enhanced equation detection
+            config = {
+                "output_format": "markdown",
+                "layout_analysis": True,
+                "detect_equations": True,
+                "equation_detection_confidence": 0.3,  # Lower threshold for equation detection
+                "detect_inline_equations": True,  # Also detect inline equations
+                "detect_tables": True,
+                "detect_lists": True,
+                "detect_code_blocks": True,
+                "detect_footnotes": True,
+                "equation_output": "latex",  # Ensure LaTeX output for equations
+                "preserve_math": True,  # Preserve mathematical content
+                "equation_detection_mode": "aggressive",  # More aggressive equation detection
+                "equation_context_window": 3,  # Larger context window for equations
+                "equation_pattern_matching": True,  # Enable pattern matching for equations
+                "equation_symbol_extraction": True  # Extract mathematical symbols
+            }
+            
+            config_parser = ConfigParser(config)
+            
+            # Initialize converter with config
+            self._converter = PdfConverter(
+                config=config_parser.generate_config_dict(),
+                artifact_dict=create_model_dict(),
+                processor_list=config_parser.get_processors(),
+                renderer=config_parser.get_renderer()
+            )
+            
+            logger.info("Marker initialized with optimized settings")
+            
+        except Exception as e:
+            logger.error(f"Failed to initialize Marker: {str(e)}")
+            self._converter = None
+            raise
+            
         self._initialize_fallback_extractors()
     
     def _initialize_fallback_extractors(self):
@@ -35,183 +78,108 @@ class MarkerConverter(PDFConverter):
         self.pymupdf_converter = PyMuPDFConverter()
         self.pypdf2_converter = PyPDF2Converter()
     
-    def _ensure_marker_initialized(self):
-        """Lazy initialization of Marker only when needed"""
-        if self._marker is not None:
-            return
-            
-        try:
-            # Disable tokenizers warning
-            os.environ["TOKENIZERS_PARALLELISM"] = "false"
-            
-            # Set GOOGLE_API_KEY from GEMINI_API_KEY for Marker compatibility
-            gemini_key = os.getenv("GEMINI_API_KEY")
-            if gemini_key:
-                os.environ["GOOGLE_API_KEY"] = gemini_key
-                logger.info("Set GOOGLE_API_KEY from GEMINI_API_KEY")
-            
-            from marker.converters.pdf import PdfConverter
-            from marker.models import create_model_dict
-            from marker.output import text_from_rendered
-            from marker.config.parser import ConfigParser
-            
-            logger.info("Initializing Marker with optimized M3 Max config")
-            
-            # Configure marker with optimizations for M3 Max
-            config = {
-                "output_format": "markdown",
-                "force_ocr": False,  # Only use OCR when needed
-                "extract_images": True,  # Enable image extraction for LLM descriptions
-                "batch_multiplier": 12,  # Larger batches for M3 Max
-                "num_workers": 8,  # Parallel workers
-                "langs": ["English"],  # Optimize for English
-                "device": "mps",  # Use MPS for M3 Max
-                "model_precision": "float16",  # Use half precision
-                "max_batch_size": 16,  # Larger batch size
-                
-                # Layout detection settings - adjusted for better section header detection
-                "layout_coverage_min_lines": 1,  # Reduced to catch single-line headers
-                "layout_coverage_threshold": 0.3,  # Reduced to be more lenient
-                "document_ocr_threshold": 0.7,
-                "error_model_segment_length": 1024,
-                "min_line_height": 6,  # Minimum line height to consider
-                "min_block_height": 8,  # Minimum block height for sections
-                
-                # OCR settings
-                "detection_batch_size": 8,
-                "recognition_batch_size": 8,
-                
-                # LLM settings
-                "use_llm": True,  # Enable LLM for image descriptions
-                "google_api_key": os.getenv("GOOGLE_API_KEY"),  # Use the key we set earlier
-                "model_name": "gemini-1.5-flash",  # Fast Gemini model
-                "max_retries": 3,
-                "max_concurrency": 3,
-                "timeout": 60,
-                "confidence_threshold": 0.75,
-                
-                # Additional layout settings
-                "ignore_page_numbers": True,  # Don't treat page numbers as sections
-                "merge_small_blocks": True,  # Merge small text blocks
-                "layout_tolerance": 3.0,  # More tolerant layout analysis
-            }
-            
-            if not os.getenv("GOOGLE_API_KEY"):
-                logger.warning("No Google API key found, LLM features will be limited")
-                config["use_llm"] = False
-            else:
-                logger.info("LLM features enabled for image descriptions")
-            
-            # Get custom processor list without problematic section header processor
-            processor_list = [
-                "marker.processors.blockquote.BlockquoteProcessor",
-                "marker.processors.code.CodeProcessor",
-                "marker.processors.document_toc.DocumentTOCProcessor",
-                "marker.processors.equation.EquationProcessor",
-                "marker.processors.footnote.FootnoteProcessor",
-                "marker.processors.ignoretext.IgnoreTextProcessor",
-                "marker.processors.line_numbers.LineNumbersProcessor",
-                "marker.processors.list.ListProcessor",
-                "marker.processors.page_header.PageHeaderProcessor",
-                "marker.processors.table.TableProcessor",
-                "marker.processors.llm.llm_table.LLMTableProcessor",
-                "marker.processors.llm.llm_form.LLMFormProcessor",
-                "marker.processors.text.TextProcessor",
-                "marker.processors.llm.llm_text.LLMTextProcessor",
-                "marker.processors.llm.llm_complex.LLMComplexRegionProcessor",
-                "marker.processors.llm.llm_image_description.LLMImageDescriptionProcessor",
-                "marker.processors.debug.DebugProcessor",
-            ]
-            
-            logger.info("Creating ConfigParser")
-            config_parser = ConfigParser(config)
-            
-            # Initialize the converter with custom processor list
-            logger.info("Initializing PdfConverter")
-            self._marker = PdfConverter(
-                artifact_dict=create_model_dict(),
-                config=config_parser.generate_config_dict(),
-                processor_list=processor_list,  # Use our custom processor list
-                renderer=config_parser.get_renderer()
-            )
-            
-            # Store text_from_rendered function for later use
-            self._text_from_rendered = text_from_rendered
-            
-            # Enable LLM if configured
-            if config["use_llm"]:
-                logger.info("Enabling LLM support for image descriptions")
-                self._marker.use_llm = True
-            
-            logger.info("Initialized Marker PDF converter with M3 Max optimized configuration")
-            print(colored("✓ Initialized Marker PDF converter", "green"))
-            
-        except Exception as e:
-            logger.error(f"Failed to initialize Marker: {str(e)}")
-            print(colored(f"⚠️ Failed to initialize Marker: {str(e)}", "red"))
-            raise
-    
     def extract_text(self, file_path: str) -> str:
+        """Extract text with semantic structure preservation"""
         try:
-            # Only initialize Marker when actually converting
-            self._ensure_marker_initialized()
+            if self._converter is None:
+                raise ValueError("Marker not initialized")
+                
+            # Process PDF with Marker
+            rendered = self._converter(file_path)
             
-            logger.info(f"Converting PDF with Marker: {file_path}")
-            # Use marker as callable and text_from_rendered to extract text
-            rendered = self._marker(file_path)
-            logger.info("PDF rendered successfully")
+            # Extract text from rendered output
+            if hasattr(rendered, 'markdown'):
+                text = rendered.markdown
+            else:
+                # For JSON output, extract text from blocks
+                text = self._extract_text_from_blocks(rendered.children)
             
-            text, _, _ = self._text_from_rendered(rendered)
-            logger.info("Text extracted from rendered output")
-            
-            print(colored("✓ Text extracted with Marker", "green"))
+            if not text:
+                raise ValueError("No text extracted by Marker")
+                
+            logger.info("Text extracted successfully with Marker")
+            print(colored("✓ Text extracted with semantic structure preserved", "green"))
             return text
             
         except Exception as e:
-            logger.error(f"Marker text extraction error: {str(e)}", exc_info=True)
+            logger.error(f"Marker text extraction error: {str(e)}")
             print(colored(f"⚠️ Marker text extraction error: {str(e)}", "yellow"))
-            # Fall back to PyMuPDF for text extraction
-            return self.pymupdf_converter.extract_text(file_path)
+            raise  # Let FileProcessor handle fallback
+            
+    def _extract_text_from_blocks(self, blocks) -> str:
+        """Extract text from JSON block structure"""
+        text = []
+        for block in blocks:
+            if hasattr(block, 'html'):
+                text.append(block.html)
+            if hasattr(block, 'children') and block.children:
+                text.append(self._extract_text_from_blocks(block.children))
+        return "\n".join(text)
     
     def extract_metadata(self, file_path: str) -> Dict[str, Any]:
         """Extract metadata using proven extraction chain"""
         metadata = {}
         
-        # 1. Try PyMuPDF metadata (primary source)
         try:
+            # 1. Try PyMuPDF metadata first
+            logger.info("Attempting PyMuPDF metadata extraction")
             metadata = self.pymupdf_converter.extract_metadata(file_path)
             if metadata:
-                logger.info("Metadata extracted with PyMuPDF")
                 print(colored("✓ Metadata extracted with PyMuPDF", "green"))
+                
+                # 2. Try to enhance with DOI and CrossRef if available
+                if 'doi' in metadata:
+                    try:
+                        crossref_data = self._get_crossref_metadata(metadata['doi'])
+                        if crossref_data:
+                            metadata.update(crossref_data)
+                            print(colored("✓ Using CrossRef API metadata", "green"))
+                    except Exception as e:
+                        logger.warning(f"CrossRef enhancement failed: {str(e)}")
+                
                 return metadata
-        except Exception as e:
-            logger.warning(f"PyMuPDF metadata extraction failed: {str(e)}")
-            print(colored("⚠️ PyMuPDF metadata extraction failed", "yellow"))
-        
-        # 2. Try PyPDF2 metadata as fallback
-        try:
+            
+            # 3. Try PyPDF2 as fallback
+            logger.info("Attempting PyPDF2 metadata extraction")
             metadata = self.pypdf2_converter.extract_metadata(file_path)
             if metadata:
-                logger.info("Metadata extracted with PyPDF2")
                 print(colored("✓ Metadata extracted with PyPDF2", "green"))
                 return metadata
+            
+            logger.warning("All PDF metadata extraction methods failed")
+            return {}
+            
         except Exception as e:
-            logger.warning(f"PyPDF2 metadata extraction failed: {str(e)}")
-            print(colored("⚠️ PyPDF2 metadata extraction failed", "yellow"))
-        
-        # 3. If all else fails, try to extract from text
+            logger.error(f"Metadata extraction error: {str(e)}")
+            print(colored(f"⚠️ Metadata extraction error: {str(e)}", "yellow"))
+            return {}
+            
+    def _get_crossref_metadata(self, doi: str) -> Optional[Dict[str, Any]]:
+        """Get metadata from CrossRef API using DOI"""
         try:
-            text = self.extract_text(file_path)
-            if text:
-                # Note: This will be handled by academic_metadata.py which has the 
-                # DOI extraction and CrossRef lookup logic
-                logger.info("Metadata will be extracted from text")
-                print(colored("ℹ️ Metadata will be extracted from text", "blue"))
-            return {}
+            import requests
+            url = f"https://api.crossref.org/works/{doi}"
+            response = requests.get(url)
+            if response.status_code == 200:
+                data = response.json()
+                return {
+                    'title': data['message'].get('title', [None])[0],
+                    'authors': [
+                        {
+                            'given': author.get('given', ''),
+                            'family': author.get('family', '')
+                        }
+                        for author in data['message'].get('author', [])
+                    ],
+                    'published': data['message'].get('published-print', {}).get('date-parts', [[None]])[0][0],
+                    'publisher': data['message'].get('publisher'),
+                    'type': data['message'].get('type'),
+                    'container-title': data['message'].get('container-title', [None])[0],
+                    'crossref_data': True
+                }
         except Exception as e:
-            logger.error(f"Text-based metadata extraction failed: {str(e)}")
-            print(colored("⚠️ Text-based metadata extraction failed", "yellow"))
-            return {}
+            logger.warning(f"CrossRef API lookup failed: {str(e)}")
+        return None
 
 class PyMuPDFConverter(PDFConverter):
     """PDF converter using PyMuPDF (fitz)"""

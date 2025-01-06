@@ -11,6 +11,10 @@ from PyPDF2 import PdfReader
 import requests
 from scholarly import scholarly
 from termcolor import colored
+import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Enums and Constants
 class ValidationLevel(str, Enum):
@@ -55,43 +59,51 @@ class Author:
 
 @dataclass
 class Reference:
-    """Represents an academic reference with structured information."""
+    """Represents a bibliographic reference."""
     raw_text: str
     title: Optional[str] = None
     authors: List[Author] = field(default_factory=list)
     year: Optional[int] = None
     doi: Optional[str] = None
     venue: Optional[str] = None
-    citation_key: Optional[str] = None
-    cited_by: Set[str] = field(default_factory=set)
-    cites: Set[str] = field(default_factory=set)
     
     @classmethod
     def from_dict(cls, data: Dict) -> 'Reference':
         data = data.copy()
         if 'authors' in data:
             data['authors'] = [Author.from_dict(a) for a in data['authors']]
-        if 'cited_by' in data:
-            data['cited_by'] = set(data['cited_by'])
-        if 'cites' in data:
-            data['cites'] = set(data['cites'])
         return cls(**data)
     
     def to_dict(self) -> Dict:
         return {
             'raw_text': self.raw_text,
             'title': self.title,
-            'authors': [a.to_dict() for a in self.authors],
+            'authors': [author.to_dict() for author in self.authors],
             'year': self.year,
             'doi': self.doi,
-            'venue': self.venue,
-            'citation_key': self.citation_key,
-            'cited_by': list(self.cited_by),
-            'cites': list(self.cites)
+            'venue': self.venue
         }
+
+@dataclass
+class Citation:
+    """Represents a citation within the text."""
+    text: str
+    references: List[Reference] = field(default_factory=list)  # Now a list of references
+    context: str = ""
     
-    def validate(self, validator: 'ReferenceValidator') -> 'ValidationResult':
-        return validator.validate(self)
+    @classmethod
+    def from_dict(cls, data: Dict) -> 'Citation':
+        data = data.copy()
+        if 'references' in data and data['references']:
+            data['references'] = [Reference.from_dict(ref) for ref in data['references']]
+        return cls(**data)
+    
+    def to_dict(self) -> Dict:
+        return {
+            'text': self.text,
+            'references': [ref.to_dict() for ref in self.references] if self.references else [],
+            'context': self.context
+        }
 
 @dataclass
 class Equation:
@@ -130,16 +142,20 @@ class ValidationResult:
 # Main Classes
 @dataclass
 class AcademicMetadata:
-    """Container for all academic metadata of a document."""
-    title: str
-    authors: List[Author]
-    abstract: Optional[str] = None
-    keywords: List[str] = field(default_factory=list)
+    """Represents academic metadata with structured information."""
+    doc_id: str
+    title: str = ""
+    authors: List[Author] = field(default_factory=list)
+    abstract: str = ""
     references: List[Reference] = field(default_factory=list)
     equations: List[Equation] = field(default_factory=list)
+    citations: List[Citation] = field(default_factory=list)
+    keywords: Set[str] = field(default_factory=set)
+    sections: Dict[str, str] = field(default_factory=dict)
     
     @classmethod
     def from_dict(cls, data: Dict) -> 'AcademicMetadata':
+        """Create AcademicMetadata from dictionary."""
         data = data.copy()
         if 'authors' in data:
             data['authors'] = [Author.from_dict(a) for a in data['authors']]
@@ -147,35 +163,25 @@ class AcademicMetadata:
             data['references'] = [Reference.from_dict(r) for r in data['references']]
         if 'equations' in data:
             data['equations'] = [Equation.from_dict(e) for e in data['equations']]
+        if 'citations' in data:
+            data['citations'] = [Citation.from_dict(c) for c in data['citations']]
+        if 'keywords' in data:
+            data['keywords'] = set(data['keywords'])
         return cls(**data)
     
     def to_dict(self) -> Dict:
+        """Convert to dictionary for serialization."""
         return {
+            'doc_id': self.doc_id,
             'title': self.title,
-            'authors': [a.to_dict() for a in self.authors],
+            'authors': [author.to_dict() for author in self.authors],
             'abstract': self.abstract,
-            'keywords': self.keywords,
-            'references': [r.to_dict() for r in self.references],
-            'equations': [e.to_dict() for e in self.equations]
+            'references': [ref.to_dict() for ref in self.references],
+            'equations': [eq.to_dict() for eq in self.equations],
+            'citations': [cit.to_dict() for cit in self.citations],
+            'keywords': list(self.keywords),
+            'sections': self.sections
         }
-    
-    def save(self, output_dir: Path) -> None:
-        """Save metadata to JSON file."""
-        try:
-            output_dir.mkdir(parents=True, exist_ok=True)
-            
-            # Sanitize filename
-            safe_title = re.sub(r'[^\w\-_\. ]', '_', self.title)
-            safe_title = safe_title[:100]  # Limit length
-            output_path = output_dir / f"{safe_title}_metadata.json"
-            
-            with open(output_path, 'w', encoding='utf-8') as f:
-                json.dump(self.to_dict(), f, indent=2)
-            print(colored(f"✓ Saved metadata to {output_path}", "green"))
-            
-        except Exception as e:
-            print(colored(f"❌ Failed to save metadata: {e}", "red"))
-            raise
 
 class ReferenceValidator:
     """Validates academic references based on specified criteria."""
@@ -614,35 +620,87 @@ class PDFMetadataExtractor:
         )
 
     def _extract_equations(self, text: str) -> List[Equation]:
-        """Extract equations from text."""
+        """Extract equations from text with enhanced pattern matching."""
         equations = []
         eq_id = 1
         
-        # Simple equation extraction (can be enhanced)
-        lines = text.split('\n')
-        for i, line in enumerate(lines):
-            if '$' in line or '\\[' in line:
-                # Get context (surrounding lines)
-                start = max(0, i-2)
-                end = min(len(lines), i+3)
-                context = '\n'.join(lines[start:end])
-                
-                # Determine equation type
-                if '\\[' in line or '\\begin{equation}' in line:
-                    eq_type = EquationType.DISPLAY
-                else:
-                    eq_type = EquationType.INLINE
-                
-                equations.append(Equation(
-                    raw_text=line,
-                    equation_id=f"eq{eq_id}",
-                    context=context,
-                    equation_type=eq_type,
-                    symbols=set()  # Symbol extraction can be added
-                ))
-                eq_id += 1
+        try:
+            # Equation patterns
+            patterns = [
+                (r'\$\$(.*?)\$\$', EquationType.DISPLAY),  # Display equations
+                (r'\$(.*?)\$', EquationType.INLINE),  # Inline equations
+                (r'\\begin\{equation\}(.*?)\\end\{equation\}', EquationType.DISPLAY),  # Numbered equations
+                (r'\\[(.*?)\\]', EquationType.DISPLAY),  # Alternative display equations
+                (r'\\begin\{align\*?\}(.*?)\\end\{align\*?\}', EquationType.DISPLAY),  # Align environments
+                (r'\\begin\{eqnarray\*?\}(.*?)\\end\{eqnarray\*?\}', EquationType.DISPLAY)  # Eqnarray environments
+            ]
+            
+            lines = text.split('\n')
+            for i, line in enumerate(lines):
+                for pattern, eq_type in patterns:
+                    matches = re.finditer(pattern, line, re.DOTALL)
+                    for match in matches:
+                        # Get equation content
+                        eq_text = match.group(1).strip()
+                        if not eq_text:
+                            continue
+                            
+                        # Get context (surrounding lines)
+                        start = max(0, i-2)
+                        end = min(len(lines), i+3)
+                        context = '\n'.join(lines[start:end])
+                        
+                        # Extract symbols
+                        symbols = self._extract_equation_symbols(eq_text)
+                        
+                        equations.append(Equation(
+                            raw_text=eq_text,
+                            equation_id=f"eq{eq_id}",
+                            context=context,
+                            equation_type=eq_type,
+                            symbols=symbols
+                        ))
+                        eq_id += 1
+            
+            return equations
+            
+        except Exception as e:
+            logger.error(f"Error extracting equations: {str(e)}")
+            print(colored(f"⚠️ Error extracting equations: {str(e)}", "yellow"))
+            return []
+            
+    def _extract_equation_symbols(self, equation: str) -> Set[str]:
+        """Extract mathematical symbols from equation."""
+        symbols = set()
         
-        return equations 
+        # Common mathematical symbols
+        symbol_patterns = [
+            r'\\alpha', r'\\beta', r'\\gamma', r'\\delta', r'\\epsilon',
+            r'\\theta', r'\\lambda', r'\\mu', r'\\pi', r'\\sigma',
+            r'\\sum', r'\\prod', r'\\int', r'\\partial', r'\\infty',
+            r'\\frac', r'\\sqrt', r'\\left', r'\\right', r'\\cdot',
+            r'\\mathcal', r'\\mathbf', r'\\mathrm', r'\\text'
+        ]
+        
+        try:
+            # Extract LaTeX commands
+            for pattern in symbol_patterns:
+                if re.search(pattern, equation):
+                    symbols.add(pattern.replace('\\', ''))
+            
+            # Extract variable names (single letters)
+            var_matches = re.findall(r'(?<=[^\\])[a-zA-Z](?![a-zA-Z])', equation)
+            symbols.update(var_matches)
+            
+            # Extract subscripts
+            subscripts = re.findall(r'_\{([^}]+)\}', equation)
+            symbols.update(subscripts)
+            
+            return symbols
+            
+        except Exception as e:
+            logger.warning(f"Error extracting symbols: {str(e)}")
+            return set()
     
     def _parse_references(self, text: str) -> List[Reference]:
         """Parse references from text using Anystyle CLI"""
@@ -932,210 +990,218 @@ class EquationExtractor:
             return set() 
 
 class MetadataExtractor:
-    """Main coordinator for academic metadata extraction"""
+    """Extract academic metadata from documents"""
     
-    def __init__(self, debug: bool = False):
-        self.debug = debug
-        self.pdf_extractor = PDFMetadataExtractor(debug=debug)
-        self.citation_parser = CitationParser()
-        self.equation_extractor = EquationExtractor(debug=debug)
-    
-    def extract_metadata(self, text: str, doc_id: str, pdf_path: Optional[str] = None) -> AcademicMetadata:
-        """Extract academic metadata from document text and PDF if available."""
-        if self.debug:
-            print(colored("\n=== Starting Metadata Extraction ===", "blue"))
-        
-        metadata = None
-        
-        # Try PDF metadata extraction first if path is provided
-        if pdf_path:
-            pdf_metadata = self.pdf_extractor.extract_from_pdf(pdf_path)
+    def extract_metadata(self, text: str, doc_id: str, pdf_path: str = None, existing_metadata: Dict = None) -> AcademicMetadata:
+        """Extract academic metadata from text and PDF"""
+        try:
+            # Initialize metadata
+            metadata = AcademicMetadata(doc_id=doc_id)
             
-            if pdf_metadata:
-                title, authors, abstract, doi = pdf_metadata
-                
-                # Parse references and equations from text
-                references = self.citation_parser.parse_references(text)
-                equations = self.equation_extractor.extract_equations(text)
-                
-                metadata = AcademicMetadata(
-                    title=title or "Untitled Document",
-                    authors=authors or [],
-                    abstract=abstract,
-                    references=references,
-                    equations=equations
-                )
-                print(colored("✓ Using PDF metadata", "green"))
-        
-        # Fall back to text parsing if needed
-        if not metadata or not metadata.title or not metadata.authors:
-            print(colored("⚠️ Falling back to text parsing", "yellow"))
-            metadata = self._parse_from_text(text)
-        
-        return metadata
-
-    def _parse_from_text(self, text: str) -> AcademicMetadata:
-        """Parse metadata from text content."""
-        lines = [line.strip() for line in text.split('\n') if line.strip()]
-        
-        # Extract title and authors
-        title, title_index = self._extract_title(lines)
-        authors = self._extract_authors(lines, title_index)
-        
-        # Extract abstract
-        abstract = self._extract_abstract(lines)
-        
-        # Extract references and equations
-        references = self.citation_parser.parse_references(text)
-        equations = self.equation_extractor.extract_equations(text)
-        
-        return AcademicMetadata(
-            title=title,
-            authors=authors,
-            abstract=abstract,
-            references=references,
-            equations=equations
-        )
-
-    def _extract_title(self, lines: List[str]) -> Tuple[str, int]:
-        """Extract title from text lines."""
-        title = "Untitled Document"
-        title_index = -1
-        subtitle = None
-        
-        # Common patterns to skip
-        skip_patterns = [
-            'open', '## open', '## **open**',
-            'contents lists available',
-            'image', 'figure', 'table',
-            'received:', 'accepted:', 'published:', 'doi:', '@', 'university',
-            'available online', 'sciencedirect', 'elsevier',
-            'journal', 'volume', 'issue'
-        ]
-        
-        # First try markdown title
-        for i, line in enumerate(lines):
-            if line.startswith(('#', '##')):
-                clean_line = re.sub(r'[#*]', '', line).strip()
-                
-                if any(skip in clean_line.lower() for skip in skip_patterns):
-                    continue
-                if re.match(r'^[\d\.]+\s', clean_line):
-                    continue
-                
-                title = clean_line
-                title_index = i
-                if i + 1 < len(lines) and lines[i + 1].startswith('*'):
-                    subtitle = re.sub(r'[*]', '', lines[i + 1]).strip()
-                break
-        
-        # Try other patterns if no markdown title
-        if title_index == -1:
-            for i, line in enumerate(lines[:20]):
-                if len(line) < 20 or len(line) > 250:
-                    continue
-                if any(skip in line.lower() for skip in skip_patterns):
-                    continue
-                if re.match(r'^(?:image|figure|fig\.?)\s+\d', line.lower()):
-                    continue
-                if re.match(r'^(?:\d{1,2}\s+\w+\s+\d{4}|doi:|https?://)', line.lower()):
-                    continue
-                if not line[0].isupper():
-                    continue
-                if len(line.split()) <= 3:
-                    continue
-                
-                digit_ratio = sum(c.isdigit() for c in line) / len(line)
-                if digit_ratio >= 0.2:
-                    continue
-                
-                special_char_ratio = sum(not c.isalnum() and not c.isspace() for c in line) / len(line)
-                if special_char_ratio >= 0.1:
-                    continue
-                
-                title = line
-                title_index = i
-                break
-        
-        # Add subtitle if found
-        if subtitle:
-            title = f"{title}: {subtitle}"
-        
-        return title, title_index
-
-    def _extract_authors(self, lines: List[str], title_index: int) -> List[Author]:
-        """Extract authors from text lines after title."""
-        authors = []
-        if title_index == -1:
-            return authors
+            # Use existing metadata if provided
+            if existing_metadata:
+                metadata.title = existing_metadata.get('title', '')
+                if 'authors' in existing_metadata:
+                    metadata.authors = [
+                        Author(
+                            full_name=a.get('full_name', ''),
+                            first_name=a.get('given', ''),
+                            last_name=a.get('family', '')
+                        )
+                        for a in existing_metadata['authors']
+                    ]
+                metadata.abstract = existing_metadata.get('abstract', '')
             
-        # Look at next few lines for authors
-        for i in range(title_index + 1, min(title_index + 5, len(lines))):
-            line = lines[i]
+            # Extract abstract if not in existing metadata
+            if not metadata.abstract and text:
+                abstract_match = re.search(r'Abstract[:\s]+(.*?)(?=\n\n|\Z)', text, re.IGNORECASE | re.DOTALL)
+                if abstract_match:
+                    metadata.abstract = abstract_match.group(1).strip()
             
-            # Skip non-author content
-            if not line or any(skip in line.lower() for skip in ['abstract', 'introduction', 'keywords', 'received']):
-                continue
+            # Extract equations
+            equations = []
+            eq_id = 1
             
-            # Look for author patterns
-            if (',' in line or ' & ' in line or ' and ' in line.lower() or '**' in line or 'M.D.' in line):
-                author_line = line.replace('**', '').strip()
-                
-                # Clean up author line
-                author_line = re.sub(r'\d+\s*$', '', author_line)
-                author_line = re.sub(r'\s*,\s*M\.D\.', '', author_line)
-                author_line = re.sub(r'\s*,\s*Ph\.D\.', '', author_line)
-                author_line = re.sub(r'\s*,\s*M\.P\.H\.', '', author_line)
-                
-                # Split authors
-                for sep in [' and ', ' & ', ',']:
-                    author_line = author_line.replace(sep, '|')
-                author_names = [name.strip() for name in author_line.split('|') if name.strip()]
-                
-                for name in author_names:
-                    if len(name) < 3:
-                        continue
-                    if '@' in name:
-                        continue
-                    if any(word in name.lower() for word in ['university', 'department', 'division']):
-                        continue
-                    
-                    # Clean name
-                    name = re.sub(r'[\(\)\[\]\{\}\d]', '', name).strip()
-                    name = re.sub(r'\s*(?:M\.D\.|Ph\.D\.|M\.P\.H\.|Professor|Dr\.|Prof\.)\s*', '', name)
-                    parts = [p for p in name.split() if len(p) > 1]
-                    
-                    if parts:
-                        authors.append(Author(
-                            full_name=name,
-                            first_name=parts[0],
-                            last_name=parts[-1]
+            # Equation patterns
+            patterns = [
+                (r'\$\$(.*?)\$\$', EquationType.DISPLAY),  # Display equations
+                (r'\$(.*?)\$', EquationType.INLINE),  # Inline equations
+                (r'\\begin\{equation\}(.*?)\\end\{equation\}', EquationType.DISPLAY),  # Numbered equations
+                (r'\\[(.*?)\\]', EquationType.DISPLAY),  # Alternative display equations
+                (r'\\begin\{align\*?\}(.*?)\\end\{align\*?\}', EquationType.DISPLAY),  # Align environments
+                (r'\\begin\{eqnarray\*?\}(.*?)\\end\{eqnarray\*?\}', EquationType.DISPLAY)  # Eqnarray environments
+            ]
+            
+            lines = text.split('\n')
+            for i, line in enumerate(lines):
+                for pattern, eq_type in patterns:
+                    matches = re.finditer(pattern, line, re.DOTALL)
+                    for match in matches:
+                        # Get equation content
+                        eq_text = match.group(1).strip()
+                        if not eq_text:
+                            continue
+                            
+                        # Get context (surrounding lines)
+                        start = max(0, i-2)
+                        end = min(len(lines), i+3)
+                        context = '\n'.join(lines[start:end])
+                        
+                        # Extract symbols
+                        symbols = set()
+                        symbol_patterns = [
+                            r'\\alpha', r'\\beta', r'\\gamma', r'\\delta', r'\\epsilon',
+                            r'\\theta', r'\\lambda', r'\\mu', r'\\pi', r'\\sigma',
+                            r'\\sum', r'\\prod', r'\\int', r'\\partial', r'\\infty'
+                        ]
+                        
+                        for sym_pattern in symbol_patterns:
+                            if re.search(sym_pattern, eq_text):
+                                symbols.add(sym_pattern.replace('\\', ''))
+                        
+                        equations.append(Equation(
+                            raw_text=eq_text,
+                            equation_id=f"eq{eq_id}",
+                            context=context,
+                            equation_type=eq_type,
+                            symbols=symbols
                         ))
+                        eq_id += 1
+            
+            metadata.equations = equations
+            
+            # Extract references using Anystyle
+            try:
+                # Create a temporary file for the text content
+                with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', encoding='utf-8', delete=False) as temp:
+                    temp.write(text)
+                    temp_path = temp.name
                 
-                if authors:  # Stop if we found authors
-                    break
-        
-        return authors
-
-    def _extract_abstract(self, lines: List[str]) -> str:
-        """Extract abstract from text lines."""
-        abstract = ""
-        abstract_start = -1
-        
-        # Find abstract header
-        for i, line in enumerate(lines):
-            if re.match(r'^(?:abstract|summary)[\s:]*$', line.lower()) or \
-               re.match(r'^[\*#\s]*(?:abstract|summary)[\*\s:]*$', line.lower()):
-                abstract_start = i
-                break
-        
-        if abstract_start != -1:
-            abstract_lines = []
-            for line in lines[abstract_start + 1:]:
-                if any(marker in line.lower() for marker in ['introduction', 'keywords', '1.', 'background']):
-                    break
-                if line.strip():
-                    abstract_lines.append(line.strip())
-            abstract = ' '.join(abstract_lines)
-        
-        return abstract 
+                try:
+                    # Run Anystyle find command
+                    cmd = ["anystyle", "--format", "json", "find", temp_path]
+                    logger.info(f"Running Anystyle command: {' '.join(cmd)}")
+                    
+                    result = subprocess.run(
+                        cmd,
+                        capture_output=True,
+                        text=True,
+                        check=True
+                    )
+                    
+                    # Parse the JSON output
+                    if result.stdout:
+                        references = json.loads(result.stdout)
+                        
+                        # Convert to our format
+                        metadata.references = []
+                        for ref in references:
+                            try:
+                                authors = []
+                                for author in ref.get('author', []):
+                                    if isinstance(author, dict):
+                                        authors.append(Author(
+                                            full_name=f"{author.get('given', '')} {author.get('family', '')}".strip(),
+                                            first_name=author.get('given', ''),
+                                            last_name=author.get('family', '')
+                                        ))
+                                    else:
+                                        authors.append(Author(full_name=str(author)))
+                                
+                                metadata.references.append(Reference(
+                                    raw_text=ref.get('original', ''),
+                                    title=ref.get('title', [None])[0] if isinstance(ref.get('title', []), list) else ref.get('title'),
+                                    authors=authors,
+                                    year=int(ref.get('date', [None])[0]) if ref.get('date') else None,
+                                    doi=ref.get('doi', [None])[0] if isinstance(ref.get('doi', []), list) else ref.get('doi'),
+                                    venue=ref.get('container-title', [None])[0] if isinstance(ref.get('container-title', []), list) else ref.get('container-title')
+                                ))
+                            except Exception as e:
+                                logger.warning(f"Error parsing individual reference: {str(e)}")
+                                print(colored(f"⚠️ Error parsing reference: {str(e)}", "yellow"))
+                                continue
+                        
+                        print(colored(f"✓ Extracted {len(metadata.references)} references with Anystyle", "green"))
+                        
+                        # Extract citations and link them to references
+                        metadata.citations = []
+                        citation_patterns = [
+                            r'\[([\d,\s-]+)\]',  # [1] or [1,2] or [1-3]
+                            r'\(([^)]+?(?:19|20)\d{2}[^)]*)\)',  # (Author, 2023) or (Author et al., 2023)
+                            r'(?:cf\.|see|in)\s+([A-Z][a-zA-Z]+(?:\s+et\s+al\.?)?,\s+(?:19|20)\d{2})',  # cf. Author et al., 2023
+                        ]
+                        
+                        for i, line in enumerate(lines):
+                            for pattern in citation_patterns:
+                                for match in re.finditer(pattern, line):
+                                    citation_text = match.group(0)
+                                    ref_key = match.group(1)
+                                    
+                                    # Get context (surrounding text)
+                                    start = max(0, i-1)
+                                    end = min(len(lines), i+2)
+                                    context = ' '.join(lines[start:end])
+                                    
+                                    # Try to find matching references
+                                    matching_refs = []
+                                    if '[' in citation_text:  # Numeric citation
+                                        try:
+                                            ref_nums = []
+                                            for part in ref_key.split(','):
+                                                part = part.strip()
+                                                if '-' in part:
+                                                    start_num, end_num = map(int, part.split('-'))
+                                                    ref_nums.extend(range(start_num, end_num + 1))
+                                                else:
+                                                    ref_nums.append(int(part))
+                                            
+                                            # Add each referenced paper
+                                            for num in ref_nums:
+                                                if 0 < num <= len(metadata.references):
+                                                    matching_refs.append(metadata.references[num - 1])
+                                        except (ValueError, IndexError) as e:
+                                            logger.warning(f"Error parsing numeric citation {citation_text}: {str(e)}")
+                                    else:  # Author-year citation
+                                        # Split on 'and' or ';' for multiple author-year citations
+                                        for author_year in re.split(r'\s+(?:and|;)\s+', ref_key):
+                                            year_match = re.search(r'(?:19|20)\d{2}', author_year)
+                                            if year_match:
+                                                year = int(year_match.group())
+                                                author_match = re.search(r'([A-Z][a-zA-Z]+)', author_year)
+                                                if author_match:
+                                                    author = author_match.group(1)
+                                                    # Find matching reference
+                                                    for ref in metadata.references:
+                                                        if (ref.year == year and 
+                                                            ref.authors and 
+                                                            any(author.lower() in a.last_name.lower() for a in ref.authors)):
+                                                            matching_refs.append(ref)
+                                                            break
+                                    
+                                    # Create citation with all matching references
+                                    metadata.citations.append(Citation(
+                                        text=citation_text,
+                                        references=matching_refs,  # Now a list of references
+                                        context=context
+                                    ))
+                        
+                        print(colored(f"✓ Extracted {len(metadata.citations)} citations", "green"))
+                        
+                except subprocess.CalledProcessError as e:
+                    logger.error(f"Anystyle command failed: {e.stderr}")
+                    print(colored(f"⚠️ Anystyle extraction failed: {e.stderr}", "yellow"))
+                    
+                finally:
+                    # Clean up temp file
+                    os.unlink(temp_path)
+                    
+            except Exception as e:
+                logger.error(f"Reference extraction failed: {str(e)}")
+                print(colored(f"⚠️ Reference extraction failed: {str(e)}", "yellow"))
+            
+            return metadata
+            
+        except Exception as e:
+            logger.error(f"Metadata extraction failed: {str(e)}")
+            print(colored(f"⚠️ Metadata extraction failed: {str(e)}", "yellow"))
+            return AcademicMetadata(doc_id=doc_id) 

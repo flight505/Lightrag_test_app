@@ -109,13 +109,14 @@ with store_col1:
         "Select Document Store",
         ["Create New..."] + stores,
         index=current_index,
-        help="Choose an existing document store or create a new one"
+        help="Choose an existing document store or create a new one",
+        key="store_select"
     )
 
 with store_col2:
     if selected_store == "Create New...":
-        new_store = st.text_input("Store Name")
-        if st.button("Create Store", type="primary", use_container_width=True):
+        new_store = st.text_input("Store Name", key="new_store")
+        if st.button("Create Store", key="create_store", type="primary", use_container_width=True):
             if new_store:
                 store_path = create_store_directory(new_store)
                 if store_path:
@@ -169,10 +170,10 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
     # Create three columns for the action buttons
     action_col1, action_col2, action_col3, action_col4 = st.columns(4)
     with action_col1:
-        if st.button("🔄 Refresh Document List", use_container_width=True):
+        if st.button("🔄 Refresh Document List", key="refresh_btn", use_container_width=True):
             st.rerun()
     with action_col2:
-        if st.button("🧹 Clean Unused Files", use_container_width=True):
+        if st.button("🧹 Clean Unused Files", key="clean_btn", use_container_width=True):
             if file_processor:
                 removed = file_processor.clean_unused_files()
                 if removed:
@@ -180,7 +181,7 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
                 else:
                     st.info("No unused files found")
     with action_col3:
-        if st.button("⚡ Convert Pending", use_container_width=True):
+        if st.button("⚡ Convert Pending", key="convert_pending", use_container_width=True):
             if file_processor:
                 # Reinitialize file processor to ensure it has the latest methods
                 file_processor = reinit_file_processor(store_path)
@@ -233,7 +234,7 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
                 
                 st.rerun()
     with action_col4:
-        if st.button("📊 View Academic Metadata", use_container_width=True):
+        if st.button("📊 View Academic Metadata", key="view_metadata", use_container_width=True):
             st.switch_page("pages/Academic.py")
     
     try:
