@@ -1,5 +1,5 @@
 import streamlit as st
-from src.academic_metadata import MetadataExtractor
+from src.academic_metadata import MetadataExtractor, PDFMetadataExtractor
 
 # Page configuration
 st.set_page_config(
@@ -15,7 +15,8 @@ st.sidebar.write("### Debug Settings")
 debug_mode = st.sidebar.checkbox("Enable Debug Mode", value=False)
 
 # Modify where you create the MetadataExtractor
-extractor = MetadataExtractor(debug=debug_mode)
+pdf_extractor = PDFMetadataExtractor(debug=debug_mode)
+extractor = MetadataExtractor()
 
 # Main layout
 left_col, right_col = st.columns([2, 1], gap="large")

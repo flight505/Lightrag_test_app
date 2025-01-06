@@ -1,250 +1,213 @@
 import streamlit as st
 from pathlib import Path
 from src.academic_metadata import (
-    AcademicMetadata, CitationGraphAnalyzer, 
-    ValidationLevel, ReferenceValidator
+    AcademicMetadata, Author, Reference, Citation, Equation
 )
+import json
+from termcolor import colored
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+from collections import Counter, defaultdict
+import networkx as nx
+import pyvis
+from pyvis.network import Network
+import tempfile
 
-# Page configuration
 st.set_page_config(
     page_title="Academic Analysis",
     page_icon="📚",
-    layout="wide",
-    initial_sidebar_state="collapsed"
+    layout="wide"
 )
 
-def check_initialization():
-    """Check if LightRAG is initialized"""
-    if not st.session_state.get("status_ready", False):
-        st.error("⚠️ Please initialize LightRAG in the Search page first")
-        return False
-    return True
-
-def show_citation_network():
-    """Show citation network analysis and visualization"""
-    st.header("📊 Citation Network Analysis")
-    
-    # Get all metadata
+def load_metadata_files(store_path: Path) -> list[AcademicMetadata]:
+    """Load all metadata files from the store"""
+    metadata_files = list(store_path.glob("*.metadata.json"))
     metadata_list = []
-    for doc_info in st.session_state.file_processor.metadata["files"].values():
-        if "academic_metadata" in doc_info:
-            metadata = AcademicMetadata.from_dict(doc_info["academic_metadata"])
-            metadata_list.append(metadata)
     
-    if not metadata_list:
-        st.warning("No academic metadata found. Process some documents first.")
-        return
+    for file in metadata_files:
+        try:
+            with open(file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                metadata = AcademicMetadata.from_dict(data)
+                metadata_list.append(metadata)
+        except Exception as e:
+            st.error(f"Error loading {file.name}: {str(e)}")
     
-    # Initialize analyzer
-    analyzer = CitationGraphAnalyzer()
-    analyzer.build_graph(metadata_list)
-    
-    # Analysis results
-    with st.spinner("Analyzing citation network..."):
-        analysis = analyzer.analyze()
-    
-    # Display results in columns
-    metrics_col, viz_col = st.columns([1, 2])
-    
-    with metrics_col:
-        # Network metrics
-        st.subheader("📈 Network Statistics")
-        st.metric("Average Citations", f"{analysis.average_citations:.2f}")
-        st.metric("Network Density", f"{analysis.network_density:.2f}")
-        
-        # Most cited papers
-        st.subheader("🏆 Most Cited Papers")
-        for paper, citations in analysis.most_cited:
-            st.write(f"- **{paper}**: {citations} citations")
-        
-        # Influential papers
-        st.subheader("⭐ Influential Papers")
-        for paper in analysis.influential_papers:
-            st.write(f"- {paper}")
-    
-    with viz_col:
-        # Visualization
-        st.subheader("🕸️ Citation Network Visualization")
-        
-        # Visualization options
-        viz_options = st.columns(3)
-        with viz_options[0]:
-            node_size = st.slider("Node Size", 50, 500, 200)
-        with viz_options[1]:
-            font_size = st.slider("Font Size", 6, 16, 8)
-        with viz_options[2]:
-            alpha = st.slider("Transparency", 0.1, 1.0, 0.6)
-        
-        # Generate visualization
-        viz_path = Path("temp_network.png")
-        with st.spinner("Generating visualization..."):
-            analyzer.visualize(
-                output_path=viz_path,
-                node_size=node_size,
-                font_size=font_size,
-                alpha=alpha
-            )
-        st.image(str(viz_path))
-        
-        # Export option
-        if st.button("Export Network Data"):
-            export_path = Path("citation_network.json")
-            analyzer.export_graph(export_path)
-            st.success(f"Network data exported to {export_path}")
+    return metadata_list
 
-def show_reference_validation():
-    """Show reference validation interface"""
-    st.header("🔍 Reference Validation")
+def create_citation_network(metadata_list: list[AcademicMetadata]) -> Network:
+    """Create citation network visualization"""
+    G = nx.DiGraph()
     
-    # Validation settings
-    validation_level = st.selectbox(
-        "Validation Level",
-        options=[v.value for v in ValidationLevel],
-        format_func=lambda x: x.title()
-    )
+    # Add nodes and edges
+    for doc in metadata_list:
+        # Add document as node
+        G.add_node(doc.doc_id, title=doc.title, type="document")
+        
+        # Add references and citations
+        for ref in doc.references:
+            ref_id = f"{ref.title}_{ref.year}" if ref.title and ref.year else str(ref)
+            G.add_node(ref_id, title=ref.title or "Unknown", type="reference")
+            G.add_edge(doc.doc_id, ref_id)
     
-    validator = ReferenceValidator(ValidationLevel(validation_level))
+    # Create PyVis network
+    net = Network(height="600px", width="100%", bgcolor="#222222", font_color="white")
     
-    # Process each document
-    for doc_name, doc_info in st.session_state.file_processor.metadata["files"].items():
-        if "academic_metadata" in doc_info:
-            metadata = AcademicMetadata.from_dict(doc_info["academic_metadata"])
-            
-            with st.expander(f"📄 {doc_name}"):
-                # Document overview
-                st.write("Title:", metadata.title)
-                st.write("Authors:", ", ".join(a.full_name for a in metadata.authors))
-                
-                # Reference validation
-                st.subheader("References")
-                for ref in metadata.references:
-                    result = ref.validate(validator)
-                    
-                    # Reference details
-                    ref_container = st.container()
-                    ref_container.markdown(f"**{ref.title or 'Untitled Reference'}**")
-                    
-                    # Show validation results
-                    if not result.is_valid:
-                        ref_container.error("❌ " + ", ".join(result.errors))
-                    if result.warnings:
-                        ref_container.warning("⚠️ " + ", ".join(result.warnings))
-                    
-                    # Reference metadata
-                    with ref_container.expander("Details"):
-                        st.json({
-                            "authors": [a.full_name for a in ref.authors],
-                            "year": ref.year,
-                            "venue": ref.venue,
-                            "doi": ref.doi,
-                            "citation_key": ref.citation_key
-                        })
-
-def show_equation_analysis():
-    """Show equation analysis interface"""
-    st.header("📐 Equation Analysis")
-    
-    # Collect all equations
-    all_equations = []
-    for doc_info in st.session_state.file_processor.metadata["files"].values():
-        if "academic_metadata" in doc_info:
-            metadata = AcademicMetadata.from_dict(doc_info["academic_metadata"])
-            all_equations.extend(metadata.equations)
-    
-    if not all_equations:
-        st.warning("No equations found in the documents.")
-        return
-    
-    # Statistics
-    st.subheader("📊 Equation Statistics")
-    eq_types = {}
-    for eq in all_equations:
-        eq_types[eq.equation_type] = eq_types.get(eq.equation_type, 0) + 1
-    
-    # Display statistics
-    stats_cols = st.columns(len(eq_types))
-    for col, (eq_type, count) in zip(stats_cols, eq_types.items()):
-        col.metric(
-            f"{eq_type.title()} Equations",
-            count,
-            help=f"Number of {eq_type} equations found"
+    # Add nodes with different colors for documents and references
+    for node in G.nodes(data=True):
+        net.add_node(
+            node[0],
+            label=node[1]["title"][:30] + "..." if len(node[1]["title"]) > 30 else node[1]["title"],
+            color="#00ff00" if node[1]["type"] == "document" else "#ff9999"
         )
     
-    # Equation browser
-    st.subheader("🔍 Equation Browser")
+    # Add edges
+    for edge in G.edges():
+        net.add_edge(edge[0], edge[1])
     
-    # Filters
-    filter_cols = st.columns(3)
-    with filter_cols[0]:
-        selected_type = st.selectbox(
-            "Equation Type",
-            options=["All"] + list(eq_types.keys())
-        )
-    with filter_cols[1]:
-        search_symbols = st.text_input(
-            "Search Symbols",
-            placeholder="e.g., sigma, alpha"
-        )
-    with filter_cols[2]:
-        selected_sort = st.selectbox(
-            "Sort By",
-            options=["Type", "Complexity", "Document"]
-        )
-        if selected_sort:
-            # Sort equations based on selection
-            if selected_sort == "Type":
-                all_equations.sort(key=lambda x: x.type)
-            elif selected_sort == "Complexity":
-                all_equations.sort(key=lambda x: x.complexity)
-            elif selected_sort == "Document":
-                all_equations.sort(key=lambda x: x.document_id)
+    net.set_options("""
+    var options = {
+        "physics": {
+            "forceAtlas2Based": {
+                "gravitationalConstant": -100,
+                "centralGravity": 0.01,
+                "springLength": 100,
+                "springConstant": 0.08
+            },
+            "solver": "forceAtlas2Based",
+            "minVelocity": 0.75,
+            "timestep": 0.5
+        }
+    }
+    """)
     
-    # Filter equations
-    filtered_equations = all_equations
-    if selected_type != "All":
-        filtered_equations = [eq for eq in filtered_equations 
-                            if eq.equation_type == selected_type]
-    if search_symbols:
-        symbols = [s.strip() for s in search_symbols.split(",")]
-        filtered_equations = [eq for eq in filtered_equations 
-                            if any(s in eq.symbols for s in symbols)]
-    
-    # Display equations
-    for eq in filtered_equations:
-        with st.expander(f"Equation {eq.equation_id}"):
-            st.latex(eq.raw_text)
-            st.write("**Context:**", eq.context)
-            st.write("**Type:**", eq.equation_type)
-            st.write("**Symbols:**", ", ".join(eq.symbols))
+    return net
 
 def main():
-    """Main function for the academic analysis page"""
     st.title("📚 Academic Analysis")
     
-    if not check_initialization():
+    # Get current store path
+    if "active_store" not in st.session_state:
+        st.error("Please select a store in the Manage page first")
+        return
+        
+    store_path = Path("DB") / st.session_state["active_store"]
+    if not store_path.exists():
+        st.error(f"Store path {store_path} does not exist")
         return
     
-    # Feature selection
-    feature = st.radio(
-        "Select Analysis Feature",
-        options=["Citation Network", "Reference Validation", "Equation Analysis"],
-        format_func=lambda x: {
-            "Citation Network": "🕸️ Citation Network",
-            "Reference Validation": "🔍 Reference Validation",
-            "Equation Analysis": "📐 Equation Analysis"
-        }[x],
-        horizontal=True
-    )
+    # Load metadata
+    metadata_list = load_metadata_files(store_path)
+    if not metadata_list:
+        st.warning("No academic metadata found in the current store")
+        return
     
-    st.divider()
+    # Display summary statistics
+    st.header("📊 Summary Statistics")
+    col1, col2, col3, col4 = st.columns(4)
     
-    # Show selected feature
-    if feature == "Citation Network":
-        show_citation_network()
-    elif feature == "Reference Validation":
-        show_reference_validation()
-    else:
-        show_equation_analysis()
+    with col1:
+        st.metric("Documents", len(metadata_list))
+    
+    total_refs = sum(len(doc.references) for doc in metadata_list)
+    with col2:
+        st.metric("References", total_refs)
+    
+    total_citations = sum(len(doc.citations) for doc in metadata_list)
+    with col3:
+        st.metric("Citations", total_citations)
+    
+    total_equations = sum(len(doc.equations) for doc in metadata_list)
+    with col4:
+        st.metric("Equations", total_equations)
+    
+    # Citation Network
+    st.header("🕸️ Citation Network")
+    net = create_citation_network(metadata_list)
+    
+    # Save and display network
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.html') as tmp:
+        net.save_graph(tmp.name)
+        with open(tmp.name, 'r', encoding='utf-8') as f:
+            html = f.read()
+        st.components.v1.html(html, height=600)
+    
+    # Reference Analysis
+    st.header("📑 Reference Analysis")
+    
+    # Year distribution
+    years = [ref.year for doc in metadata_list for ref in doc.references if ref.year]
+    if years:
+        fig = px.histogram(
+            x=years,
+            title="Reference Year Distribution",
+            labels={"x": "Year", "y": "Count"},
+            template="plotly_dark"
+        )
+        st.plotly_chart(fig, use_container_width=True)
+    
+    # Author Analysis
+    st.header("👥 Author Analysis")
+    
+    # Count author appearances
+    author_counts = Counter()
+    for doc in metadata_list:
+        for ref in doc.references:
+            for author in ref.authors:
+                if author.full_name:
+                    author_counts[author.full_name] += 1
+    
+    # Create author frequency chart
+    top_authors = dict(sorted(author_counts.items(), key=lambda x: x[1], reverse=True)[:20])
+    if top_authors:
+        fig = px.bar(
+            x=list(top_authors.keys()),
+            y=list(top_authors.values()),
+            title="Top 20 Most Cited Authors",
+            labels={"x": "Author", "y": "Citations"},
+            template="plotly_dark"
+        )
+        fig.update_layout(xaxis_tickangle=45)
+        st.plotly_chart(fig, use_container_width=True)
+    
+    # Equation Analysis
+    if any(doc.equations for doc in metadata_list):
+        st.header("📐 Equation Analysis")
+        
+        # Count equation types
+        eq_types = Counter()
+        symbols = Counter()
+        for doc in metadata_list:
+            for eq in doc.equations:
+                eq_types[eq.equation_type] += 1
+                symbols.update(eq.symbols)
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Equation types pie chart
+            if eq_types:
+                fig = px.pie(
+                    values=list(eq_types.values()),
+                    names=list(eq_types.keys()),
+                    title="Equation Types Distribution",
+                    template="plotly_dark"
+                )
+                st.plotly_chart(fig, use_container_width=True)
+        
+        with col2:
+            # Most common symbols
+            if symbols:
+                top_symbols = dict(sorted(symbols.items(), key=lambda x: x[1], reverse=True)[:10])
+                fig = px.bar(
+                    x=list(top_symbols.keys()),
+                    y=list(top_symbols.values()),
+                    title="Top 10 Mathematical Symbols",
+                    labels={"x": "Symbol", "y": "Occurrences"},
+                    template="plotly_dark"
+                )
+                st.plotly_chart(fig, use_container_width=True)
 
 if __name__ == "__main__":
     main() 

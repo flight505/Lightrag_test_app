@@ -6,6 +6,7 @@ from termcolor import colored
 import logging
 import os
 from .config_manager import PDFEngine, ConfigManager
+from pathlib import Path
 
 # Disable tokenizers warning
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -40,18 +41,68 @@ class MarkerConverter(PDFConverter):
                 "output_format": "markdown",
                 "layout_analysis": True,
                 "detect_equations": True,
-                "equation_detection_confidence": 0.3,  # Lower threshold for equation detection
-                "detect_inline_equations": True,  # Also detect inline equations
+                "equation_detection_confidence": 0.3,
+                "detect_inline_equations": True,
                 "detect_tables": True,
                 "detect_lists": True,
                 "detect_code_blocks": True,
                 "detect_footnotes": True,
-                "equation_output": "latex",  # Ensure LaTeX output for equations
-                "preserve_math": True,  # Preserve mathematical content
-                "equation_detection_mode": "aggressive",  # More aggressive equation detection
-                "equation_context_window": 3,  # Larger context window for equations
-                "equation_pattern_matching": True,  # Enable pattern matching for equations
-                "equation_symbol_extraction": True  # Extract mathematical symbols
+                "equation_output": "latex",
+                "preserve_math": True,
+                "equation_detection_mode": "aggressive",
+                "equation_context_window": 3,
+                "equation_pattern_matching": True,
+                "equation_symbol_extraction": True,
+                
+                # Enhanced header handling
+                "header_detection": {
+                    "enabled": True,
+                    "style": "atx",  # Use # style headers
+                    "levels": {
+                        "title": 1,    # Title uses single #
+                        "section": 2,   # Sections use ##
+                        "subsection": 3 # Subsections use ###
+                    },
+                    "remove_duplicate_markers": True
+                },
+                
+                # Enhanced list handling
+                "list_detection": {
+                    "enabled": True,
+                    "unordered_marker": "-",  # Use - for unordered lists
+                    "ordered_marker": "1.",   # Use 1. for ordered lists
+                    "preserve_numbers": True,  # Keep original list numbers
+                    "indent_spaces": 2        # Use 2 spaces for indentation
+                },
+                
+                # Layout and formatting
+                "layout": {
+                    "paragraph_breaks": True,
+                    "line_spacing": 2,
+                    "remove_redundant_whitespace": True,
+                    "preserve_line_breaks": True,
+                    "preserve_blank_lines": True
+                },
+                
+                # Content preservation
+                "preserve": {
+                    "links": True,
+                    "tables": True,
+                    "images": True,
+                    "footnotes": True,
+                    "formatting": True,
+                    "lists": True,
+                    "headers": True
+                },
+                
+                # Output settings
+                "output": {
+                    "format": "markdown",
+                    "save_markdown": True,
+                    "save_text": True,
+                    "markdown_ext": ".md",
+                    "text_ext": ".txt"
+                }
             }
             
             config_parser = ConfigParser(config)
@@ -87,12 +138,28 @@ class MarkerConverter(PDFConverter):
             # Process PDF with Marker
             rendered = self._converter(file_path)
             
+            # Save markdown file
+            markdown_path = str(Path(file_path).with_suffix('.md'))
+            
             # Extract text from rendered output
             if hasattr(rendered, 'markdown'):
                 text = rendered.markdown
+                # Save markdown content
+                try:
+                    with open(markdown_path, 'w', encoding='utf-8') as f:
+                        f.write(text)
+                    print(colored(f"✓ Markdown saved to {markdown_path}", "green"))
+                except Exception as e:
+                    print(colored(f"⚠️ Error saving markdown: {str(e)}", "yellow"))
             else:
                 # For JSON output, extract text from blocks
                 text = self._extract_text_from_blocks(rendered.children)
+                try:
+                    with open(markdown_path, 'w', encoding='utf-8') as f:
+                        f.write(text)
+                    print(colored(f"✓ Markdown saved to {markdown_path}", "green"))
+                except Exception as e:
+                    print(colored(f"⚠️ Error saving markdown: {str(e)}", "yellow"))
             
             if not text:
                 raise ValueError("No text extracted by Marker")

@@ -185,6 +185,15 @@ class FileProcessor:
             if not text:
                 return {"error": "Failed to extract text from PDF"}
             
+            # Save the extracted text
+            text_path = Path(file_path).with_suffix('.txt')
+            try:
+                with open(text_path, 'w', encoding='utf-8') as f:
+                    f.write(text)
+                print(colored(f"✓ Text saved to {text_path}", "green"))
+            except Exception as e:
+                print(colored(f"⚠️ Error saving text: {str(e)}", "yellow"))
+            
             # Try DOI-based metadata extraction first
             if progress_callback:
                 progress_callback("Extracting metadata...")
@@ -271,3 +280,36 @@ class FileProcessor:
     def is_supported_file(self, file_path: str) -> bool:
         """Check if the file type is supported"""
         return file_path.lower().endswith('.pdf')
+
+    def clean_unused_files(self) -> List[str]:
+        """Remove orphaned files (txt/md/metadata without corresponding PDFs)"""
+        if not self.store_path:
+            print(colored("⚠️ No store path set", "yellow"))
+            return []
+            
+        removed_files = []
+        try:
+            # Get all PDFs as reference
+            pdfs = {p.stem for p in Path(self.store_path).glob("*.pdf")}
+            
+            # Check for orphaned files
+            for ext in [".txt", ".md", ".metadata.json"]:
+                for file_path in Path(self.store_path).glob(f"*{ext}"):
+                    if file_path.stem not in pdfs:
+                        try:
+                            file_path.unlink()
+                            removed_files.append(str(file_path))
+                            print(colored(f"✓ Removed orphaned file: {file_path.name}", "green"))
+                        except Exception as e:
+                            print(colored(f"⚠️ Error removing {file_path.name}: {str(e)}", "yellow"))
+            
+            if removed_files:
+                print(colored(f"✓ Removed {len(removed_files)} orphaned files", "green"))
+            else:
+                print(colored("✓ No orphaned files found", "green"))
+                
+            return removed_files
+            
+        except Exception as e:
+            print(colored(f"❌ Error cleaning unused files: {str(e)}", "red"))
+            return []

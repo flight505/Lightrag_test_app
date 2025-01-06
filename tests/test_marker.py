@@ -44,6 +44,23 @@ def test_text_extraction():
     print(colored(f"✓ Found {found_sections} common paper sections", "green"))
 
 @pytest.mark.skipif(not SAMPLE_PDF.exists(), reason="Sample PDF not found")
+def test_markdown_conversion():
+    """Test PDF to markdown conversion"""
+    converter = MarkerConverter()
+    text = converter.extract_text(str(SAMPLE_PDF))
+    
+    # Check markdown formatting
+    assert "# " in text or "## " in text, "No markdown headers found"
+    assert "\n\n" in text, "No proper paragraph spacing found"
+    assert "- " in text or "* " in text or "1. " in text, "No list formatting found"
+    
+    # Save markdown output for inspection
+    output_path = SAMPLE_PDF.with_suffix('.md')
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(text)
+    print(colored(f"✓ Markdown output saved to {output_path}", "green"))
+
+@pytest.mark.skipif(not SAMPLE_PDF.exists(), reason="Sample PDF not found")
 def test_structure_preservation():
     """Test if Marker preserves document structure"""
     converter = MarkerConverter()
@@ -60,6 +77,25 @@ def test_structure_preservation():
     
     print(colored("✓ Document structure preserved", "green"))
     print(colored("✓ Found paragraphs, sections, and lists", "green"))
+
+@pytest.mark.skipif(not SAMPLE_PDF.exists(), reason="Sample PDF not found")
+def test_equation_preservation():
+    """Test if Marker preserves LaTeX equations"""
+    converter = MarkerConverter()
+    text = converter.extract_text(str(SAMPLE_PDF))
+    
+    # Check for equation delimiters
+    inline_equations = text.count('$')
+    display_equations = text.count('$$')
+    
+    print(colored(f"Found {inline_equations//2} inline equations", "blue"))
+    print(colored(f"Found {display_equations//2} display equations", "blue"))
+    
+    # Save text output for inspection
+    output_path = SAMPLE_PDF.with_suffix('.txt')
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(text)
+    print(colored(f"✓ Text output saved to {output_path}", "green"))
 
 def test_marker_error_handling():
     """Test Marker's error handling with invalid input"""
