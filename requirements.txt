@@ -6,7 +6,7 @@ networkx
 openai
 pandas
 numpy
-marker-pdf==1.2.2
+marker-pdf>=1.2.3  # PDF processing with layout preservation
 matplotlib
 requests
 stqdm  # Progress bars for Streamlit
@@ -22,6 +22,9 @@ tiktoken
 PyMuPDF  # fitz
 PyPDF2
 scholarly
+anystyle-cli  # Reference extraction
+pdf2doi
+crossrefapi
 
 # RAG packages
 lightrag-hku>=1.0.9

@@ -5,7 +5,7 @@ A sophisticated academic research tool combining knowledge graph capabilities wi
 ## Architecture Overview 🏗️
 
 <p align="center">
-  <img src="https://private-user-images.githubusercontent.com/20601200/400261737-d59098dc-c84c-4c3d-b902-fb2215fa9f91.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MzYxMjMyNzMsIm5iZiI6MTczNjEyMjk3MywicGF0aCI6Ii8yMDYwMTIwMC80MDAyNjE3MzctZDU5MDk4ZGMtYzg0Yy00YzNkLWI5MDItZmIyMjE1ZmE5ZjkxLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTAxMDYlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwMTA2VDAwMjI1M1omWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTlmYzQxOTI3Nzk4N2NjYzI1YTk5MzVjZDY5ZDUzNzQzMGMyMTc1ZmFhMjQzMjIzZWEyYjRkYTQzZWFlNmQ3N2MmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.3AMezH-z6Nbms9EjtTya_XtgFiVbmwYcIPnCuLbpO9c" alt="LightRAG Architecture" width="100%">
+  <img src="https://github.com/user-attachments/assets/d59098dc-c84c-4c3d-b902-fb2215fa9f91" alt="LightRAG Architecture" width="100%">
 </p>
 
 Our system enhances the core LightRAG framework with specialized academic components:

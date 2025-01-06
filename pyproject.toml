@@ -29,6 +29,8 @@ dependencies = [
     # PDF processing
     "PyMuPDF",
     "PyPDF2",
+    "pdf2doi",
+    "crossrefapi",
     "scholarly",
 
     # RAG packages

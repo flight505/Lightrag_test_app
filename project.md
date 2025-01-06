@@ -19,11 +19,25 @@ The LightRAG application is a sophisticated academic research tool that combines
    - JSON serialization and persistence
 
 2. **FileProcessor** (`src/file_processor.py`):
-   - PDF conversion with Marker optimization for M3 Max
-   - LaTeX equation extraction and identification
-   - Academic reference pattern matching
-   - Metadata management and file tracking
-   - Batch processing with progress tracking
+   - PDF Processing Workflow:
+     1. Metadata Extraction: Uses PyMuPDF (primary) and PyPDF2 (fallback) to extract native PDF metadata (title, authors, creation date)
+     2. Text Extraction: Employs Marker (optimized for M3 Max) to convert PDFs while preserving layout, equations, and figures
+     3. Academic Metadata Processing: Analyzes extracted text to identify and structure:
+        - References (using Anystyle - a critical tool for accurate reference extraction)
+        - Citations
+        - LaTeX equations
+        - Author affiliations
+        - Abstract
+     4. Results Integration: Combines all extracted data into a unified document representation
+   
+   Purpose: Ensures high-quality PDF processing while preserving academic content integrity, maintaining source files for reference, and enabling sophisticated search and analysis capabilities.
+   
+   Features:
+   - Optimized Marker configuration for M3 Max
+   - Fallback extraction chain for robustness
+   - Progress tracking for batch operations
+   - Source file preservation for validation
+   - Comprehensive error handling
 
 3. **FileManager** (`src/file_manager.py`):
    - Database directory structure management
@@ -107,3 +121,25 @@ The LightRAG application is a sophisticated academic research tool that combines
 - Parallel document processing
 - Efficient metadata management
 - Caching mechanisms for frequent operations
+
+## PDF Processing Pipeline
+
+## Components
+
+### FileProcessor (`src/file_processor.py`)
+Handles the complete PDF processing workflow:
+1. Metadata Extraction: Uses PyMuPDF (primary) and PyPDF2 (fallback) to extract native PDF metadata (title, authors, creation date)
+2. Text Extraction: Uses Marker (optimized for M3) to convert PDFs while preserving layout, equations, and figures
+3. Academic Metadata Processing: Analyzes extracted text to identify and structure:
+   - References (using Anystyle - a critical tool for accurate reference extraction)
+   - Citations
+   - LaTeX equations
+   - Author affiliations
+   - Abstract
+4. Results Integration: Combines all extracted data into a unified document representation
+
+### Important Notes
+- Anystyle is a critical component for reference extraction - DO NOT REMOVE OR REPLACE IT
+- Marker should be used with its official Python API from marker.converters.pdf
+- PDFs are preserved in the store directory until explicit deletion
+- All text processing preserves semantic structure and layout
