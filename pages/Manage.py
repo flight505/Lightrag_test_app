@@ -150,8 +150,7 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
         file_processor = st.session_state["file_processor"]
     
     # File upload section
-    st.markdown("### Upload Documents")
-    st.info("Upload your PDF files here. After uploading, click 'Convert Pending' to process them.")
+    st.markdown("### Upload Documents (PDF)", help="Upload your PDF files here. After uploading, click 'Convert Pending' to process them.")
     uploaded_files = st.file_uploader(
         "Upload PDF documents",
         type=["pdf"],
