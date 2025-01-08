@@ -4,6 +4,9 @@ from datetime import datetime
 from pathlib import Path
 import json
 import threading
+from termcolor import colored
+import queue
+import time
 
 import streamlit as st
 import pandas as pd
@@ -29,43 +32,31 @@ def init_session_state():
     if 'config_manager' not in st.session_state:
         st.session_state['config_manager'] = ConfigManager()
 
-def run_with_context(func, *args, **kwargs):
-    """Run a function with proper Streamlit context"""
-    thread = threading.current_thread()
-    add_script_run_ctx(thread)
-    return func(*args, **kwargs)
-
-# Initialize session state
-init_session_state()
-
 def process_files(uploaded_files, file_processor, status):
     """Save uploaded files without processing"""
     try:
         if not file_processor or not file_processor.store_path:
             raise ValueError("File processor not properly initialized with store path")
-            
+        
+        results = []
         for uploaded_file in uploaded_files:
-            status.update(label=f"Saving {uploaded_file.name}...")
-            
-            # Save uploaded file
-            pdf_path = Path(file_processor.store_path) / uploaded_file.name
-            with open(pdf_path, "wb") as f:
-                f.write(uploaded_file.getbuffer())
-            
-        status.update(label="✅ All files saved successfully. Click 'Convert Pending' to process them.", state="complete")
-        return True
+            try:
+                # Save uploaded file
+                pdf_path = Path(file_processor.store_path) / uploaded_file.name
+                with open(pdf_path, "wb") as f:
+                    f.write(uploaded_file.getbuffer())
+                results.append({"success": True, "file": uploaded_file.name})
+            except Exception as e:
+                results.append({"success": False, "file": uploaded_file.name, "error": str(e)})
+        
+        return results
         
     except Exception as e:
-        status.update(label=f"❌ Error saving files: {str(e)}", state="error")
         logger.error(f"Error saving files: {str(e)}", exc_info=True)
-        return False
+        return [{"success": False, "file": "batch", "error": str(e)}]
 
-def reinit_file_processor(store_path: str) -> FileProcessor:
-    """Reinitialize the file processor with the current store path"""
-    file_processor = FileProcessor(st.session_state["config_manager"])
-    file_processor.set_store_path(store_path)
-    st.session_state["file_processor"] = file_processor
-    return file_processor
+# Initialize session state
+init_session_state()
 
 # Page configuration
 st.set_page_config(
@@ -144,9 +135,13 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
     
     # Ensure file processor is initialized with store path
     if not st.session_state["file_processor"]:
-        file_processor = reinit_file_processor(store_path)
+        file_processor = FileProcessor(st.session_state["config_manager"])
+        file_processor.set_store_path(store_path)
+        st.session_state["file_processor"] = file_processor
     elif not st.session_state["file_processor"].store_path:
-        file_processor = reinit_file_processor(store_path)
+        file_processor = FileProcessor(st.session_state["config_manager"])
+        file_processor.set_store_path(store_path)
+        st.session_state["file_processor"] = file_processor
     else:
         file_processor = st.session_state["file_processor"]
     
@@ -162,7 +157,21 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
     
     if uploaded_files:
         status = st.status("Saving uploaded files...", expanded=True)
-        process_files(uploaded_files, file_processor, status)
+        results = process_files(uploaded_files, file_processor, status)
+        
+        # Handle results in main thread
+        success_count = 0
+        for result in results:
+            if result["success"]:
+                success_count += 1
+                status.write(f"✓ Saved: {result['file']}")
+            else:
+                status.write(f"❌ Failed to save {result['file']}: {result.get('error', 'Unknown error')}")
+        
+        if success_count == len(results):
+            status.update(label="✅ All files saved successfully. Click 'Convert Pending' to process them.", state="complete")
+        else:
+            status.update(label=f"⚠️ Saved {success_count} of {len(results)} files", state="error")
     
     # Document list section
     st.markdown("### Manage Documents")
@@ -184,7 +193,8 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
         if st.button("⚡ Convert Pending", key="convert_pending", use_container_width=True):
             if file_processor:
                 # Reinitialize file processor to ensure it has the latest methods
-                file_processor = reinit_file_processor(store_path)
+                file_processor = FileProcessor(st.session_state["config_manager"])
+                file_processor.set_store_path(store_path)
                 
                 status = st.status("Checking for pending documents...", expanded=True)
                 # Get list of pending PDFs (those without corresponding txt files)
@@ -361,27 +371,124 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
             selected_col1, selected_col2 = st.columns(2)
             with selected_col1:
                 if st.button("🗑️ Delete Selected", use_container_width=True):
+                    deletion_status = st.status("Deleting selected files...", expanded=True)
+                    deleted_files = []
+                    failed_files = []
+                    
+                    # Get current store path
+                    store_path = Path(DB_ROOT) / st.session_state["active_store"]
+                    if not store_path.exists():
+                        st.error(f"Store path {store_path} does not exist")
+                        deletion_status.update(label="❌ Store path does not exist", state="error")
+                        st.stop()
+                    
                     for file in selected_files:
-                        file_path = Path(store_path) / file
                         try:
-                            # Remove the file and its associated files
-                            if file_path.exists():
-                                file_path.unlink()
+                            file_path = store_path / file
                             txt_path = file_path.with_suffix(".txt")
-                            if txt_path.exists():
-                                txt_path.unlink()
-                            metadata_path = Path(store_path) / f"{file_path.stem}_metadata.json"
-                            if metadata_path.exists():
-                                metadata_path.unlink()
-                            st.success(f"Deleted {file}")
+                            metadata_path = store_path / f"{file_path.stem}_metadata.json"
+                            
+                            # Log deletion attempt
+                            logger.info(f"Attempting to delete: {file}")
+                            deletion_status.write(f"Processing: {file}")
+                            
+                            deletion_success = False
+                            
+                            try:
+                                # Delete PDF if exists
+                                if file_path.exists():
+                                    os.remove(str(file_path))  # Using os.remove instead of unlink
+                                    logger.info(f"Deleted PDF: {file}")
+                                    deletion_status.write(f"✓ Deleted PDF: {file}")
+                                    deleted_files.append(str(file_path))
+                                    deletion_success = True
+                                
+                                # Delete TXT if exists
+                                if txt_path.exists():
+                                    os.remove(str(txt_path))  # Using os.remove instead of unlink
+                                    logger.info(f"Deleted TXT: {txt_path.name}")
+                                    deletion_status.write(f"✓ Deleted TXT: {txt_path.name}")
+                                    deleted_files.append(str(txt_path))
+                                    deletion_success = True
+                                
+                                # Delete metadata if exists
+                                if metadata_path.exists():
+                                    os.remove(str(metadata_path))  # Using os.remove instead of unlink
+                                    logger.info(f"Deleted metadata: {metadata_path.name}")
+                                    deletion_status.write(f"✓ Deleted metadata: {metadata_path.name}")
+                                    deleted_files.append(str(metadata_path))
+                                    deletion_success = True
+                                
+                                if deletion_success:
+                                    try:
+                                        print(colored(f"✓ Successfully deleted files for: {file}", "green"))
+                                        # Remove from DataFrame
+                                        edited_df.drop(edited_df[edited_df["name"] == file].index, inplace=True)
+                                    except Exception as print_err:
+                                        logger.warning(f"Print formatting error: {print_err}")
+                                        print(f"✓ Successfully deleted files for: {file}")
+                                else:
+                                    logger.warning(f"No files found to delete for: {file}")
+                                    deletion_status.write(f"⚠️ No files found for: {file}")
+                                
+                            except PermissionError as pe:
+                                error_msg = f"Permission denied while deleting {file}: {str(pe)}"
+                                logger.error(error_msg)
+                                deletion_status.write(f"❌ {error_msg}")
+                                failed_files.append(file)
+                            except FileNotFoundError as fe:
+                                error_msg = f"File not found while deleting {file}: {str(fe)}"
+                                logger.error(error_msg)
+                                deletion_status.write(f"❌ {error_msg}")
+                                failed_files.append(file)
+                            except Exception as e:
+                                error_msg = f"Error deleting {file}: {str(e)}"
+                                logger.error(error_msg)
+                                deletion_status.write(f"❌ {error_msg}")
+                                failed_files.append(file)
+                            
                         except Exception as e:
-                            st.error(f"Error deleting {file}: {str(e)}")
-                    st.rerun()
+                            error_msg = f"Error processing {file}: {str(e)}"
+                            logger.error(error_msg)
+                            try:
+                                print(colored(error_msg, "red"))
+                            except Exception:
+                                print(f"Error: {error_msg}")
+                            deletion_status.write(f"❌ {error_msg}")
+                            failed_files.append(file)
+                    
+                    # Show final status
+                    if deleted_files:
+                        deletion_status.write("---")
+                        deletion_status.write("**Successfully deleted:**")
+                        for f in deleted_files:
+                            deletion_status.write(f"- {Path(f).name}")
+                    
+                    if failed_files:
+                        deletion_status.write("---")
+                        deletion_status.write("**Failed to delete:**")
+                        for f in failed_files:
+                            deletion_status.write(f"- {f}")
+                    
+                    deletion_status.update(
+                        label=f"Deleted {len(deleted_files)} files" + 
+                             (f" ({len(failed_files)} failed)" if failed_files else ""),
+                        state="complete" if not failed_files else "error"
+                    )
+                    
+                    # Clear the session state for the data editor to force a refresh
+                    if "document_editor" in st.session_state:
+                        del st.session_state["document_editor"]
+                    
+                    # Force refresh only if files were actually deleted
+                    if deleted_files:
+                        st.rerun()
             
             with selected_col2:
                 if st.button("🔄 Reprocess Selected", use_container_width=True):
                     # Reinitialize file processor to ensure it has the latest methods
-                    file_processor = reinit_file_processor(store_path)
+                    file_processor = FileProcessor(st.session_state["config_manager"])
+                    file_processor.set_store_path(store_path)
                     
                     status = st.status("Reprocessing selected files...", expanded=True)
                     progress_text = "Reprocessing documents..."
@@ -395,22 +502,37 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
                             current += 1
                             file_path = Path(store_path) / file
                             
-                            def update_status(msg: str):
-                                status.update(label=f"[{current}/{total}] {msg}")
+                            # Create a results queue for thread communication
+                            results_queue = queue.Queue()
+                            
+                            def process_with_progress():
+                                try:
+                                    result = file_processor.process_file(str(file_path))
+                                    results_queue.put({"success": True, "result": result})
+                                except Exception as e:
+                                    results_queue.put({"success": False, "error": str(e)})
+                            
+                            # Start processing in thread
+                            process_thread = threading.Thread(target=process_with_progress)
+                            process_thread.start()
+                            
+                            # Update UI while waiting for results
+                            while process_thread.is_alive():
                                 progress = current / total
                                 progress_bar.progress(progress, text=f"{progress_text} ({current}/{total})")
+                                time.sleep(0.1)  # Small delay to prevent UI freeze
                             
-                            try:
-                                result = file_processor.process_file(
-                                    str(file_path),
-                                    progress_callback=update_status
-                                )
-                                if "error" not in result:
-                                    status.update(label=f"✅ Successfully reprocessed {file}")
+                            # Get results
+                            process_thread.join()
+                            result = results_queue.get()
+                            
+                            if result["success"]:
+                                if "error" not in result["result"]:
+                                    status.update(label=f"✅ Successfully processed {file}")
                                 else:
-                                    status.update(label=f"❌ Failed to reprocess {file}: {result['error']}", state="error")
-                            except Exception as e:
-                                status.update(label=f"❌ Error reprocessing {file}: {str(e)}", state="error")
+                                    status.update(label=f"❌ Failed to process {file}: {result['result']['error']}", state="error")
+                            else:
+                                status.update(label=f"❌ Error processing {file}: {result['error']}", state="error")
                             
                             # Update progress
                             progress = current / total

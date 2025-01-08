@@ -228,7 +228,7 @@ class FileProcessor:
             }
             
             # Save metadata to file
-            metadata_file = Path(file_path).with_suffix('.metadata.json')
+            metadata_file = Path(file_path).parent / f"{Path(file_path).stem}_metadata.json"
             try:
                 with open(metadata_file, 'w', encoding='utf-8') as f:
                     json.dump(academic_metadata_dict, f, indent=2)
@@ -293,7 +293,7 @@ class FileProcessor:
             pdfs = {p.stem for p in Path(self.store_path).glob("*.pdf")}
             
             # Check for orphaned files
-            for ext in [".txt", ".md", ".metadata.json"]:
+            for ext in [".txt", ".md"]:
                 for file_path in Path(self.store_path).glob(f"*{ext}"):
                     if file_path.stem not in pdfs:
                         try:
@@ -302,6 +302,17 @@ class FileProcessor:
                             print(colored(f"✓ Removed orphaned file: {file_path.name}", "green"))
                         except Exception as e:
                             print(colored(f"⚠️ Error removing {file_path.name}: {str(e)}", "yellow"))
+            
+            # Check for orphaned metadata files
+            for file_path in Path(self.store_path).glob("*_metadata.json"):
+                pdf_stem = file_path.stem.replace("_metadata", "")
+                if pdf_stem not in pdfs:
+                    try:
+                        file_path.unlink()
+                        removed_files.append(str(file_path))
+                        print(colored(f"✓ Removed orphaned metadata: {file_path.name}", "green"))
+                    except Exception as e:
+                        print(colored(f"⚠️ Error removing {file_path.name}: {str(e)}", "yellow"))
             
             if removed_files:
                 print(colored(f"✓ Removed {len(removed_files)} orphaned files", "green"))

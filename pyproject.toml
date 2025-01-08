@@ -1,7 +1,7 @@
 [project]
-name = "lightrag-test"
+name = "lightrag"
 version = "0.1.0"
-description = "A Streamlit-based LightRAG application for academic research."
+description = "LightRAG - A lightweight RAG implementation"
 readme = "README.md"
 requires-python = ">=3.10.16"
 dependencies = [
@@ -28,7 +28,7 @@ dependencies = [
     "nano-vectordb",
     
     # PDF processing
-    "pymupdf",  # PDF processing library
+    "PyMuPDF",
     "PyPDF2",
     "pdf2doi",
     "crossrefapi",

@@ -6,7 +6,7 @@ import json
 import subprocess
 import tempfile
 import re
-import pymupdf as fitz  # Use pymupdf instead of PyMuPDF
+import fitz  # Changed from pymupdf import
 from PyPDF2 import PdfReader
 import requests
 from scholarly import scholarly

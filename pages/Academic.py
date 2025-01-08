@@ -22,7 +22,7 @@ st.set_page_config(
 
 def load_metadata_files(store_path: Path) -> list[AcademicMetadata]:
     """Load all metadata files from the store"""
-    metadata_files = list(store_path.glob("*.metadata.json"))
+    metadata_files = list(store_path.glob("*_metadata.json"))
     metadata_list = []
     
     for file in metadata_files:
