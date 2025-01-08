@@ -120,22 +120,11 @@ class MarkerConverter(PDFConverter):
         except Exception as e:
             logger.error(f"Failed to initialize Marker: {str(e)}")
             print(colored(f"⚠️ Failed to initialize Marker: {str(e)}", "yellow"))
-            self._converter = None
             raise
-            
-        self._initialize_fallback_extractors()
-    
-    def _initialize_fallback_extractors(self):
-        """Initialize fallback metadata extractors"""
-        self.pymupdf_converter = PyMuPDFConverter()
-        self.pypdf2_converter = PyPDF2Converter()
     
     def extract_text(self, file_path: str) -> str:
         """Extract text with semantic structure preservation"""
         try:
-            if self._converter is None:
-                raise ValueError("Marker not initialized")
-                
             # Process PDF with Marker
             rendered = self._converter(file_path)
             
@@ -172,7 +161,7 @@ class MarkerConverter(PDFConverter):
         except Exception as e:
             logger.error(f"Marker text extraction error: {str(e)}")
             print(colored(f"⚠️ Marker text extraction error: {str(e)}", "yellow"))
-            return ""
+            raise  # No fallback for text extraction - we need Marker's semantic preservation
             
     def _extract_text_from_blocks(self, blocks) -> str:
         """Extract text from JSON block structure"""

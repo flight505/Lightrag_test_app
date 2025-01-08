@@ -51,28 +51,19 @@ class FileProcessor:
 
     @st.cache_data
     def _convert_pdf_with_marker(_self, pdf_path: str) -> Optional[str]:
-        """Convert PDF to text using Marker with PyMuPDF fallback"""
+        """Convert PDF to text using Marker for semantic preservation"""
         try:
-            # Try to initialize marker
+            # Initialize and use Marker
             if _self._ensure_marker_initialized():
-                try:
-                    # Extract text using MarkerConverter
-                    text_content = _self.marker_converter.extract_text(str(pdf_path))
-                    if text_content:
-                        print(colored("✓ Text extracted with Marker", "green"))
-                        return text_content
-                except Exception as e:
-                    logger.warning(f"Marker text extraction failed: {str(e)}")
-                    print(colored(f"⚠️ Marker extraction failed: {str(e)}", "yellow"))
+                text_content = _self.marker_converter.extract_text(str(pdf_path))
+                if text_content:
+                    print(colored("✓ Text extracted with semantic structure preserved", "green"))
+                    return text_content
+                else:
+                    print(colored(f"❌ No text extracted from {Path(pdf_path).name}", "red"))
+                    return None
             
-            # Fallback to PyMuPDF
-            print(colored("ℹ️ Falling back to PyMuPDF for text extraction", "blue"))
-            text_content = _self.pymupdf_converter.extract_text(str(pdf_path))
-            if text_content:
-                print(colored("✓ Text extracted with PyMuPDF", "green"))
-                return text_content
-            
-            print(colored(f"❌ No text extracted from {Path(pdf_path).name}", "red"))
+            print(colored(f"❌ Failed to initialize Marker for {Path(pdf_path).name}", "red"))
             return None
             
         except Exception as e:
@@ -82,8 +73,10 @@ class FileProcessor:
     @st.cache_data
     def _extract_metadata_with_doi(_self, file_path: str) -> Optional[Dict[str, Any]]:
         """Extract metadata using DOI lookup"""
+        print(colored("\n=== Starting DOI-based Metadata Extraction ===", "blue"))
         try:
             # Try pdf2doi first
+            print(colored("→ Attempting pdf2doi extraction...", "blue"))
             result = pdf2doi.pdf2doi(file_path)
             if isinstance(result, dict) and 'identifier' in result:
                 doi = result['identifier']
@@ -91,8 +84,9 @@ class FileProcessor:
                 doi = result
                 
             if doi:
-                print(colored(f"✓ Found DOI: {doi}", "green"))
+                print(colored(f"✓ DOI found: {doi}", "green"))
                 # Get BibTeX from crossref
+                print(colored("→ Fetching metadata from Crossref...", "blue"))
                 work = _self.works.doi(doi)
                 if work:
                     authors = []
@@ -103,7 +97,7 @@ class FileProcessor:
                             'full_name': f"{author.get('given', '')} {author.get('family', '')}"
                         })
                     
-                    return {
+                    metadata = {
                         'title': work.get('title', [None])[0],
                         'authors': authors,
                         'doi': doi,
@@ -111,32 +105,48 @@ class FileProcessor:
                         'journal': work.get('container-title', [None])[0],
                         'source': 'crossref'
                     }
+                    print(colored("✓ Crossref metadata extracted successfully", "green"))
+                    return metadata
+                else:
+                    print(colored("⚠️ Crossref lookup failed - no metadata found", "yellow"))
         except Exception as e:
             logger.warning(f"DOI extraction failed: {str(e)}")
             print(colored(f"⚠️ DOI extraction failed: {str(e)}", "yellow"))
+        
+        print(colored("⚠️ DOI-based extraction failed - falling back to direct extraction", "yellow"))
         return None
 
     @st.cache_data
     def _extract_metadata_fallback(_self, file_path: str, text: str) -> Dict[str, Any]:
         """Extract metadata using PyPDF2/PyMuPDF and scholarly"""
+        print(colored("\n=== Starting Direct Metadata Extraction ===", "blue"))
         metadata = {}
         
         try:
             # Try PyMuPDF first
+            print(colored("→ Attempting PyMuPDF extraction...", "blue"))
             doc = pymupdf.open(file_path)
             metadata = doc.metadata
             doc.close()
             
-            if not metadata:
+            if metadata:
+                print(colored("✓ PyMuPDF metadata extracted successfully", "green"))
+            else:
+                print(colored("⚠️ PyMuPDF extraction failed - no metadata found", "yellow"))
                 # Fallback to PyPDF2
+                print(colored("→ Attempting PyPDF2 extraction...", "blue"))
                 reader = PdfReader(file_path)
                 metadata = reader.metadata
                 if metadata:
                     # Convert PyPDF2 metadata format
                     metadata = {k[1:].lower(): v for k, v in metadata.items() if k.startswith('/')}
+                    print(colored("✓ PyPDF2 metadata extracted successfully", "green"))
+                else:
+                    print(colored("⚠️ PyPDF2 extraction failed - no metadata found", "yellow"))
             
             # Try to enhance with scholarly
             if metadata.get('title'):
+                print(colored(f"\n→ Attempting Google Scholar enhancement for title: {metadata['title'][:50]}...", "blue"))
                 try:
                     search_query = scholarly.search_pubs(metadata['title'])
                     pub = next(search_query, None)
@@ -164,14 +174,20 @@ class FileProcessor:
                             'abstract': bib.get('abstract', ''),
                             'source': 'scholarly'
                         })
+                        print(colored("✓ Google Scholar metadata enhancement successful", "green"))
                 except Exception as e:
                     logger.warning(f"Scholarly lookup failed: {str(e)}")
-                    print(colored(f"⚠️ Scholarly lookup failed: {str(e)}", "yellow"))
+                    print(colored(f"⚠️ Google Scholar enhancement failed: {str(e)}", "yellow"))
+            else:
+                print(colored("⚠️ No title found - skipping Google Scholar enhancement", "yellow"))
             
         except Exception as e:
             logger.error(f"Fallback metadata extraction failed: {str(e)}")
-            print(colored(f"⚠️ Fallback metadata extraction failed: {str(e)}", "yellow"))
+            print(colored(f"⚠️ Direct metadata extraction failed: {str(e)}", "yellow"))
         
+        print(colored("\n=== Metadata Extraction Summary ===", "blue"))
+        print(colored(f"→ Sources used: {metadata.get('source', 'none')}", "blue"))
+        print(colored(f"→ Fields found: {', '.join(metadata.keys())}", "blue"))
         return metadata
 
     def process_file(self, file_path: str, progress_callback=None) -> Dict[str, Any]:
