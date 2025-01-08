@@ -180,12 +180,12 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
     # Document list section
     st.markdown("### Manage Documents")
     
-    # Create three columns for the action buttons
-    action_col1, action_col2, action_col3, action_col4 = st.columns(4)
-    with action_col1:
+    # Top action buttons (document management) for the action buttons "Refresh Document List", "Clean Unused Files", "Convert Pending", and "View Academic Metadata" 
+    doc_action_col1, doc_action_col2, doc_action_col3, doc_action_col4 = st.columns(4)
+    with doc_action_col1:
         if st.button("🔄 Refresh Document List", key="refresh_btn", use_container_width=True):
             st.rerun()
-    with action_col2:
+    with doc_action_col2:
         if st.button("🧹 Clean Unused Files", key="clean_btn", use_container_width=True):
             if file_processor:
                 removed = file_processor.clean_unused_files()
@@ -193,7 +193,7 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
                     st.info(f"Removed {len(removed)} unused files")
                 else:
                     st.info("No unused files found")
-    with action_col3:
+    with doc_action_col3:
         if st.button("⚡ Convert Pending", key="convert_pending", use_container_width=True):
             if file_processor:
                 # Reinitialize file processor to ensure it has the latest methods
@@ -247,7 +247,7 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
                     logger.error(f"Error during batch conversion: {str(e)}", exc_info=True)
                 
                 st.rerun()
-    with action_col4:
+    with doc_action_col4:
         if st.button("📊 View Academic Metadata", key="view_metadata", use_container_width=True):
             st.switch_page("pages/Academic.py")
     
@@ -371,9 +371,9 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
         if selected_files:
             st.markdown("### Selected Files")
             
-            # Action buttons for selected files
-            selected_col1, selected_col2 = st.columns(2)
-            with selected_col1:
+            # Bottom action buttons (selected files operations) for the buttons "Delete Selected" and "Reprocess Selected"
+            selected_files_col1, selected_files_col2 = st.columns(2)
+            with selected_files_col1:
                 if st.button("🗑️ Delete Selected", use_container_width=True):
                     deletion_status = st.status("Deleting selected files...", expanded=True)
                     deleted_files = []
@@ -488,7 +488,7 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
                     if deleted_files:
                         st.rerun()
             
-            with selected_col2:
+            with selected_files_col2:
                 if st.button("🔄 Reprocess Selected", use_container_width=True):
                     # Reinitialize file processor to ensure it has the latest methods
                     file_processor = FileProcessor(st.session_state["config_manager"])
