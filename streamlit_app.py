@@ -1,3 +1,47 @@
+# //A script
+# requires-python = ">=3.11"|
+# dependencies = [
+#    # Core packages
+#    "streamlit",
+#    "watchdog",
+#    "termcolor",
+#    "networkx",
+#    "openai",
+#    "pandas",
+#    "numpy",
+#    "plotly",
+#    "marker-pdf>=1.2.3",    
+#    "matplotlib",
+#    "requests",
+#    "stqdm",
+#    "uv",
+#    "xxhash",
+#    "pyvis",
+#    "aioboto3",
+#    "ruff",
+#    "ollama",
+#    "tiktoken",
+#    "nano-vectordb",
+#    
+#    # PDF processing
+#    "PyMuPDF",
+#    "PyPDF2",
+#    "pdf2doi",
+#    "crossrefapi",
+#    "scholarly",
+#    
+#    # RAG packages
+#    "lightrag-hku>=1.1.0",
+#    
+#    # Development
+#    "python-dotenv",
+#    "python-docx",
+#    "pytest"
+#]
+#///
+
+
+
 import streamlit as st
 from src.academic_metadata import MetadataExtractor, PDFMetadataExtractor
 
