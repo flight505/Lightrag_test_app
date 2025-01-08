@@ -1392,16 +1392,7 @@ wheels = [
 ]
 
 [[package]]
-name = "lightrag-hku"
-version = "1.0.9"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/ce/46/dc179bb31902f993616b72872172cc0c1ad84088f659eb17852387e7eff9/lightrag_hku-1.0.9.tar.gz", hash = "sha256:b3d05e64909943b9f5d1b55d1eee77391f61f5702e55c2ec5ce415adb004f16f", size = 108076 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/a6/41/aa5670f0ac1f55b90299a44f9171556b7256c4198a040f65dcead3e5839c/lightrag_hku-1.0.9-py3-none-any.whl", hash = "sha256:e1f63a1374fa41054286684c30935b4c49d98f9704a0cb3007851733b8fa157d", size = 88966 },
-]
-
-[[package]]
-name = "lightrag-test"
+name = "lightrag"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
@@ -1440,7 +1431,7 @@ dependencies = [
 requires-dist = [
     { name = "aioboto3" },
     { name = "crossrefapi" },
-    { name = "lightrag-hku", specifier = ">=1.0.9" },
+    { name = "lightrag-hku", specifier = ">=1.1.0" },
     { name = "marker-pdf", specifier = ">=1.2.3" },
     { name = "matplotlib" },
     { name = "nano-vectordb" },
@@ -1467,6 +1458,15 @@ requires-dist = [
     { name = "uv" },
     { name = "watchdog" },
     { name = "xxhash" },
+]
+
+[[package]]
+name = "lightrag-hku"
+version = "1.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d8/8c/1f3c67ce9a34f41530b228c6a9c34e58fc4196d513ff68f5b705cdb981f1/lightrag_hku-1.1.0.tar.gz", hash = "sha256:36c082128de08cf68439e59378a6e3320f5dec99ee2c97d7d7c39b98fa2b10ba", size = 123580 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cb/95/6c5e1a616f6e27054e16546415bd62385b2d702288a2083e1859b2fbb2dc/lightrag_hku-1.1.0-py3-none-any.whl", hash = "sha256:5aab74d7b7564a777b84264dc968c92804a734f4d711aeb616bfd30d353f91b8", size = 102799 },
 ]
 
 [[package]]
