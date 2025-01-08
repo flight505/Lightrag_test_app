@@ -34,7 +34,7 @@ The academic components seamlessly integrate with LightRAG's:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/lightrag.git
+git clone https://github.com/flight505/Lightrag_test_app.git
 cd lightrag
 ```
 
@@ -44,15 +44,19 @@ python -m venv venv
 source venv/bin/activate  # On Windows: .\venv\Scripts\activate
 ```
 
+3. Set up environment variables:
+```bash
+export OPENAI_API_KEY="your-api-key"
+```
+
 3. Install dependencies using uv:
 ```bash
 pip install uv
-uv pip install -r requirements.txt
+uv sync
 ```
-
-4. Set up environment variables:
+3. A alternative to setting up environment is using temp uv env and running the streamlit app directly:
 ```bash
-export OPENAI_API_KEY="your-api-key"
+uv run streamlit_app.py && streamlit run streamlit_app.py
 ```
 
 ## Usage 🚀
