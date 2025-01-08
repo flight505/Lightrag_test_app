@@ -508,6 +508,54 @@ Session State is not persisted. If the Streamlit server crashes, then everything
 For caveats and limitations with the Session State API, please see the API limitations.
 
 ---
+# Caching and State
+
+Streamlit provides caching primitives and state management to optimize performance and add statefulness.
+
+## Caching
+Cache expensive computations and data fetching between reruns:
+
+@st.cache_data
+def load_data():
+    # Cache data transforms, DB queries, ML inference
+    data = pd.read_csv("data.csv") 
+    return data
+
+@st.cache_resource
+def init_model():
+    # Cache global resources like DB connections, ML models
+    model = load_model()
+    return model
+
+## Session State
+Share variables between reruns and pages:
+
+# Initialize state
+if 'counter' not in st.session_state:
+    st.session_state.counter = 0
+
+# Read/write state
+st.session_state.counter += 1
+st.write(st.session_state.counter)
+
+# Delete state
+del st.session_state['counter']
+
+## Query Parameters 
+Manage URL query parameters:
+
+# Get parameters
+params = st.query_params
+
+# Set parameters  
+st.query_params['show_all'] = True
+
+# Clear parameters
+st.query_params.clear()
+
+
+
+---
 # Session State
 Session State is a way to share variables between reruns, for each user session. In addition to the ability to store and persist state, Streamlit also exposes the ability to manipulate state using Callbacks. Session state also persists across apps inside a multipage app.
 

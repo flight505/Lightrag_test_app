@@ -13,8 +13,9 @@ import logging
 import pdf2doi
 from crossref.restful import Works
 from scholarly import scholarly
-import fitz
+import pymupdf  # Use only pymupdf, not fitz
 from PyPDF2 import PdfReader
+import streamlit as st
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +25,7 @@ class FileProcessor:
     def __init__(self, config_manager: ConfigManager):
         """Initialize FileProcessor with configuration"""
         self.config_manager = config_manager
-        self.marker_converter = None
+        self.marker_converter = None  # Use MarkerConverter instead of direct marker
         self.pymupdf_converter = PyMuPDFConverter()  # Fallback converter
         self.metadata_extractor = MetadataExtractor()
         self.metadata = {}
@@ -34,7 +35,52 @@ class FileProcessor:
         self.works = Works()  # Initialize crossref client
         logger.info("FileProcessor initialized")
 
-    def _extract_metadata_with_doi(self, file_path: str) -> Optional[Dict[str, Any]]:
+    @st.cache_resource
+    def _ensure_marker_initialized(_self) -> bool:
+        """Ensure Marker converter is initialized, return True if successful"""
+        if _self.marker_converter is None:
+            try:
+                _self.marker_converter = MarkerConverter()
+                logger.info("Created MarkerConverter instance")
+                return True
+            except Exception as e:
+                logger.error(f"Failed to initialize Marker: {str(e)}")
+                print(colored(f"⚠️ Failed to initialize Marker: {str(e)}", "yellow"))
+                return False
+        return True
+
+    @st.cache_data
+    def _convert_pdf_with_marker(_self, pdf_path: str) -> Optional[str]:
+        """Convert PDF to text using Marker with PyMuPDF fallback"""
+        try:
+            # Try to initialize marker
+            if _self._ensure_marker_initialized():
+                try:
+                    # Extract text using MarkerConverter
+                    text_content = _self.marker_converter.extract_text(str(pdf_path))
+                    if text_content:
+                        print(colored("✓ Text extracted with Marker", "green"))
+                        return text_content
+                except Exception as e:
+                    logger.warning(f"Marker text extraction failed: {str(e)}")
+                    print(colored(f"⚠️ Marker extraction failed: {str(e)}", "yellow"))
+            
+            # Fallback to PyMuPDF
+            print(colored("ℹ️ Falling back to PyMuPDF for text extraction", "blue"))
+            text_content = _self.pymupdf_converter.extract_text(str(pdf_path))
+            if text_content:
+                print(colored("✓ Text extracted with PyMuPDF", "green"))
+                return text_content
+            
+            print(colored(f"❌ No text extracted from {Path(pdf_path).name}", "red"))
+            return None
+            
+        except Exception as e:
+            print(colored(f"❌ Error converting PDF {Path(pdf_path).name}: {str(e)}", "red"))
+            return None
+
+    @st.cache_data
+    def _extract_metadata_with_doi(_self, file_path: str) -> Optional[Dict[str, Any]]:
         """Extract metadata using DOI lookup"""
         try:
             # Try pdf2doi first
@@ -47,7 +93,7 @@ class FileProcessor:
             if doi:
                 print(colored(f"✓ Found DOI: {doi}", "green"))
                 # Get BibTeX from crossref
-                work = self.works.doi(doi)
+                work = _self.works.doi(doi)
                 if work:
                     authors = []
                     for author in work.get('author', []):
@@ -70,13 +116,14 @@ class FileProcessor:
             print(colored(f"⚠️ DOI extraction failed: {str(e)}", "yellow"))
         return None
 
-    def _extract_metadata_fallback(self, file_path: str, text: str) -> Dict[str, Any]:
+    @st.cache_data
+    def _extract_metadata_fallback(_self, file_path: str, text: str) -> Dict[str, Any]:
         """Extract metadata using PyPDF2/PyMuPDF and scholarly"""
         metadata = {}
         
         try:
             # Try PyMuPDF first
-            doc = fitz.open(file_path)
+            doc = pymupdf.open(file_path)
             metadata = doc.metadata
             doc.close()
             
@@ -126,48 +173,6 @@ class FileProcessor:
             print(colored(f"⚠️ Fallback metadata extraction failed: {str(e)}", "yellow"))
         
         return metadata
-
-    def _ensure_marker_initialized(self) -> bool:
-        """Ensure Marker converter is initialized, return True if successful"""
-        if self.marker_converter is None:
-            try:
-                self.marker_converter = MarkerConverter()
-                logger.info("Created MarkerConverter instance")
-                return True
-            except Exception as e:
-                logger.error(f"Failed to initialize Marker: {str(e)}")
-                print(colored(f"⚠️ Failed to initialize Marker: {str(e)}", "yellow"))
-                return False
-        return True
-
-    def _convert_pdf_with_marker(self, pdf_path: str) -> Optional[str]:
-        """Convert PDF to text using Marker with PyMuPDF fallback"""
-        try:
-            # Try to initialize marker
-            if self._ensure_marker_initialized():
-                try:
-                    # Extract text using MarkerConverter
-                    text_content = self.marker_converter.extract_text(str(pdf_path))
-                    if text_content:
-                        print(colored("✓ Text extracted with Marker", "green"))
-                        return text_content
-                except Exception as e:
-                    logger.warning(f"Marker text extraction failed: {str(e)}")
-                    print(colored(f"⚠️ Marker extraction failed: {str(e)}", "yellow"))
-            
-            # Fallback to PyMuPDF
-            print(colored("ℹ️ Falling back to PyMuPDF for text extraction", "blue"))
-            text_content = self.pymupdf_converter.extract_text(str(pdf_path))
-            if text_content:
-                print(colored("✓ Text extracted with PyMuPDF", "green"))
-                return text_content
-            
-            print(colored(f"❌ No text extracted from {Path(pdf_path).name}", "red"))
-            return None
-            
-        except Exception as e:
-            print(colored(f"❌ Error converting PDF {Path(pdf_path).name}: {str(e)}", "red"))
-            return None
 
     def process_file(self, file_path: str, progress_callback=None) -> Dict[str, Any]:
         """Process a file and extract its content and metadata"""

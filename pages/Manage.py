@@ -1,4 +1,8 @@
 import os
+# Set Marker environment variables
+os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
+os.environ["IN_STREAMLIT"] = "true"
+
 import logging
 from datetime import datetime
 from pathlib import Path
@@ -133,7 +137,7 @@ st.divider()
 if "active_store" in st.session_state and st.session_state["active_store"]:
     store_path = os.path.join(DB_ROOT, st.session_state["active_store"])
     
-    # Ensure file processor is initialized with store path
+    # Use cached file processor
     if not st.session_state["file_processor"]:
         file_processor = FileProcessor(st.session_state["config_manager"])
         file_processor.set_store_path(store_path)

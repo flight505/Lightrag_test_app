@@ -35,7 +35,7 @@ dependencies = [
     "scholarly",
     
     # RAG packages
-    "lightrag-hku>=1.0.9",
+    "lightrag-hku>=1.1.0",
     
     # Development
     "python-dotenv",

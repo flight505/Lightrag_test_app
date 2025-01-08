@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
-import fitz
+import pymupdf
 from PyPDF2 import PdfReader
 from termcolor import colored
 import logging
@@ -27,10 +27,10 @@ class PDFConverter(ABC):
         pass
 
 class MarkerConverter(PDFConverter):
-    """PDF converter using Marker with optimized settings"""
+    """PDF converter using Marker"""
     
     def __init__(self):
-        """Initialize Marker with optimized settings"""
+        """Initialize Marker converter"""
         try:
             from marker.converters.pdf import PdfConverter
             from marker.models import create_model_dict
@@ -119,6 +119,7 @@ class MarkerConverter(PDFConverter):
             
         except Exception as e:
             logger.error(f"Failed to initialize Marker: {str(e)}")
+            print(colored(f"⚠️ Failed to initialize Marker: {str(e)}", "yellow"))
             self._converter = None
             raise
             
@@ -171,7 +172,7 @@ class MarkerConverter(PDFConverter):
         except Exception as e:
             logger.error(f"Marker text extraction error: {str(e)}")
             print(colored(f"⚠️ Marker text extraction error: {str(e)}", "yellow"))
-            raise  # Let FileProcessor handle fallback
+            return ""
             
     def _extract_text_from_blocks(self, blocks) -> str:
         """Extract text from JSON block structure"""
@@ -253,7 +254,7 @@ class PyMuPDFConverter(PDFConverter):
     
     def extract_text(self, file_path: str) -> str:
         try:
-            doc = fitz.open(file_path)
+            doc = pymupdf.open(file_path)
             text = ""
             for page in doc:
                 text += page.get_text()
@@ -268,7 +269,7 @@ class PyMuPDFConverter(PDFConverter):
     
     def extract_metadata(self, file_path: str) -> Dict[str, Any]:
         try:
-            doc = fitz.open(file_path)
+            doc = pymupdf.open(file_path)
             metadata = doc.metadata
             doc.close()
             logger.info("Metadata extracted successfully with PyMuPDF")
@@ -344,7 +345,7 @@ class PDFConverterFactory:
                 try:
                     converter = PyMuPDFConverter()
                     # Test if PyMuPDF is working
-                    fitz.open  # Just check if the module is available
+                    pymupdf.open  # Just check if the module is available
                     logger.info("Successfully initialized PyMuPDF converter")
                     return converter
                 except Exception as e2:
