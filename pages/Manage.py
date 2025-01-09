@@ -225,47 +225,46 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
                 file_processor.set_store_path(store_path)
                 
                 with status_container.container():
-                    with st.status("Checking for pending documents...", expanded=True) as status:
-                        # Get list of pending PDFs (those without corresponding txt files)
-                        pdf_files = list(Path(store_path).glob("*.pdf"))
-                        pending_files = []
-                        
-                        for pdf_file in pdf_files:
-                            txt_path = pdf_file.with_suffix(".txt")
-                            if not txt_path.exists():
-                                pending_files.append(str(pdf_file))
-                        
-                        if not pending_files:
-                            status.update(label="No pending documents to convert", state="complete")
-                            st.rerun()
-                        
-                        try:
-                            total_files = len(pending_files)
-                            status.update(label=f"Converting {total_files} document(s)...")
-                            
-                            for idx, file_path in enumerate(pending_files, 1):
-                                file_name = os.path.basename(file_path)
-                                status.write(f"Processing {idx}/{total_files}: {file_name}")
-                                
-                                def update_status(msg: str):
-                                    status.write(f"[{idx}/{total_files}] {msg}")
-                                
-                                result = file_processor.process_file(
-                                    file_path,
-                                    progress_callback=update_status
-                                )
-                                
-                                if "error" not in result:
-                                    status.write(f"✓ Successfully processed {file_name}")
-                                else:
-                                    status.write(f"❌ Failed to process {file_name}: {result['error']}")
-                            
-                            status.update(label=f"✅ Finished processing {total_files} document(s)", state="complete")
-                        except Exception as e:
-                            status.update(label=f"❌ Error during conversion: {str(e)}", state="error")
-                            logger.error(f"Error during batch conversion: {str(e)}", exc_info=True)
-                        
+                    status = st.status("Checking for pending documents...", expanded=False)
+                    # Get list of pending PDFs (those without corresponding txt files)
+                    pdf_files = list(Path(store_path).glob("*.pdf"))
+                    pending_files = []
+                    
+                    for pdf_file in pdf_files:
+                        txt_path = pdf_file.with_suffix(".txt")
+                        if not txt_path.exists():
+                            pending_files.append(str(pdf_file))
+                    
+                    if not pending_files:
+                        status.update(label="No pending documents to convert", state="complete")
                         st.rerun()
+                    
+                    try:
+                        total_files = len(pending_files)
+                        status.update(label=f"Converting {total_files} document(s)...")
+                        
+                        for idx, file_path in enumerate(pending_files, 1):
+                            file_name = os.path.basename(file_path)
+                            status.update(label=f"Converting {idx}/{total_files}: {file_name}")
+                            
+                            def update_status(msg: str):
+                                status.update(label=f"Converting {idx}/{total_files}: {file_name}")
+                            
+                            result = file_processor.process_file(
+                                file_path,
+                                progress_callback=update_status
+                            )
+                            
+                            if "error" in result:
+                                status.update(label=f"Error processing {file_name}: {result['error']}", state="error")
+                                st.rerun()
+                        
+                        status.update(label=f"✅ Converted {total_files} document(s)", state="complete")
+                    except Exception as e:
+                        status.update(label=f"❌ Error during conversion: {str(e)}", state="error")
+                        logger.error(f"Error during batch conversion: {str(e)}", exc_info=True)
+                    
+                    st.rerun()
     with doc_action_col4:
         if st.button("📊 View Academic Metadata", key="view_metadata", use_container_width=True):
             st.switch_page("pages/Academic.py")

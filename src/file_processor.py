@@ -35,7 +35,7 @@ class FileProcessor:
         self.works = Works()  # Initialize crossref client
         logger.info("FileProcessor initialized")
 
-    @st.cache_resource
+    @st.cache_resource(show_spinner=False)
     def _ensure_marker_initialized(_self) -> bool:
         """Ensure Marker converter is initialized, return True if successful"""
         if _self.marker_converter is None:
@@ -49,7 +49,7 @@ class FileProcessor:
                 return False
         return True
 
-    @st.cache_data
+    @st.cache_data(show_spinner=False)
     def _convert_pdf_with_marker(_self, pdf_path: str) -> Optional[str]:
         """Convert PDF to text using Marker for semantic preservation"""
         try:
@@ -70,7 +70,7 @@ class FileProcessor:
             print(colored(f"❌ Error converting PDF {Path(pdf_path).name}: {str(e)}", "red"))
             return None
 
-    @st.cache_data
+    @st.cache_data(show_spinner=False)
     def _extract_metadata_with_doi(_self, file_path: str) -> Optional[Dict[str, Any]]:
         """Extract metadata using DOI lookup"""
         print(colored("\n=== Starting DOI-based Metadata Extraction ===", "blue"))
@@ -116,7 +116,7 @@ class FileProcessor:
         print(colored("⚠️ DOI-based extraction failed - falling back to direct extraction", "yellow"))
         return None
 
-    @st.cache_data
+    @st.cache_data(show_spinner=False)
     def _extract_metadata_fallback(_self, file_path: str, text: str) -> Dict[str, Any]:
         """Extract metadata using PyPDF2/PyMuPDF and scholarly"""
         print(colored("\n=== Starting Direct Metadata Extraction ===", "blue"))
