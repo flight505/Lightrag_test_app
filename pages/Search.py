@@ -236,9 +236,10 @@ def show_search():
             # Return original prompt if rewrite fails
             return prompt
 
-
+    st.divider()
+    
     # Main interface
-    st.write("## 💬 LightRAG Chat")
+    st.write("### 💬 LightRAG Chat")
 
     # Configuration form
     with st.form("configuration_form"):

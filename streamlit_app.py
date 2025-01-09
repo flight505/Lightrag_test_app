@@ -45,8 +45,8 @@
 
 import os
 import streamlit as st
-from src.academic_metadata import MetadataExtractor, PDFMetadataExtractor
 from streamlit_navigation_bar import st_navbar
+from termcolor import colored
 
 import pages as pg
 
@@ -56,40 +56,54 @@ st.set_page_config(
     page_icon="🏠",
     layout="wide",
     initial_sidebar_state="collapsed",
-    menu_items=None  # This hides the burger menu
 )
 
 # Navigation bar
-pages = ["Home", "Search", "Manage Documents", "Academic Analysis", "GitHub"]
+pages = ["Home", "Search", "Documents", "Academics", "GitHub"]
 parent_dir = os.path.dirname(os.path.abspath(__file__))
-urls = {"GitHub": "https://github.com/flight505/Lightrag_test_app"}
+print(colored(parent_dir, "red"))
+urls = {
+    "GitHub": "https://github.com/flight505/Lightrag_test_app",
+}
+logo_path = os.path.join(parent_dir, "lightning_icon2.svg")
 styles = {
     "nav": {
-        "background-color": "royalblue",
-        "justify-content": "left",
+        "background-color": "#44475a",
+        "padding": "0.5rem 2rem",
+        "height": "3.5rem",
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "space-between"
     },
     "img": {
         "padding-right": "14px",
     },
     "span": {
-        "color": "white",
-        "padding": "14px",
+        "color": "#f8f8f2",
+        "padding": "0.5rem 1.5rem",
+        "font-weight": "500",
+        "border-radius": "0.5rem",
+        "white-space": "nowrap",
+        "text-align": "center",
+        "min-width": "8.5rem"
     },
     "active": {
-        "background-color": "white",
-        "color": "var(--text-color)",
-        "font-weight": "normal",
-        "padding": "14px",
+        "background-color": "#282a36",
+        "color": "#bd93f9",
+        "font-weight": "600"
     }
 }
 options = {
     "show_menu": False,
     "show_sidebar": False,
+    "fix_shadow": True,
+    "hide_nav": True
 }
 
 page = st_navbar(
     pages,
     urls=urls,
+    logo_path=logo_path,
     styles=styles,
     options=options,
 )
@@ -97,8 +111,8 @@ page = st_navbar(
 functions = {
     "Home": pg.show_home,
     "Search": pg.show_search,
-    "Manage Documents": pg.show_manage,
-    "Academic Analysis": pg.show_academic,
+    "Documents": pg.show_manage,
+    "Academics": pg.show_academic,
 }
 go_to = functions.get(page)
 if go_to:

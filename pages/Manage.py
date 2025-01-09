@@ -26,6 +26,8 @@ from src.config_manager import ConfigManager
 logger = logging.getLogger(__name__)
 
 def show_manage():
+    st.divider()
+
     # Initialize session state at the top of the script
     if 'initialized' not in st.session_state:
         st.session_state['initialized'] = True
@@ -86,19 +88,7 @@ def show_manage():
     </style>
     """, unsafe_allow_html=True)
 
-    # Navigation menu
-    nav_col1, nav_col2, nav_col3 = st.columns([1, 1, 1])
-    with nav_col1:
-        if st.button("🏠 Home", use_container_width=True):
-            st.switch_page("streamlit_app.py")
-    with nav_col2:
-        if st.button("💬 Chat", use_container_width=True):
-            st.switch_page("pages/Search.py")
-    with nav_col3:
-        if st.button("📁 Manage Documents", use_container_width=True, type="primary"):
-            st.switch_page("pages/Manage.py")
-
-    st.divider()
+    
 
     # Main interface
     main_col1, main_col2 = st.columns([1, 1])

@@ -16,6 +16,9 @@ from pyvis.network import Network
 import tempfile
 
 def show_academic():
+    st.divider()
+    st.write("### 📚 Academic Analysis")
+    
     def load_metadata_files(store_path: Path) -> list[AcademicMetadata]:
         """Load all metadata files from the store"""
         metadata_files = list(store_path.glob("*_metadata.json"))

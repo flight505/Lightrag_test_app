@@ -1,10 +1,12 @@
 import streamlit as st
 
-from src.academic_metadata import MetadataExtractor, PDFMetadataExtractor
+# from src.academic_metadata import MetadataExtractor, PDFMetadataExtractor
 
 def show_home():
     # Add this near the top of your app, in the sidebar
-    st.write("### Debug Settings")
+    st.divider()
+    st.write("### 🏠 Home")
+
     debug_mode = st.checkbox("Enable Debug Mode", value=False)
 
     # Modify where you create the MetadataExtractor
@@ -74,10 +76,3 @@ def show_home():
             - Validate references
             - Analyze equations
             """)
-
-    # Footer
-    st.markdown("""
-    <div style='position: fixed; bottom: 0; width: 100%; text-align: center; padding: 10px; background: var(--background-color)'>
-    <small>LightRAG - Simple and Fast Retrieval-Augmented Generation</small>
-    </div>
-    """, unsafe_allow_html=True) 
