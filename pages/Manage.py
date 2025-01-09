@@ -77,6 +77,20 @@ st.set_page_config(
     menu_items=None  # This hides the burger menu
 )
 
+# Hide filename display in file uploader
+st.markdown("""
+<style>
+/* Hide the filename text that appears after upload */
+.uploadedFile {
+    display: none;
+}
+/* Hide the specific class for filename display */
+.st-emotion-cache-fis6aj {
+    display: none;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # Navigation menu
 nav_col1, nav_col2, nav_col3 = st.columns([1, 1, 1])
 with nav_col1:
@@ -92,12 +106,11 @@ with nav_col3:
 st.divider()
 
 # Main interface
-st.write("## 📁 Document Manager")
-
-# Store selection in main content
-store_col1, store_col2 = st.columns([3, 1])
-with store_col1:
-    # List existing stores
+main_col1, main_col2 = st.columns([1, 1])
+with main_col1:
+    st.write("### 📁 Document Manager")
+    
+    # Store selection in main content
     stores = [d for d in os.listdir(DB_ROOT) if os.path.isdir(os.path.join(DB_ROOT, d))]
     
     # Calculate current store index
@@ -114,8 +127,9 @@ with store_col1:
         key="store_select"
     )
 
-with store_col2:
+with main_col2:
     if selected_store == "Create New...":
+        st.write("## Create Store")
         new_store = st.text_input("Store Name", key="new_store")
         if st.button("Create Store", key="create_store", type="primary", use_container_width=True):
             if new_store:
@@ -140,6 +154,16 @@ with store_col2:
             file_processor.set_store_path(store_path)
             st.session_state["file_processor"] = file_processor
             st.rerun()
+        # Show upload section when store is selected
+        if "active_store" in st.session_state and st.session_state["active_store"]:
+            st.write("### 📄 Upload Documents")
+            uploaded_files = st.file_uploader(
+                "",
+                type=["pdf"],
+                accept_multiple_files=True,
+                help="Select one or more PDF files to upload. Files will be saved but not processed immediately.",
+                label_visibility="hidden"
+            )
 
 st.divider()
 
@@ -158,15 +182,6 @@ if "active_store" in st.session_state and st.session_state["active_store"]:
         st.session_state["file_processor"] = file_processor
     else:
         file_processor = st.session_state["file_processor"]
-    
-    # File upload section
-    st.markdown("### Upload Documents (PDF)", help="Upload your PDF files here. After uploading, click 'Convert Pending' to process them.")
-    uploaded_files = st.file_uploader(
-        "Upload PDF documents",
-        type=["pdf"],
-        accept_multiple_files=True,
-        help="Select one or more PDF files to upload. Files will be saved but not processed immediately."
-    )
     
     # Centralized status container - all status updates will appear here
     status_container = st.empty()  # Placeholder for status messages

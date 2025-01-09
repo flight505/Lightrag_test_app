@@ -7,6 +7,7 @@ requires-python = ">=3.10.16"
 dependencies = [
     # Core packages
     "streamlit",
+    "streamlit-navigation-bar",
     "watchdog",
     "termcolor",
     "networkx",

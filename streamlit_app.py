@@ -3,6 +3,7 @@
 # dependencies = [
 #    # Core packages
 #    "streamlit",
+#    "streamlit-navigation-bar",
 #    "watchdog",
 #    "termcolor",
 #    "networkx",
