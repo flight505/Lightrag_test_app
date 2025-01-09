@@ -14,7 +14,7 @@ gatherUsageStats = false
 
 [client]
 showSidebarNavigation = false
-showErrorDetails = false
+showErrorDetails = true
 
 [runner]
 fastReruns = true
@@ -23,4 +23,4 @@ fastReruns = true
 showWarningOnDirectExecution = false
 
 [logger]
-level = "error"
+level = "debug"
