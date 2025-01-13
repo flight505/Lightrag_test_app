@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import Optional
 import logging
 import shutil
@@ -9,23 +10,37 @@ from termcolor import colored
 DB_ROOT = "DB"
 GITIGNORE_PATH = ".gitignore"
 
-def ensure_db_exists() -> str:
-    """Ensures DB directory exists and is in gitignore"""
-    if not os.path.exists(DB_ROOT):
-        os.makedirs(DB_ROOT)
-        print(colored(f"Created {DB_ROOT} directory", "green"))
-        try:
-            with open(GITIGNORE_PATH, "a+", encoding="utf-8") as f:
-                f.seek(0)
+logger = logging.getLogger(__name__)
+
+def ensure_db_exists() -> None:
+    """Ensure DB directory exists with proper permissions"""
+    try:
+        # Create DB directory if it doesn't exist
+        if not os.path.exists(DB_ROOT):
+            os.makedirs(DB_ROOT, mode=0o755, exist_ok=True)
+            print(colored(f"✓ Created DB directory at {DB_ROOT}", "green"))
+        
+        # Ensure directory has proper permissions
+        os.chmod(DB_ROOT, 0o755)
+        
+        # Create .gitignore if it doesn't exist
+        gitignore_path = ".gitignore"
+        if os.path.exists(gitignore_path):
+            with open(gitignore_path, "r", encoding="utf-8") as f:
                 content = f.read()
-                if DB_ROOT not in content:
-                    if content and not content.endswith("\n"):
-                        f.write("\n")
-                    f.write(f"{DB_ROOT}/\n")
-                    logging.info(f"Added {DB_ROOT}/ to .gitignore")
-        except Exception as e:
-            logging.warning(f"Failed to update .gitignore, but continuing: {str(e)}")
-    return DB_ROOT
+            if "DB/" not in content:
+                with open(gitignore_path, "a", encoding="utf-8") as f:
+                    f.write("\nDB/\n")
+        else:
+            with open(gitignore_path, "w", encoding="utf-8") as f:
+                f.write("DB/\n")
+        
+        print(colored("✓ DB directory ready", "green"))
+        
+    except Exception as e:
+        logger.error(f"Failed to ensure DB directory: {str(e)}")
+        print(colored(f"⚠️ Failed to ensure DB directory: {str(e)}", "red"))
+        raise
 
 def create_store_directory(store_name: str) -> Optional[str]:
     """
@@ -38,25 +53,14 @@ def create_store_directory(store_name: str) -> Optional[str]:
         str: Path to created directory or None if failed
     """
     try:
-        # Ensure DB root exists and is in gitignore
+        # Ensure DB exists first
         ensure_db_exists()
-            
-        # Create store path directly in DB
-        store_path = os.path.join(DB_ROOT, store_name)
         
-        # If store exists outside DB, move it into DB
-        if os.path.exists(store_name):
-            if not os.path.exists(store_path):
-                shutil.move(store_name, store_path)
-                logging.info(f"Moved existing store into DB: {store_path}")
-            else:
-                shutil.rmtree(store_name)  # Remove duplicate outside DB
-                logging.warning(f"Removed duplicate store outside DB: {store_name}")
-            return store_path
-            
-        # Create new store in DB with required structure
+        # Create store directory
+        store_path = os.path.join(DB_ROOT, store_name)
         if not os.path.exists(store_path):
-            os.makedirs(store_path)
+            os.makedirs(store_path, mode=0o755, exist_ok=True)
+            print(colored(f"✓ Created store directory at {store_path}", "green"))
             
             # Create required subdirectories
             os.makedirs(os.path.join(store_path, "converted"), exist_ok=True)  # For converted documents
@@ -76,9 +80,10 @@ def create_store_directory(store_name: str) -> Optional[str]:
             logging.info(f"Created store directory with structure: {store_path}")
             return store_path
         else:
-            logging.warning(f"Store directory already exists: {store_path}")
+            print(colored(f"ℹ️ Store directory already exists at {store_path}", "blue"))
             return store_path
         
     except Exception as e:
-        logging.error(f"Failed to create store directory: {str(e)}")
-        return None
+        logger.error(f"Failed to create store directory: {str(e)}")
+        print(colored(f"⚠️ Failed to create store directory: {str(e)}", "red"))
+        raise

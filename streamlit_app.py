@@ -49,7 +49,7 @@ from streamlit_navigation_bar import st_navbar
 from termcolor import colored
 from src.file_manager import ensure_db_exists
 
-# Ensure DB exists at startup
+# Ensure DB directory exists at startup
 ensure_db_exists()
 
 import pages as pg
@@ -65,7 +65,6 @@ st.set_page_config(
 # Navigation bar
 pages = ["Home", "Search", "Documents", "Academics", "GitHub"]
 parent_dir = os.path.dirname(os.path.abspath(__file__))
-print(colored(parent_dir, "red"))
 urls = {
     "GitHub": "https://github.com/flight505/Lightrag_test_app",
 }
