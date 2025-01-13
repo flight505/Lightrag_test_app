@@ -34,14 +34,21 @@ dependencies = [
     "pdf2doi",
     "crossrefapi",
     "scholarly",
+    "arxiv>=2.1.3",
     
     # RAG packages
-    "lightrag-hku>=1.1.0",
+    "lightrag-hku>=1.1.1",
     
     # Development
     "python-dotenv",
     "python-docx",
-    "pytest"
+    "pytest",
+    "marker-pdf",  # For PDF text extraction with semantic structure
+    "termcolor",
+    "habanero",  # For Crossref API
+    "scholarly",  # For Google Scholar lookups
+    "beautifulsoup4",
+    "lxml"
 ]
 
 [build-system]

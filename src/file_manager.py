@@ -3,10 +3,29 @@ from typing import Optional
 import logging
 import shutil
 from datetime import datetime
+from termcolor import colored
 
 # Constants
 DB_ROOT = "DB"
 GITIGNORE_PATH = ".gitignore"
+
+def ensure_db_exists() -> str:
+    """Ensures DB directory exists and is in gitignore"""
+    if not os.path.exists(DB_ROOT):
+        os.makedirs(DB_ROOT)
+        print(colored(f"Created {DB_ROOT} directory", "green"))
+        try:
+            with open(GITIGNORE_PATH, "a+", encoding="utf-8") as f:
+                f.seek(0)
+                content = f.read()
+                if DB_ROOT not in content:
+                    if content and not content.endswith("\n"):
+                        f.write("\n")
+                    f.write(f"{DB_ROOT}/\n")
+                    logging.info(f"Added {DB_ROOT}/ to .gitignore")
+        except Exception as e:
+            logging.warning(f"Failed to update .gitignore, but continuing: {str(e)}")
+    return DB_ROOT
 
 def create_store_directory(store_name: str) -> Optional[str]:
     """
@@ -20,20 +39,7 @@ def create_store_directory(store_name: str) -> Optional[str]:
     """
     try:
         # Ensure DB root exists and is in gitignore
-        if not os.path.exists(DB_ROOT):
-            os.makedirs(DB_ROOT)
-            # Add DB_ROOT to gitignore if not already present
-            try:
-                with open(GITIGNORE_PATH, "a+", encoding="utf-8") as f:
-                    f.seek(0)
-                    content = f.read()
-                    if DB_ROOT not in content:
-                        if content and not content.endswith("\n"):
-                            f.write("\n")
-                        f.write(f"{DB_ROOT}/\n")
-                        logging.info(f"Added {DB_ROOT}/ to .gitignore")
-            except Exception as e:
-                logging.warning(f"Failed to update .gitignore, but continuing: {str(e)}")
+        ensure_db_exists()
             
         # Create store path directly in DB
         store_path = os.path.join(DB_ROOT, store_name)
