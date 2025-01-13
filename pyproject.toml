@@ -43,12 +43,7 @@ dependencies = [
     "python-dotenv",
     "python-docx",
     "pytest",
-    "marker-pdf",  # For PDF text extraction with semantic structure
-    "termcolor",
-    "habanero",  # For Crossref API
-    "scholarly",  # For Google Scholar lookups
     "beautifulsoup4",
-    "lxml"
 ]
 
 [build-system]
