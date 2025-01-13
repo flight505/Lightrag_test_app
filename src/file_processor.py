@@ -25,8 +25,7 @@ class FileProcessor:
     def __init__(self, config_manager: ConfigManager):
         """Initialize FileProcessor with configuration"""
         self.config_manager = config_manager
-        self.marker_converter = None  # Use MarkerConverter instead of direct marker
-        self.pymupdf_converter = PyMuPDFConverter()  # Fallback converter
+        self.marker_converter = None  # Lazy initialization
         self.metadata_extractor = MetadataExtractor()
         self.metadata = {}
         self.metadata_lock = RLock()
@@ -35,40 +34,22 @@ class FileProcessor:
         self.works = Works()  # Initialize crossref client
         logger.info("FileProcessor initialized")
 
-    @st.cache_resource(show_spinner=False)
-    def _ensure_marker_initialized(_self) -> bool:
-        """Ensure Marker converter is initialized, return True if successful"""
-        if _self.marker_converter is None:
-            try:
-                _self.marker_converter = MarkerConverter()
-                logger.info("Created MarkerConverter instance")
-                return True
-            except Exception as e:
-                logger.error(f"Failed to initialize Marker: {str(e)}")
-                print(colored(f"⚠️ Failed to initialize Marker: {str(e)}", "yellow"))
-                return False
-        return True
+    def _ensure_marker_initialized(self):
+        """Ensure Marker is initialized when needed"""
+        if self.marker_converter is None:
+            print(colored("→ Initializing Marker converter...", "blue"))
+            self.marker_converter = MarkerConverter()
+            print(colored("✓ Marker initialized", "green"))
 
-    @st.cache_data(show_spinner=False)
-    def _convert_pdf_with_marker(_self, pdf_path: str) -> Optional[str]:
+    def _convert_pdf_with_marker(self, pdf_path: str) -> Optional[str]:
         """Convert PDF to text using Marker for semantic preservation"""
-        try:
-            # Initialize and use Marker
-            if _self._ensure_marker_initialized():
-                text_content = _self.marker_converter.extract_text(str(pdf_path))
-                if text_content:
-                    print(colored("✓ Text extracted with semantic structure preserved", "green"))
-                    return text_content
-                else:
-                    print(colored(f"❌ No text extracted from {Path(pdf_path).name}", "red"))
-                    return None
-            
-            print(colored(f"❌ Failed to initialize Marker for {Path(pdf_path).name}", "red"))
-            return None
-            
-        except Exception as e:
-            print(colored(f"❌ Error converting PDF {Path(pdf_path).name}: {str(e)}", "red"))
-            return None
+        self._ensure_marker_initialized()
+        text_content = self.marker_converter.extract_text(str(pdf_path))
+        if text_content:
+            print(colored("✓ Text extracted with semantic structure preserved", "green"))
+            return text_content
+        print(colored(f"❌ No text extracted from {Path(pdf_path).name}", "red"))
+        return None
 
     @st.cache_data(show_spinner=False)
     def _extract_metadata_with_doi(_self, file_path: str) -> Optional[Dict[str, Any]]:
@@ -92,7 +73,7 @@ class FileProcessor:
                     
                 print(colored(f"✓ Found {identifier_type}: {identifier} (method: {method})", "green"))
                 
-                # Check if it's an arXiv identifier regardless of type
+                # Check if it's an arXiv identifier
                 if "arxiv" in identifier.lower():
                     print(colored("→ arXiv identifier detected, fetching from arXiv API...", "blue"))
                     try:
@@ -115,39 +96,25 @@ class FileProcessor:
                         # Process authors
                         authors = []
                         for author in paper.authors:
-                            try:
-                                name = str(author).strip()
-                                if not name:
-                                    continue
-                                    
-                                name_parts = name.split()
-                                if len(name_parts) > 1:
-                                    authors.append({
-                                        'given': ' '.join(name_parts[:-1]),
-                                        'family': name_parts[-1],
-                                        'full_name': name
-                                    })
-                                else:
-                                    authors.append({
-                                        'given': name,
-                                        'family': name,
-                                        'full_name': name
-                                    })
-                            except Exception as e:
-                                print(colored(f"⚠️ Error processing author {author}: {str(e)}", "yellow"))
-                                continue
+                            name_parts = str(author).split()
+                            if len(name_parts) > 0:
+                                given = ' '.join(name_parts[:-1]) if len(name_parts) > 1 else ''
+                                family = name_parts[-1]
+                                authors.append({
+                                    'given': given,
+                                    'family': family,
+                                    'full_name': str(author)
+                                })
                         
                         metadata = {
-                            'title': paper.title.strip() if paper.title else "Untitled",
+                            'title': paper.title,
                             'authors': authors,
-                            'identifier': identifier,
+                            'abstract': paper.summary,
+                            'identifier': arxiv_id,
                             'identifier_type': 'arxiv',
                             'year': paper.published.year if paper.published else None,
-                            'abstract': paper.summary.strip() if paper.summary else "",
-                            'source': 'arxiv',
-                            'arxiv_id': arxiv_id,
                             'categories': paper.categories if hasattr(paper, 'categories') else [],
-                            'journal': None,  # arXiv papers don't have a journal
+                            'source': 'arxiv',
                             'validation_info': validation_info,
                             'extraction_method': method
                         }
@@ -156,45 +123,49 @@ class FileProcessor:
                         return metadata
                         
                     except Exception as e:
-                        logger.warning(f"arXiv lookup failed: {str(e)}")
-                        print(colored(f"⚠️ arXiv lookup failed: {str(e)}", "yellow"))
+                        print(colored(f"⚠️ arXiv API error: {str(e)}", "yellow"))
                         return None
                 
-                # Handle DOI
-                print(colored("→ Fetching metadata from Crossref...", "blue"))
-                work = _self.works.doi(identifier)
-                if work:
-                    authors = []
-                    for author in work.get('author', []):
-                        try:
-                            given = author.get('given', '').strip()
-                            family = author.get('family', '').strip()
-                            if given or family:
-                                authors.append({
-                                    'given': given,
-                                    'family': family,
-                                    'full_name': f"{given} {family}".strip()
-                                })
-                        except Exception as e:
-                            print(colored(f"⚠️ Error processing Crossref author: {str(e)}", "yellow"))
-                            continue
-                    
-                    metadata = {
-                        'title': work.get('title', [None])[0],
-                        'authors': authors,
-                        'identifier': identifier,
-                        'identifier_type': 'doi',
-                        'year': work.get('published-print', {}).get('date-parts', [[None]])[0][0],
-                        'journal': work.get('container-title', [None])[0],
-                        'source': 'crossref',
-                        'validation_info': validation_info,
-                        'extraction_method': method
-                    }
-                    
-                    print(colored("✓ Crossref metadata extracted successfully", "green"))
-                    return metadata
-                else:
-                    print(colored("⚠️ Crossref lookup failed - no metadata found", "yellow"))
+                # If not arXiv, try Crossref
+                print(colored("→ Using Crossref for DOI lookup...", "blue"))
+                try:
+                    work = _self.works.doi(identifier)
+                    if work:
+                        authors = []
+                        for author in work.get('author', []):
+                            try:
+                                given = author.get('given', '').strip()
+                                family = author.get('family', '').strip()
+                                if given or family:
+                                    authors.append({
+                                        'given': given,
+                                        'family': family,
+                                        'full_name': f"{given} {family}".strip()
+                                    })
+                            except Exception as e:
+                                print(colored(f"⚠️ Error processing Crossref author: {str(e)}", "yellow"))
+                                continue
+                        
+                        metadata = {
+                            'title': work.get('title', [None])[0],
+                            'authors': authors,
+                            'identifier': identifier,
+                            'identifier_type': 'doi',
+                            'year': work.get('published-print', {}).get('date-parts', [[None]])[0][0],
+                            'journal': work.get('container-title', [None])[0],
+                            'source': 'crossref',
+                            'validation_info': validation_info,
+                            'extraction_method': method
+                        }
+                        
+                        print(colored("✓ Crossref metadata extracted successfully", "green"))
+                        return metadata
+                    else:
+                        print(colored("⚠️ Crossref lookup failed - no metadata found", "yellow"))
+                except Exception as e:
+                    print(colored(f"⚠️ Crossref API error: {str(e)}", "yellow"))
+                    return None
+                
             else:
                 print(colored("⚠️ Invalid pdf2doi result format", "yellow"))
                 
@@ -202,179 +173,76 @@ class FileProcessor:
             logger.warning(f"DOI extraction failed: {str(e)}")
             print(colored(f"⚠️ DOI extraction failed: {str(e)}", "yellow"))
         
-        print(colored("⚠️ DOI-based extraction failed - falling back to direct extraction", "yellow"))
+        print(colored("⚠️ DOI-based extraction failed", "yellow"))
         return None
 
-    @st.cache_data(show_spinner=False)
-    def _extract_metadata_fallback(_self, file_path: str, text: str) -> Dict[str, Any]:
-        """Extract metadata using PyPDF2/PyMuPDF and scholarly"""
-        print(colored("\n=== Starting Direct Metadata Extraction ===", "blue"))
-        metadata = {}
-        
+    def process_file(self, file_path: str, progress_callback: Optional[Callable] = None) -> Optional[Dict[str, Any]]:
+        """Process a file and extract metadata"""
         try:
-            # Try PyMuPDF first
-            print(colored("→ Attempting PyMuPDF extraction...", "blue"))
-            doc = pymupdf.open(file_path)
-            metadata = doc.metadata
-            doc.close()
+            print(colored("\n=== Starting File Processing ===", "blue"))
             
-            if metadata:
-                print(colored("✓ PyMuPDF metadata extracted successfully", "green"))
-            else:
-                print(colored("⚠️ PyMuPDF extraction failed - no metadata found", "yellow"))
-                # Fallback to PyPDF2
-                print(colored("→ Attempting PyPDF2 extraction...", "blue"))
-                reader = PdfReader(file_path)
-                metadata = reader.metadata
-                if metadata:
-                    # Convert PyPDF2 metadata format
-                    metadata = {k[1:].lower(): v for k, v in metadata.items() if k.startswith('/')}
-                    print(colored("✓ PyPDF2 metadata extracted successfully", "green"))
-                else:
-                    print(colored("⚠️ PyPDF2 extraction failed - no metadata found", "yellow"))
-            
-            # Try to enhance with scholarly
-            if metadata.get('title'):
-                print(colored(f"\n→ Attempting Google Scholar enhancement for title: {metadata['title'][:50]}...", "blue"))
-                try:
-                    search_query = scholarly.search_pubs(metadata['title'])
-                    pub = next(search_query, None)
-                    if pub:
-                        bib = pub.get('bib', {})
-                        authors = []
-                        if bib.get('author'):
-                            if isinstance(bib['author'], str):
-                                # Split author string
-                                author_list = [a.strip() for a in bib['author'].split(' and ')]
-                            else:
-                                author_list = bib['author']
-                                
-                            for author in author_list:
-                                if isinstance(author, str):
-                                    authors.append({'full_name': author})
-                                else:
-                                    authors.append(author)
-                        
-                        metadata.update({
-                            'title': bib.get('title', metadata.get('title')),
-                            'authors': authors,
-                            'year': bib.get('year', metadata.get('year')),
-                            'journal': bib.get('journal', metadata.get('journal')),
-                            'abstract': bib.get('abstract', ''),
-                            'source': 'scholarly'
-                        })
-                        print(colored("✓ Google Scholar metadata enhancement successful", "green"))
-                except Exception as e:
-                    logger.warning(f"Scholarly lookup failed: {str(e)}")
-                    print(colored(f"⚠️ Google Scholar enhancement failed: {str(e)}", "yellow"))
-            else:
-                print(colored("⚠️ No title found - skipping Google Scholar enhancement", "yellow"))
-            
-        except Exception as e:
-            logger.error(f"Fallback metadata extraction failed: {str(e)}")
-            print(colored(f"⚠️ Direct metadata extraction failed: {str(e)}", "yellow"))
-        
-        print(colored("\n=== Metadata Extraction Summary ===", "blue"))
-        print(colored(f"→ Sources used: {metadata.get('source', 'none')}", "blue"))
-        print(colored(f"→ Fields found: {', '.join(metadata.keys())}", "blue"))
-        return metadata
-
-    def process_file(self, file_path: str, progress_callback=None) -> Dict[str, Any]:
-        """Process a file and extract its content and metadata"""
-        try:
             # Validate file
-            error = self.config_manager.validate_file(file_path)
-            if error:
-                print(colored(f"⚠️ File validation failed: {error}", "red"))
-                return {"error": error}
+            print(colored("→ Validating file...", "blue"))
+            if not self.config_manager.config.validate_file(file_path):
+                print(colored("⚠️ File validation failed", "yellow"))
+                return None
+            print(colored("✓ File validation successful", "green"))
             
-            # Extract text first for potential use in metadata extraction
+            # Extract text content
+            print(colored("\n=== Extracting Text Content ===", "blue"))
+            text_content = self._convert_pdf_with_marker(file_path)
+            if not text_content:
+                print(colored("❌ Failed to extract text content", "red"))
+                return None
+                
             if progress_callback:
-                progress_callback("Converting PDF...")
-            text = self._convert_pdf_with_marker(file_path)
-            if not text:
-                return {"error": "Failed to extract text from PDF"}
+                progress_callback(0.5)
             
-            # Save the extracted text
-            text_path = Path(file_path).with_suffix('.txt')
+            # Extract metadata
+            print(colored("\n=== Extracting Metadata ===", "blue"))
+            metadata = None
             try:
-                with open(text_path, 'w', encoding='utf-8') as f:
-                    f.write(text)
-                print(colored(f"✓ Text saved to {text_path}", "green"))
+                metadata = self._extract_metadata_with_doi(file_path)
+                if metadata:
+                    print(colored(f"✓ Using metadata from {metadata.get('source', 'unknown')}", "green"))
+                    
+                    # Save metadata to file
+                    metadata_file = Path(file_path).parent / f"{Path(file_path).stem}_metadata.json"
+                    try:
+                        with open(metadata_file, 'w', encoding='utf-8') as f:
+                            json.dump(metadata, f, indent=2, ensure_ascii=False)
+                        print(colored(f"✓ Metadata saved to {metadata_file}", "green"))
+                    except Exception as e:
+                        print(colored(f"⚠️ Error saving metadata: {str(e)}", "yellow"))
+                        
+            except Exception as e:
+                print(colored(f"⚠️ DOI metadata extraction failed: {str(e)}", "yellow"))
+            
+            if progress_callback:
+                progress_callback(0.75)
+            
+            # Save text content
+            print(colored("\n=== Saving Text Content ===", "blue"))
+            text_file = Path(file_path).with_suffix('.txt')
+            try:
+                with open(text_file, 'w', encoding='utf-8') as f:
+                    f.write(text_content)
+                print(colored(f"✓ Text saved to {text_file}", "green"))
             except Exception as e:
                 print(colored(f"⚠️ Error saving text: {str(e)}", "yellow"))
             
-            # Try DOI-based metadata extraction first
             if progress_callback:
-                progress_callback("Extracting metadata...")
-            metadata = self._extract_metadata_with_doi(file_path)
-            
-            # If we got metadata from arXiv or Crossref, use it directly
-            if metadata and metadata.get('source') in ['arxiv', 'crossref']:
-                print(colored(f"✓ Using metadata from {metadata.get('source')}", "green"))
+                progress_callback(1.0)
                 
-                # Save metadata to file
-                metadata_file = Path(file_path).parent / f"{Path(file_path).stem}_metadata.json"
-                try:
-                    with open(metadata_file, 'w', encoding='utf-8') as f:
-                        json.dump(metadata, f, indent=2)
-                    print(colored(f"✓ Metadata saved to {metadata_file}", "green"))
-                except Exception as e:
-                    print(colored(f"⚠️ Error saving metadata: {str(e)}", "yellow"))
-                
-                return {
-                    "text": text,
-                    "metadata": metadata
-                }
-            
-            # If DOI extraction fails, use fallback methods
-            if not metadata:
-                print(colored("ℹ️ No DOI found, using fallback metadata extraction", "blue"))
-                metadata = self._extract_metadata_fallback(file_path, text)
-            
-            # Finally process academic metadata with both text and PDF
-            if progress_callback:
-                progress_callback("Processing academic metadata...")
-            academic_metadata = self.metadata_extractor.extract_metadata(
-                text=text,
-                doc_id=os.path.basename(file_path),
-                pdf_path=file_path,
-                existing_metadata=metadata  # Pass existing metadata to avoid reprocessing
-            )
-            
-            # Convert academic metadata to dict for storage
-            academic_metadata_dict = {
-                'doc_id': academic_metadata.doc_id,
-                'title': academic_metadata.title,
-                'authors': [author.to_dict() for author in academic_metadata.authors],
-                'abstract': academic_metadata.abstract,
-                'references': [ref.to_dict() for ref in academic_metadata.references],
-                'equations': [eq.to_dict() for eq in academic_metadata.equations],
-                'citations': [cit.to_dict() for cit in academic_metadata.citations],
-                'keywords': list(academic_metadata.keywords),
-                'sections': academic_metadata.sections
-            }
-            
-            # Save metadata to file
-            metadata_file = Path(file_path).parent / f"{Path(file_path).stem}_metadata.json"
-            try:
-                with open(metadata_file, 'w', encoding='utf-8') as f:
-                    json.dump(academic_metadata_dict, f, indent=2)
-                print(colored(f"✓ Metadata saved to {metadata_file}", "green"))
-            except Exception as e:
-                print(colored(f"⚠️ Error saving metadata: {str(e)}", "yellow"))
-            
-            # Return combined results
+            print(colored("\n=== Processing Complete ===", "green"))
             return {
-                "text": text,
-                "metadata": metadata,
-                "academic_metadata": academic_metadata_dict
+                'text': text_content,
+                'metadata': metadata
             }
-                
+            
         except Exception as e:
-            error_msg = f"Error processing file: {str(e)}"
-            print(colored(f"⚠️ {error_msg}", "red"))
-            return {"error": error_msg}
+            print(colored(f"❌ Error processing file: {str(e)}", "red"))
+            return None
 
     def _load_metadata(self) -> Dict[str, Any]:
         """Load metadata from file"""

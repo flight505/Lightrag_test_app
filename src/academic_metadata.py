@@ -703,24 +703,26 @@ class PDFMetadataExtractor:
             return set()
     
     def _parse_references(self, text: str) -> List[Reference]:
-        """Parse references from text using Anystyle CLI"""
+        """Parse references using Anystyle CLI with enhanced error handling"""
         references = []
         if not self.anystyle_available:
+            print(colored("⚠️ Anystyle not available - skipping reference parsing", "yellow"))
             return references
             
         try:
             # Write references to temp file
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.txt') as f:
-                f.write('\n'.join(text) if isinstance(text, list) else text)
-                f.flush()
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+                f.write(text)
+                temp_path = f.name
+            
+            try:
+                # Run anystyle parse command with JSON output
+                cmd = ["anystyle", "--format", "json", "parse", temp_path]
+                print(colored(f"→ Running Anystyle: {' '.join(cmd)}", "blue"))
                 
-                # Run anystyle parse command
-                result = subprocess.run(
-                    ['anystyle', '--format', 'json', 'parse', f.name],
-                    capture_output=True, text=True
-                )
+                result = subprocess.run(cmd, capture_output=True, text=True)
                 
-                if result.returncode == 0:
+                if result.returncode == 0 and result.stdout:
                     try:
                         parsed_refs = json.loads(result.stdout)
                         for ref in parsed_refs:
@@ -728,13 +730,10 @@ class PDFMetadataExtractor:
                                 # Handle date/year parsing
                                 year = None
                                 if 'date' in ref:
-                                    try:
-                                        date_str = str(ref['date'][0]) if isinstance(ref['date'], list) else str(ref['date'])
-                                        year_match = re.search(r'\d{4}', date_str)
-                                        if year_match:
-                                            year = int(year_match.group())
-                                    except (ValueError, TypeError, IndexError) as e:
-                                        print(colored(f"⚠️ Could not parse year from date: {ref.get('date')} - {e}", "yellow"))
+                                    date_str = str(ref['date'][0]) if isinstance(ref['date'], list) else str(ref['date'])
+                                    year_match = re.search(r'\d{4}', date_str)
+                                    if year_match:
+                                        year = int(year_match.group())
                                 
                                 # Create reference object
                                 reference = Reference(
@@ -742,18 +741,26 @@ class PDFMetadataExtractor:
                                     title=ref.get('title', [None])[0] if isinstance(ref.get('title', []), list) else ref.get('title'),
                                     authors=self._parse_authors(ref.get('author', [])),
                                     year=year,
-                                    doi=ref.get('doi'),
+                                    doi=ref.get('doi', [None])[0] if isinstance(ref.get('doi', []), list) else ref.get('doi'),
                                     venue=ref.get('container-title', [None])[0] if isinstance(ref.get('container-title', []), list) else ref.get('container-title')
                                 )
                                 references.append(reference)
                             except Exception as e:
-                                print(colored(f"⚠️ Error parsing individual reference: {str(e)}", "yellow"))
+                                print(colored(f"⚠️ Error parsing reference: {str(e)}", "yellow"))
                                 continue
-                                
+                        
+                        print(colored(f"✓ Parsed {len(references)} references with Anystyle", "green"))
                     except json.JSONDecodeError as e:
-                        print(colored(f"⚠️ Error decoding Anystyle JSON output: {str(e)}", "yellow"))
+                        print(colored(f"⚠️ Error decoding Anystyle output: {str(e)}", "yellow"))
                 else:
                     print(colored(f"⚠️ Anystyle command failed: {result.stderr}", "yellow"))
+                    
+            finally:
+                # Clean up temp file
+                try:
+                    os.unlink(temp_path)
+                except Exception:
+                    pass
                     
         except Exception as e:
             print(colored(f"⚠️ Error running Anystyle: {str(e)}", "yellow"))
@@ -990,186 +997,107 @@ class EquationExtractor:
             return set() 
 
 class MetadataExtractor:
-    """Extract academic metadata from documents"""
-    
-    def extract_metadata(self, text: str, doc_id: str, pdf_path: str = None, existing_metadata: Dict = None) -> AcademicMetadata:
-        """Extract academic metadata from text and PDF"""
+    def __init__(self):
+        # Check if anystyle is available via command line
         try:
-            # Initialize metadata
-            metadata = AcademicMetadata(doc_id=doc_id)
-            
-            # Use existing metadata if provided
-            if existing_metadata:
-                metadata.title = existing_metadata.get('title', '')
-                if 'authors' in existing_metadata:
-                    metadata.authors = [
-                        Author(
-                            full_name=a.get('full_name', ''),
-                            first_name=a.get('given', ''),
-                            last_name=a.get('family', '')
-                        )
-                        for a in existing_metadata['authors']
-                    ]
-                metadata.abstract = existing_metadata.get('abstract', '')
-            
-            # Extract abstract if not in existing metadata
-            if not metadata.abstract and text:
-                abstract_match = re.search(r'Abstract[:\s]+(.*?)(?=\n\n|\Z)', text, re.IGNORECASE | re.DOTALL)
-                if abstract_match:
-                    metadata.abstract = abstract_match.group(1).strip()
-            
-            # Extract equations
-            equations = []
-            eq_id = 1
-            
-            # Equation patterns
-            patterns = [
-                (r'\$\$(.*?)\$\$', EquationType.DISPLAY),  # Display equations
-                (r'\$(.*?)\$', EquationType.INLINE),  # Inline equations
-                (r'\\begin\{equation\}(.*?)\\end\{equation\}', EquationType.DISPLAY),  # Numbered equations
-                (r'\\[(.*?)\\]', EquationType.DISPLAY),  # Alternative display equations
-                (r'\\begin\{align\*?\}(.*?)\\end\{align\*?\}', EquationType.DISPLAY),  # Align environments
-                (r'\\begin\{eqnarray\*?\}(.*?)\\end\{eqnarray\*?\}', EquationType.DISPLAY)  # Eqnarray environments
-            ]
-            
-            lines = text.split('\n')
-            for i, line in enumerate(lines):
-                for pattern, eq_type in patterns:
-                    matches = re.finditer(pattern, line, re.DOTALL)
-                    for match in matches:
-                        # Get equation content
-                        eq_text = match.group(1).strip()
-                        if not eq_text:
-                            continue
-                            
-                        # Get context (surrounding lines)
-                        start = max(0, i-2)
-                        end = min(len(lines), i+3)
-                        context = '\n'.join(lines[start:end])
-                        
-                        # Extract symbols
-                        symbols = set()
-                        symbol_patterns = [
-                            r'\\alpha', r'\\beta', r'\\gamma', r'\\delta', r'\\epsilon',
-                            r'\\theta', r'\\lambda', r'\\mu', r'\\pi', r'\\sigma',
-                            r'\\sum', r'\\prod', r'\\int', r'\\partial', r'\\infty'
-                        ]
-                        
-                        for sym_pattern in symbol_patterns:
-                            if re.search(sym_pattern, eq_text):
-                                symbols.add(sym_pattern.replace('\\', ''))
-                        
-                        equations.append(Equation(
-                            raw_text=eq_text,
-                            equation_id=f"eq{eq_id}",
-                            context=context,
-                            equation_type=eq_type,
-                            symbols=symbols
-                        ))
-                        eq_id += 1
-            
-            metadata.equations = equations
-            
-            # Extract references using Anystyle
-            try:
-                # Create a temporary file for the text content
-                with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', encoding='utf-8', delete=False) as temp:
-                    temp.write(text)
-                    temp_path = temp.name
+            result = subprocess.run(['anystyle', '--version'], 
+                                  capture_output=True, text=True)
+            if result.returncode == 0:
+                self.anystyle_available = True
+                print(colored(f"✓ Found Anystyle: {result.stdout.strip()}", "green"))
+            else:
+                print(colored("⚠️ Anystyle command failed", "yellow"))
+                self.anystyle_available = False
+        except FileNotFoundError:
+            print(colored("⚠️ Anystyle not found in PATH", "yellow"))
+            self.anystyle_available = False
+
+    def extract_metadata(self, text: str, doc_id: str, pdf_path: str = None, existing_metadata: Dict = None) -> Dict[str, Any]:
+        """Extract academic metadata from text and PDF, reusing existing metadata if available"""
+        try:
+            # If we have existing metadata from arXiv or DOI, use it but add references
+            if existing_metadata and existing_metadata.get('source') in ['arxiv', 'crossref']:
+                print(colored(f"✓ Using existing {existing_metadata['source']} metadata", "green"))
                 
-                try:
-                    # Run Anystyle find command
-                    cmd = ["anystyle", "--format", "json", "find", temp_path]
-                    logger.info(f"Running Anystyle command: {' '.join(cmd)}")
-                    
-                    result = subprocess.run(
-                        cmd,
-                        capture_output=True,
-                        text=True,
-                        check=True
-                    )
-                    
-                    # Parse the JSON output
-                    if result.stdout:
-                        references = json.loads(result.stdout)
-                        
-                        # Convert to our format
-                        metadata.references = []
-                        for ref in references:
-                            try:
-                                authors = []
-                                for author in ref.get('author', []):
-                                    if isinstance(author, dict):
-                                        authors.append(Author(
-                                            full_name=f"{author.get('given', '')} {author.get('family', '')}".strip(),
-                                            first_name=author.get('given', ''),
-                                            last_name=author.get('family', '')
-                                        ))
-                                    else:
-                                        authors.append(Author(full_name=str(author)))
-                                
-                                metadata.references.append(Reference(
-                                    raw_text=ref.get('original', ''),
-                                    title=ref.get('title', [None])[0] if isinstance(ref.get('title', []), list) else ref.get('title'),
-                                    authors=authors,
-                                    year=int(ref.get('date', [None])[0]) if ref.get('date') else None,
-                                    doi=ref.get('doi', [None])[0] if isinstance(ref.get('doi', []), list) else ref.get('doi'),
-                                    venue=ref.get('container-title', [None])[0] if isinstance(ref.get('container-title', []), list) else ref.get('container-title')
-                                ))
-                            except Exception as e:
-                                logger.warning(f"Error parsing individual reference: {str(e)}")
-                                print(colored(f"⚠️ Error parsing reference: {str(e)}", "yellow"))
-                                continue
-                        
-                        print(colored(f"✓ Extracted {len(metadata.references)} references with Anystyle", "green"))
-                        
-                        # Extract citations and link them to references
-                        metadata.citations = []
-                        citation_patterns = [
-                            (r'\[([\d,\s-]+)\]', lambda m: m.group(1)),  # [1] or [1,2] or [1-3]
-                            (r'\(([^)]+?(?:19|20)\d{2}[^)]*)\)', lambda m: m.group(1)),  # (Author, 2023) or (Author et al., 2023)
-                            (r'(?:cf\.|see|in)\s+([A-Z][a-zA-Z]+(?:\s+et\s+al\.?)?,\s+(?:19|20)\d{2})', lambda m: m.group(1))  # cf. Author et al., 2023
-                        ]
-                        
-                        for i, line in enumerate(lines):
-                            for pattern, extractor in citation_patterns:
-                                for match in re.finditer(pattern, line):
-                                    try:
-                                        citation_text = match.group(0)
-                                        ref_key = extractor(match)
-                                        
-                                        # Get context (surrounding text)
-                                        start = max(0, i-1)
-                                        end = min(len(lines), i+2)
-                                        context = ' '.join(lines[start:end])
-                                        
-                                        # Create citation with context
-                                        metadata.citations.append(Citation(
-                                            text=citation_text,
-                                            references=[],  # Empty list since we can't reliably match references
-                                            context=context
-                                        ))
-                                    except (IndexError, AttributeError) as e:
-                                        logger.warning(f"Error processing citation match: {str(e)}")
-                                        continue
-                        
-                        print(colored(f"✓ Extracted {len(metadata.citations)} citations", "green"))
-                        
-                except subprocess.CalledProcessError as e:
-                    logger.error(f"Anystyle command failed: {e.stderr}")
-                    print(colored(f"⚠️ Anystyle extraction failed: {e.stderr}", "yellow"))
-                    
-                finally:
-                    # Clean up temp file
-                    os.unlink(temp_path)
-                    
-            except Exception as e:
-                logger.error(f"Reference extraction failed: {str(e)}")
-                print(colored(f"⚠️ Reference extraction failed: {str(e)}", "yellow"))
+                # Extract references section from text
+                references_text = self._extract_references_section(text)
+                if references_text and self.anystyle_available:
+                    print(colored("→ Extracting references with Anystyle...", "blue"))
+                    references = self._parse_references(references_text)
+                    if references:
+                        existing_metadata['references'] = [ref.to_dict() for ref in references]
+                        print(colored(f"✓ Added {len(references)} references to metadata", "green"))
+                
+                return existing_metadata
             
+            # Initialize with existing metadata if provided
+            metadata = existing_metadata or {}
+            
+            # Only extract what we don't already have
+            if not metadata.get('title'):
+                metadata['title'] = self._extract_title(text)
+            
+            if not metadata.get('authors'):
+                metadata['authors'] = self._extract_authors(text)
+                
+            if not metadata.get('abstract'):
+                metadata['abstract'] = self._extract_abstract(text)
+                
+            if not metadata.get('references'):
+                references_text = self._extract_references_section(text)
+                if references_text and self.anystyle_available:
+                    print(colored("→ Extracting references with Anystyle...", "blue"))
+                    references = self._parse_references(references_text)
+                    if references:
+                        metadata['references'] = [ref.to_dict() for ref in references]
+                        print(colored(f"✓ Added {len(references)} references to metadata", "green"))
+                
+            if not metadata.get('citations'):
+                metadata['citations'] = self._extract_citations(text)
+                
             return metadata
             
         except Exception as e:
-            logger.error(f"Metadata extraction failed: {str(e)}")
-            print(colored(f"⚠️ Metadata extraction failed: {str(e)}", "yellow"))
-            return AcademicMetadata(doc_id=doc_id) 
+            print(colored(f"⚠️ Error extracting metadata: {str(e)}", "red"))
+            return {}
+
+    def _extract_references_section(self, text: str) -> Optional[str]:
+        """Extract the references section from text, supporting both PDF and markdown formats"""
+        try:
+            lines = text.split('\n')
+            references_start = -1
+            references_end = len(lines)
+            
+            # Enhanced pattern for markdown and PDF formats
+            ref_pattern = r'^[\*#\s]*(?:references|bibliography|works cited|citations)[\*\s]*$'
+            end_pattern = r'^[\*#\s]*(?:appendix|acknowledgments?|supplementary|notes?|about|author)[\*\s]*$'
+            
+            # Find references section start
+            for i, line in enumerate(lines):
+                if re.match(ref_pattern, line.lower()):
+                    references_start = i + 1  # Skip the header
+                    break
+            
+            if references_start == -1:
+                return None
+            
+            # Find references section end (next major section or end of file)
+            for i in range(references_start, len(lines)):
+                if re.match(end_pattern, lines[i].lower()):
+                    references_end = i
+                    break
+                # Also stop at markdown horizontal rules
+                if re.match(r'^[\s]*[-*_]{3,}[\s]*$', lines[i]):
+                    references_end = i
+                    break
+            
+            references_text = '\n'.join(lines[references_start:references_end])
+            if not references_text.strip():
+                return None
+                
+            print(colored("✓ Found references section", "green"))
+            return references_text
+            
+        except Exception as e:
+            print(colored(f"⚠️ Error extracting references section: {str(e)}", "yellow"))
+            return None 

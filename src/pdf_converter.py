@@ -31,137 +31,125 @@ class MarkerConverter(PDFConverter):
     
     def __init__(self):
         """Initialize Marker converter"""
-        try:
-            from marker.converters.pdf import PdfConverter
-            from marker.models import create_model_dict
-            from marker.config.parser import ConfigParser
+        from marker.converters.pdf import PdfConverter
+        from marker.models import create_model_dict
+        from marker.config.parser import ConfigParser
+        
+        # Configure Marker settings with enhanced equation detection
+        config = {
+            "output_format": "markdown",
+            "layout_analysis": True,
+            "detect_equations": True,
+            "equation_detection_confidence": 0.3,
+            "detect_inline_equations": True,
+            "detect_tables": True,
+            "detect_lists": True,
+            "detect_code_blocks": True,
+            "detect_footnotes": True,
+            "equation_output": "latex",
+            "preserve_math": True,
+            "equation_detection_mode": "aggressive",
+            "equation_context_window": 3,
+            "equation_pattern_matching": True,
+            "equation_symbol_extraction": True,
             
-            # Configure Marker settings with enhanced equation detection
-            config = {
-                "output_format": "markdown",
-                "layout_analysis": True,
-                "detect_equations": True,
-                "equation_detection_confidence": 0.3,
-                "detect_inline_equations": True,
-                "detect_tables": True,
-                "detect_lists": True,
-                "detect_code_blocks": True,
-                "detect_footnotes": True,
-                "equation_output": "latex",
-                "preserve_math": True,
-                "equation_detection_mode": "aggressive",
-                "equation_context_window": 3,
-                "equation_pattern_matching": True,
-                "equation_symbol_extraction": True,
-                
-                # Enhanced header handling
-                "header_detection": {
-                    "enabled": True,
-                    "style": "atx",  # Use # style headers
-                    "levels": {
-                        "title": 1,    # Title uses single #
-                        "section": 2,   # Sections use ##
-                        "subsection": 3 # Subsections use ###
-                    },
-                    "remove_duplicate_markers": True
+            # Enhanced header handling
+            "header_detection": {
+                "enabled": True,
+                "style": "atx",  # Use # style headers
+                "levels": {
+                    "title": 1,    # Title uses single #
+                    "section": 2,   # Sections use ##
+                    "subsection": 3 # Subsections use ###
                 },
-                
-                # Enhanced list handling
-                "list_detection": {
-                    "enabled": True,
-                    "unordered_marker": "-",  # Use - for unordered lists
-                    "ordered_marker": "1.",   # Use 1. for ordered lists
-                    "preserve_numbers": True,  # Keep original list numbers
-                    "indent_spaces": 2        # Use 2 spaces for indentation
-                },
-                
-                # Layout and formatting
-                "layout": {
-                    "paragraph_breaks": True,
-                    "line_spacing": 2,
-                    "remove_redundant_whitespace": True,
-                    "preserve_line_breaks": True,
-                    "preserve_blank_lines": True
-                },
-                
-                # Content preservation
-                "preserve": {
-                    "links": True,
-                    "tables": True,
-                    "images": True,
-                    "footnotes": True,
-                    "formatting": True,
-                    "lists": True,
-                    "headers": True
-                },
-                
-                # Output settings
-                "output": {
-                    "format": "markdown",
-                    "save_markdown": True,
-                    "save_text": True,
-                    "markdown_ext": ".md",
-                    "text_ext": ".txt"
-                }
+                "remove_duplicate_markers": True
+            },
+            
+            # Enhanced list handling
+            "list_detection": {
+                "enabled": True,
+                "unordered_marker": "-",  # Use - for unordered lists
+                "ordered_marker": "1.",   # Use 1. for ordered lists
+                "preserve_numbers": True,  # Keep original list numbers
+                "indent_spaces": 2        # Use 2 spaces for indentation
+            },
+            
+            # Layout and formatting
+            "layout": {
+                "paragraph_breaks": True,
+                "line_spacing": 2,
+                "remove_redundant_whitespace": True,
+                "preserve_line_breaks": True,
+                "preserve_blank_lines": True
+            },
+            
+            # Content preservation
+            "preserve": {
+                "links": True,
+                "tables": True,
+                "images": True,
+                "footnotes": True,
+                "formatting": True,
+                "lists": True,
+                "headers": True
+            },
+            
+            # Output settings
+            "output": {
+                "format": "markdown",
+                "save_markdown": True,
+                "save_text": True,
+                "markdown_ext": ".md",
+                "text_ext": ".txt"
             }
-            
-            config_parser = ConfigParser(config)
-            
-            # Initialize converter with config
-            self._converter = PdfConverter(
-                config=config_parser.generate_config_dict(),
-                artifact_dict=create_model_dict(),
-                processor_list=config_parser.get_processors(),
-                renderer=config_parser.get_renderer()
-            )
-            
-            logger.info("Marker initialized with optimized settings")
-            
-        except Exception as e:
-            logger.error(f"Failed to initialize Marker: {str(e)}")
-            print(colored(f"⚠️ Failed to initialize Marker: {str(e)}", "yellow"))
-            raise
+        }
+        
+        config_parser = ConfigParser(config)
+        
+        # Initialize converter with config
+        self._converter = PdfConverter(
+            config=config_parser.generate_config_dict(),
+            artifact_dict=create_model_dict(),
+            processor_list=config_parser.get_processors(),
+            renderer=config_parser.get_renderer()
+        )
+        
+        logger.info("Marker initialized with optimized settings")
     
     def extract_text(self, file_path: str) -> str:
         """Extract text with semantic structure preservation"""
-        try:
-            # Process PDF with Marker
-            rendered = self._converter(file_path)
+        # Process PDF with Marker
+        rendered = self._converter(file_path)
+        
+        # Save markdown file
+        markdown_path = str(Path(file_path).with_suffix('.md'))
+        
+        # Extract text from rendered output
+        if hasattr(rendered, 'markdown'):
+            text = rendered.markdown
+            # Save markdown content
+            try:
+                with open(markdown_path, 'w', encoding='utf-8') as f:
+                    f.write(text)
+                print(colored(f"✓ Markdown saved to {markdown_path}", "green"))
+            except Exception as e:
+                print(colored(f"⚠️ Error saving markdown: {str(e)}", "yellow"))
+        else:
+            # For JSON output, extract text from blocks
+            text = self._extract_text_from_blocks(rendered.children)
+            try:
+                with open(markdown_path, 'w', encoding='utf-8') as f:
+                    f.write(text)
+                print(colored(f"✓ Markdown saved to {markdown_path}", "green"))
+            except Exception as e:
+                print(colored(f"⚠️ Error saving markdown: {str(e)}", "yellow"))
+        
+        if not text:
+            raise ValueError("No text extracted by Marker")
             
-            # Save markdown file
-            markdown_path = str(Path(file_path).with_suffix('.md'))
-            
-            # Extract text from rendered output
-            if hasattr(rendered, 'markdown'):
-                text = rendered.markdown
-                # Save markdown content
-                try:
-                    with open(markdown_path, 'w', encoding='utf-8') as f:
-                        f.write(text)
-                    print(colored(f"✓ Markdown saved to {markdown_path}", "green"))
-                except Exception as e:
-                    print(colored(f"⚠️ Error saving markdown: {str(e)}", "yellow"))
-            else:
-                # For JSON output, extract text from blocks
-                text = self._extract_text_from_blocks(rendered.children)
-                try:
-                    with open(markdown_path, 'w', encoding='utf-8') as f:
-                        f.write(text)
-                    print(colored(f"✓ Markdown saved to {markdown_path}", "green"))
-                except Exception as e:
-                    print(colored(f"⚠️ Error saving markdown: {str(e)}", "yellow"))
-            
-            if not text:
-                raise ValueError("No text extracted by Marker")
-                
-            logger.info("Text extracted successfully with Marker")
-            print(colored("✓ Text extracted with semantic structure preserved", "green"))
-            return text
-            
-        except Exception as e:
-            logger.error(f"Marker text extraction error: {str(e)}")
-            print(colored(f"⚠️ Marker text extraction error: {str(e)}", "yellow"))
-            raise  # No fallback for text extraction - we need Marker's semantic preservation
+        logger.info("Text extracted successfully with Marker")
+        print(colored("✓ Text extracted with semantic structure preserved", "green"))
+        return text
             
     def _extract_text_from_blocks(self, blocks) -> str:
         """Extract text from JSON block structure"""
@@ -178,33 +166,17 @@ class MarkerConverter(PDFConverter):
         metadata = {}
         
         try:
-            # 1. Try PyMuPDF metadata first
-            logger.info("Attempting PyMuPDF metadata extraction")
-            metadata = self.pymupdf_converter.extract_metadata(file_path)
-            if metadata:
-                print(colored("✓ Metadata extracted with PyMuPDF", "green"))
-                
-                # 2. Try to enhance with DOI and CrossRef if available
-                if 'doi' in metadata:
-                    try:
-                        crossref_data = self._get_crossref_metadata(metadata['doi'])
-                        if crossref_data:
-                            metadata.update(crossref_data)
-                            print(colored("✓ Using CrossRef API metadata", "green"))
-                    except Exception as e:
-                        logger.warning(f"CrossRef enhancement failed: {str(e)}")
-                
-                return metadata
+            # Try to extract DOI and use CrossRef if available
+            if 'doi' in metadata:
+                try:
+                    crossref_data = self._get_crossref_metadata(metadata['doi'])
+                    if crossref_data:
+                        metadata.update(crossref_data)
+                        print(colored("✓ Using CrossRef API metadata", "green"))
+                except Exception as e:
+                    logger.warning(f"CrossRef enhancement failed: {str(e)}")
             
-            # 3. Try PyPDF2 as fallback
-            logger.info("Attempting PyPDF2 metadata extraction")
-            metadata = self.pypdf2_converter.extract_metadata(file_path)
-            if metadata:
-                print(colored("✓ Metadata extracted with PyPDF2", "green"))
-                return metadata
-            
-            logger.warning("All PDF metadata extraction methods failed")
-            return {}
+            return metadata
             
         except Exception as e:
             logger.error(f"Metadata extraction error: {str(e)}")
@@ -322,22 +294,6 @@ class PDFConverterFactory:
         elif engine == PDFEngine.PYPDF2:
             logger.info("Using PyPDF2 converter")
             return PyPDF2Converter()
-        else:  # AUTO - try Marker first, then PyMuPDF, fallback to PyPDF2
-            logger.info("AUTO mode: Attempting to use Marker first")
-            try:
-                converter = MarkerConverter()
-                logger.info("Successfully initialized Marker converter")
-                return converter
-            except Exception as e:
-                logger.warning(f"Marker initialization failed: {str(e)}, trying PyMuPDF")
-                print(colored("⚠️ Marker failed, trying PyMuPDF", "yellow"))
-                try:
-                    converter = PyMuPDFConverter()
-                    # Test if PyMuPDF is working
-                    pymupdf.open  # Just check if the module is available
-                    logger.info("Successfully initialized PyMuPDF converter")
-                    return converter
-                except Exception as e2:
-                    logger.warning(f"PyMuPDF initialization failed: {str(e2)}, falling back to PyPDF2")
-                    print(colored("⚠️ Falling back to PyPDF2", "yellow"))
-                    return PyPDF2Converter() 
+        else:  # AUTO - use Marker
+            logger.info("AUTO mode: Using Marker")
+            return MarkerConverter() 

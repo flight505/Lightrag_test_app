@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 import os
+from pathlib import Path
 from termcolor import colored
 import logging
 
@@ -25,6 +26,29 @@ class ProcessingConfig:
     chunk_size: int = 500
     chunk_overlap: int = 50
     chunk_strategy: str = "sentence"
+    
+    def validate_file(self, file_path: str) -> bool:
+        """Validate file exists and meets size requirements"""
+        try:
+            path = Path(file_path)
+            if not path.exists():
+                print(colored(f"⚠️ File not found: {file_path}", "yellow"))
+                return False
+                
+            if not path.is_file():
+                print(colored(f"⚠️ Not a file: {file_path}", "yellow"))
+                return False
+                
+            size_mb = path.stat().st_size / (1024 * 1024)
+            if size_mb > self.max_file_size_mb:
+                print(colored(f"⚠️ File too large: {size_mb:.1f}MB > {self.max_file_size_mb}MB", "yellow"))
+                return False
+                
+            return True
+            
+        except Exception as e:
+            print(colored(f"⚠️ Error validating file: {str(e)}", "yellow"))
+            return False
 
 class ConfigManager:
     """Manages configuration settings for file processing"""

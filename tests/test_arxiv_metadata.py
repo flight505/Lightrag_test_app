@@ -1,93 +1,109 @@
-import os
-import json
 import pytest
-import re
 from pathlib import Path
-from termcolor import colored
+import json
 import logging
-
-from src.academic_metadata import MetadataExtractor, PDFMetadataExtractor
 from src.file_processor import FileProcessor
-from src.config_manager import ConfigManager
+from src.config_manager import ConfigManager, PDFEngine
 
 # Configure logging
 logging.basicConfig(
-    filename="tests/metadata_extraction.log",
-    level=logging.DEBUG,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    filename='tests/metadata_extraction.log'
 )
-logger = logging.getLogger(__name__)
 
 # Test data paths
-TEST_DIR = Path("tests/pdfs")
-ARXIV_PDF = "Chen et al. - 2023 - TSMixer An All-MLP Architecture for Time Series Forecasting-annotated.pdf"
-DOI_PDF = "Choo et al. - 2023 - Deep-learning-based personalized prediction of absolute neutrophil count recovery and comparison with clinicians-annotated.pdf"
+ARXIV_PATH = Path("tests/pdfs/Chen et al. - 2023 - TSMixer An All-MLP Architecture for Time Series Forecasting-annotated.pdf")
+DOI_PATH = Path("tests/pdfs/Choo et al. - 2023 - Deep-learning-based personalized prediction of absolute neutrophil count recovery and comparison with clinicians-annotated.pdf")
 
-def extract_arxiv_id(text: str) -> str:
-    """Extract arXiv ID from text"""
-    arxiv_pattern = r'arXiv:(\d{4}\.\d{5})'
-    match = re.search(arxiv_pattern, text)
-    if match:
-        return match.group(1)
-    return None
+@pytest.fixture
+def config_manager():
+    """Create a ConfigManager instance for testing"""
+    return ConfigManager(
+        pdf_engine=PDFEngine.MARKER,
+        enable_crossref=True,
+        enable_scholarly=True,
+        debug_mode=True,
+        max_file_size_mb=10  # Set reasonable file size limit for tests
+    )
 
-def test_arxiv_metadata_extraction():
+@pytest.fixture
+def file_processor(config_manager):
+    """Create a FileProcessor instance for testing"""
+    return FileProcessor(config_manager)
+
+def test_arxiv_metadata_extraction(file_processor):
     """Test metadata extraction from arXiv paper"""
-    try:
-        # Initialize components
-        config = ConfigManager()
-        processor = FileProcessor(config)
-        metadata_extractor = MetadataExtractor()
+    print("\n=== Testing arXiv Paper Metadata Extraction ===")
+    assert ARXIV_PATH.exists(), f"Test file not found: {ARXIV_PATH}"
+    
+    # Process the arXiv paper
+    result = file_processor.process_file(str(ARXIV_PATH))
+    assert result is not None, "File processing failed"
+    
+    metadata = result.get('metadata')
+    assert metadata is not None, "No metadata extracted"
+    
+    # Verify basic metadata
+    assert metadata.get('title'), "Title not extracted"
+    assert metadata.get('authors'), "Authors not extracted"
+    assert metadata.get('abstract'), "Abstract not extracted"
+    assert metadata.get('arxiv_id'), "arXiv ID not extracted"
+    
+    # Save metadata for consolidation test
+    metadata_file = ARXIV_PATH.parent / f"{ARXIV_PATH.stem}_metadata.json"
+    with open(metadata_file, 'w', encoding='utf-8') as f:
+        json.dump(metadata, f, indent=2)
+    print(f"✓ Saved arXiv metadata to {metadata_file}")
 
-        # Process arXiv paper
-        arxiv_path = TEST_DIR / ARXIV_PDF
-        assert arxiv_path.exists(), f"Test file not found: {arxiv_path}"
-
-        print(colored("\nProcessing arXiv paper...", "cyan"))
-
-        # First process the PDF and get metadata
-        result = processor.process_file(str(arxiv_path))
-        if "error" in result:
-            raise Exception(f"PDF processing failed: {result['error']}")
-
-        # Extract metadata from processor result
-        metadata = result.get('metadata', {})
-        assert metadata, "No metadata returned from processor"
-        assert metadata.get('title'), "No title in metadata"
-        assert metadata.get('authors'), "No authors in metadata"
-        assert metadata.get('abstract'), "No abstract in metadata"
-        assert metadata.get('arxiv_id'), "No arXiv ID in metadata"
-
-        # Save test metadata
-        output_path = arxiv_path.with_suffix('.test_metadata.json')
-        with open(output_path, 'w', encoding='utf-8') as f:
-            json.dump(metadata, f, indent=2)
-        print(colored(f"✓ Saved test metadata to {output_path}", "green"))
-
-        return metadata
-
-    except Exception as e:
-        logger.error(f"Test failed: {str(e)}")
-        raise
+def test_doi_metadata_extraction(file_processor):
+    """Test metadata extraction from DOI paper"""
+    print("\n=== Testing DOI Paper Metadata Extraction ===")
+    assert DOI_PATH.exists(), f"Test file not found: {DOI_PATH}"
+    
+    # Process the DOI paper
+    result = file_processor.process_file(str(DOI_PATH))
+    assert result is not None, "File processing failed"
+    
+    metadata = result.get('metadata')
+    assert metadata is not None, "No metadata extracted"
+    
+    # Verify basic metadata
+    assert metadata.get('title'), "Title not extracted"
+    assert metadata.get('authors'), "Authors not extracted"
+    assert metadata.get('identifier'), "DOI not extracted"
+    
+    # Save metadata for consolidation test
+    metadata_file = DOI_PATH.parent / f"{DOI_PATH.stem}_metadata.json"
+    with open(metadata_file, 'w', encoding='utf-8') as f:
+        json.dump(metadata, f, indent=2)
+    print(f"✓ Saved DOI metadata to {metadata_file}")
 
 def test_metadata_consolidation():
-    """Test consolidation of metadata from multiple documents"""
-    try:
-        # Process both papers
-        arxiv_metadata = test_arxiv_metadata_extraction()
-        assert arxiv_metadata, "Failed to extract arXiv metadata"
-
-        # Save consolidated metadata
-        consolidated_path = TEST_DIR / "consolidated_metadata.json"
-        with open(consolidated_path, 'w', encoding='utf-8') as f:
-            json.dump({
-                "arxiv_paper": arxiv_metadata
-            }, f, indent=2)
-        print(colored(f"✓ Saved consolidated metadata to {consolidated_path}", "green"))
-
-    except Exception as e:
-        logger.error(f"Consolidation failed: {str(e)}")
-        raise
-
-if __name__ == "__main__":
-    test_metadata_consolidation() 
+    """Test consolidation of metadata from both papers"""
+    print("\n=== Testing Metadata Consolidation ===")
+    
+    # Load metadata files
+    arxiv_metadata_file = ARXIV_PATH.parent / f"{ARXIV_PATH.stem}_metadata.json"
+    doi_metadata_file = DOI_PATH.parent / f"{DOI_PATH.stem}_metadata.json"
+    
+    assert arxiv_metadata_file.exists(), f"arXiv metadata file not found: {arxiv_metadata_file}"
+    assert doi_metadata_file.exists(), f"DOI metadata file not found: {doi_metadata_file}"
+    
+    with open(arxiv_metadata_file, 'r', encoding='utf-8') as f:
+        arxiv_metadata = json.load(f)
+    with open(doi_metadata_file, 'r', encoding='utf-8') as f:
+        doi_metadata = json.load(f)
+    
+    # Create consolidated metadata
+    consolidated = {
+        'papers': [arxiv_metadata, doi_metadata],
+        'total_papers': 2,
+        'timestamp': str(Path(arxiv_metadata_file).stat().st_mtime)
+    }
+    
+    # Save consolidated metadata
+    consolidated_file = ARXIV_PATH.parent / "consolidated_metadata.json"
+    with open(consolidated_file, 'w', encoding='utf-8') as f:
+        json.dump(consolidated, f, indent=2)
+    print(f"✓ Saved consolidated metadata to {consolidated_file}") 
