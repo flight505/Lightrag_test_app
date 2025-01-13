@@ -31,7 +31,7 @@ The LightRAG application is a sophisticated academic research tool that combines
 
 2. **FileProcessor**:
    - PDF Processing Workflow:
-     1. Metadata Extraction: Uses PyMuPDF (primary) and PyPDF2 (fallback) to extract native PDF metadata (title, authors, creation date)
+     1. Metadata Extraction using pdf2doi and crossref or arxiv depending on the type of id returned by pdf2doi. 
      2. Text Extraction: Employs Marker (optimized for M3 Max) to convert PDFs while preserving layout, equations, and figures
      3. Academic Metadata Processing: Analyzes extracted text to identify and structure:
         - References (using Anystyle - a critical tool for accurate reference extraction)
