@@ -11,6 +11,8 @@ runOnSave = true
 
 [browser]
 gatherUsageStats = false
+serverAddress = "localhost"
+serverPort = 8502
 
 [client]
 showSidebarNavigation = false
