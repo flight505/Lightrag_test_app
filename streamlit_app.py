@@ -47,6 +47,10 @@ import os
 import streamlit as st
 from streamlit_navigation_bar import st_navbar
 from termcolor import colored
+from src.file_manager import ensure_db_exists
+
+# Ensure DB exists at startup
+ensure_db_exists()
 
 import pages as pg
 
