@@ -1126,64 +1126,32 @@ class MetadataExtractor:
                         # Extract citations and link them to references
                         metadata.citations = []
                         citation_patterns = [
-                            r'\[([\d,\s-]+)\]',  # [1] or [1,2] or [1-3]
-                            r'\(([^)]+?(?:19|20)\d{2}[^)]*)\)',  # (Author, 2023) or (Author et al., 2023)
-                            r'(?:cf\.|see|in)\s+([A-Z][a-zA-Z]+(?:\s+et\s+al\.?)?,\s+(?:19|20)\d{2})',  # cf. Author et al., 2023
+                            (r'\[([\d,\s-]+)\]', lambda m: m.group(1)),  # [1] or [1,2] or [1-3]
+                            (r'\(([^)]+?(?:19|20)\d{2}[^)]*)\)', lambda m: m.group(1)),  # (Author, 2023) or (Author et al., 2023)
+                            (r'(?:cf\.|see|in)\s+([A-Z][a-zA-Z]+(?:\s+et\s+al\.?)?,\s+(?:19|20)\d{2})', lambda m: m.group(1))  # cf. Author et al., 2023
                         ]
                         
                         for i, line in enumerate(lines):
-                            for pattern in citation_patterns:
+                            for pattern, extractor in citation_patterns:
                                 for match in re.finditer(pattern, line):
-                                    citation_text = match.group(0)
-                                    ref_key = match.group(1)
-                                    
-                                    # Get context (surrounding text)
-                                    start = max(0, i-1)
-                                    end = min(len(lines), i+2)
-                                    context = ' '.join(lines[start:end])
-                                    
-                                    # Try to find matching references
-                                    matching_refs = []
-                                    if '[' in citation_text:  # Numeric citation
-                                        try:
-                                            ref_nums = []
-                                            for part in ref_key.split(','):
-                                                part = part.strip()
-                                                if '-' in part:
-                                                    start_num, end_num = map(int, part.split('-'))
-                                                    ref_nums.extend(range(start_num, end_num + 1))
-                                                else:
-                                                    ref_nums.append(int(part))
-                                            
-                                            # Add each referenced paper
-                                            for num in ref_nums:
-                                                if 0 < num <= len(metadata.references):
-                                                    matching_refs.append(metadata.references[num - 1])
-                                        except (ValueError, IndexError) as e:
-                                            logger.warning(f"Error parsing numeric citation {citation_text}: {str(e)}")
-                                    else:  # Author-year citation
-                                        # Split on 'and' or ';' for multiple author-year citations
-                                        for author_year in re.split(r'\s+(?:and|;)\s+', ref_key):
-                                            year_match = re.search(r'(?:19|20)\d{2}', author_year)
-                                            if year_match:
-                                                year = int(year_match.group())
-                                                author_match = re.search(r'([A-Z][a-zA-Z]+)', author_year)
-                                                if author_match:
-                                                    author = author_match.group(1)
-                                                    # Find matching reference
-                                                    for ref in metadata.references:
-                                                        if (ref.year == year and 
-                                                            ref.authors and 
-                                                            any(author.lower() in a.last_name.lower() for a in ref.authors)):
-                                                            matching_refs.append(ref)
-                                                            break
-                                    
-                                    # Create citation with all matching references
-                                    metadata.citations.append(Citation(
-                                        text=citation_text,
-                                        references=matching_refs,  # Now a list of references
-                                        context=context
-                                    ))
+                                    try:
+                                        citation_text = match.group(0)
+                                        ref_key = extractor(match)
+                                        
+                                        # Get context (surrounding text)
+                                        start = max(0, i-1)
+                                        end = min(len(lines), i+2)
+                                        context = ' '.join(lines[start:end])
+                                        
+                                        # Create citation with context
+                                        metadata.citations.append(Citation(
+                                            text=citation_text,
+                                            references=[],  # Empty list since we can't reliably match references
+                                            context=context
+                                        ))
+                                    except (IndexError, AttributeError) as e:
+                                        logger.warning(f"Error processing citation match: {str(e)}")
+                                        continue
                         
                         print(colored(f"✓ Extracted {len(metadata.citations)} citations", "green"))
                         

@@ -309,6 +309,24 @@ class FileProcessor:
                 progress_callback("Extracting metadata...")
             metadata = self._extract_metadata_with_doi(file_path)
             
+            # If we got metadata from arXiv or Crossref, use it directly
+            if metadata and metadata.get('source') in ['arxiv', 'crossref']:
+                print(colored(f"✓ Using metadata from {metadata.get('source')}", "green"))
+                
+                # Save metadata to file
+                metadata_file = Path(file_path).parent / f"{Path(file_path).stem}_metadata.json"
+                try:
+                    with open(metadata_file, 'w', encoding='utf-8') as f:
+                        json.dump(metadata, f, indent=2)
+                    print(colored(f"✓ Metadata saved to {metadata_file}", "green"))
+                except Exception as e:
+                    print(colored(f"⚠️ Error saving metadata: {str(e)}", "yellow"))
+                
+                return {
+                    "text": text,
+                    "metadata": metadata
+                }
+            
             # If DOI extraction fails, use fallback methods
             if not metadata:
                 print(colored("ℹ️ No DOI found, using fallback metadata extraction", "blue"))
