@@ -13,7 +13,6 @@ import queue
 import time
 
 import streamlit as st
-from streamlit_navigation_bar import st_navbar
 import pandas as pd
 from streamlit.runtime.scriptrunner import add_script_run_ctx
 

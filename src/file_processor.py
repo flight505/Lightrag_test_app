@@ -78,37 +78,126 @@ class FileProcessor:
             # Try pdf2doi first
             print(colored("→ Attempting pdf2doi extraction...", "blue"))
             result = pdf2doi.pdf2doi(file_path)
-            if isinstance(result, dict) and 'identifier' in result:
-                doi = result['identifier']
-            else:
-                doi = result
+            
+            # Handle pdf2doi result dictionary
+            if isinstance(result, dict):
+                identifier = result.get('identifier')
+                identifier_type = result.get('identifier_type', '').lower()
+                validation_info = result.get('validation_info')
+                method = result.get('method')
                 
-            if doi:
-                print(colored(f"✓ DOI found: {doi}", "green"))
-                # Get BibTeX from crossref
+                if not identifier:
+                    print(colored("⚠️ No identifier found in PDF", "yellow"))
+                    return None
+                    
+                print(colored(f"✓ Found {identifier_type}: {identifier} (method: {method})", "green"))
+                
+                # Check if it's an arXiv identifier regardless of type
+                if "arxiv" in identifier.lower():
+                    print(colored("→ arXiv identifier detected, fetching from arXiv API...", "blue"))
+                    try:
+                        # Extract just the raw arXiv ID number
+                        arxiv_id = identifier.lower()
+                        if '/' in arxiv_id:
+                            arxiv_id = arxiv_id.split('/')[-1]
+                        if 'arxiv.' in arxiv_id:
+                            arxiv_id = arxiv_id.split('arxiv.')[-1]
+                        if ':' in arxiv_id:
+                            arxiv_id = arxiv_id.split(':')[-1]
+                        arxiv_id = arxiv_id.strip()
+                        
+                        print(colored(f"→ Querying arXiv API with ID: {arxiv_id}", "blue"))
+                        
+                        import arxiv
+                        search = arxiv.Search(id_list=[arxiv_id])
+                        paper = next(search.results())
+                        
+                        # Process authors
+                        authors = []
+                        for author in paper.authors:
+                            try:
+                                name = str(author).strip()
+                                if not name:
+                                    continue
+                                    
+                                name_parts = name.split()
+                                if len(name_parts) > 1:
+                                    authors.append({
+                                        'given': ' '.join(name_parts[:-1]),
+                                        'family': name_parts[-1],
+                                        'full_name': name
+                                    })
+                                else:
+                                    authors.append({
+                                        'given': name,
+                                        'family': name,
+                                        'full_name': name
+                                    })
+                            except Exception as e:
+                                print(colored(f"⚠️ Error processing author {author}: {str(e)}", "yellow"))
+                                continue
+                        
+                        metadata = {
+                            'title': paper.title.strip() if paper.title else "Untitled",
+                            'authors': authors,
+                            'identifier': identifier,
+                            'identifier_type': 'arxiv',
+                            'year': paper.published.year if paper.published else None,
+                            'abstract': paper.summary.strip() if paper.summary else "",
+                            'source': 'arxiv',
+                            'arxiv_id': arxiv_id,
+                            'categories': paper.categories if hasattr(paper, 'categories') else [],
+                            'journal': None,  # arXiv papers don't have a journal
+                            'validation_info': validation_info,
+                            'extraction_method': method
+                        }
+                        
+                        print(colored("✓ arXiv metadata extracted successfully", "green"))
+                        return metadata
+                        
+                    except Exception as e:
+                        logger.warning(f"arXiv lookup failed: {str(e)}")
+                        print(colored(f"⚠️ arXiv lookup failed: {str(e)}", "yellow"))
+                        return None
+                
+                # Handle DOI
                 print(colored("→ Fetching metadata from Crossref...", "blue"))
-                work = _self.works.doi(doi)
+                work = _self.works.doi(identifier)
                 if work:
                     authors = []
                     for author in work.get('author', []):
-                        authors.append({
-                            'given': author.get('given', ''),
-                            'family': author.get('family', ''),
-                            'full_name': f"{author.get('given', '')} {author.get('family', '')}"
-                        })
+                        try:
+                            given = author.get('given', '').strip()
+                            family = author.get('family', '').strip()
+                            if given or family:
+                                authors.append({
+                                    'given': given,
+                                    'family': family,
+                                    'full_name': f"{given} {family}".strip()
+                                })
+                        except Exception as e:
+                            print(colored(f"⚠️ Error processing Crossref author: {str(e)}", "yellow"))
+                            continue
                     
                     metadata = {
                         'title': work.get('title', [None])[0],
                         'authors': authors,
-                        'doi': doi,
+                        'identifier': identifier,
+                        'identifier_type': 'doi',
                         'year': work.get('published-print', {}).get('date-parts', [[None]])[0][0],
                         'journal': work.get('container-title', [None])[0],
-                        'source': 'crossref'
+                        'source': 'crossref',
+                        'validation_info': validation_info,
+                        'extraction_method': method
                     }
+                    
                     print(colored("✓ Crossref metadata extracted successfully", "green"))
                     return metadata
                 else:
                     print(colored("⚠️ Crossref lookup failed - no metadata found", "yellow"))
+            else:
+                print(colored("⚠️ Invalid pdf2doi result format", "yellow"))
+                
         except Exception as e:
             logger.warning(f"DOI extraction failed: {str(e)}")
             print(colored(f"⚠️ DOI extraction failed: {str(e)}", "yellow"))
