@@ -1,16 +1,17 @@
-from dataclasses import dataclass, field
-from enum import Enum
-from typing import List, Dict, Set, Optional, Any, Tuple
 import json
+import logging
+import os
+import re
 import subprocess
 import tempfile
-import re
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Any, Dict, List, Optional, Set, Tuple
+
 import fitz  # Changed from pymupdf import
-from PyPDF2 import PdfReader
 import requests
+from PyPDF2 import PdfReader
 from termcolor import colored
-import os
-import logging
 
 logger = logging.getLogger(__name__)
 
