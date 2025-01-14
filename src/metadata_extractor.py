@@ -6,187 +6,218 @@ import tempfile
 import json
 import os
 from .academic_metadata import Reference, Author, AcademicMetadata
+from .equation_metadata import EquationExtractor
+from pathlib import Path
+import shutil
 
 class MetadataExtractor:
     """Extracts metadata from academic documents"""
     
-    def __init__(self):
+    def __init__(self, debug: bool = True):
         """Initialize metadata extractor and check Anystyle availability"""
-        self.has_anystyle = self._check_anystyle()
-        
-    def _check_anystyle(self) -> bool:
-        """Check if Anystyle is available"""
+        self.anystyle_available = False
+        self.debug = debug
+        self.equation_extractor = EquationExtractor(debug=debug)
         try:
-            result = subprocess.run(['anystyle', '--version'], capture_output=True, text=True, check=True)
-            print(colored(f"✓ Found Anystyle: {result.stdout.strip()}", "green"))
-            return True
-        except subprocess.CalledProcessError:
-            print(colored("⚠️ Anystyle not found. Please install Anystyle CLI: gem install anystyle-cli", "yellow"))
-            return False
+            result = subprocess.run(['anystyle', '--version'], capture_output=True, text=True)
+            if result.returncode == 0:
+                print(colored(f"✓ Found Anystyle: {result.stdout.strip()}", "green"))
+                self.anystyle_available = True
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            print(colored("⚠️ Anystyle not found. Please install it with: gem install anystyle-cli", "yellow"))
+    
+    def _parse_authors(self, author_data: List[Dict]) -> List[Author]:
+        """Parse author information from Anystyle output"""
+        authors = []
+        try:
+            for author in author_data:
+                # Extract author parts
+                given = author.get('given', '')
+                family = author.get('family', '')
+                
+                # Skip if no name parts found
+                if not given and not family:
+                    continue
+                    
+                # Create full name
+                full_name = f"{given} {family}".strip()
+                
+                # Create Author object
+                author_obj = Author(
+                    full_name=full_name,
+                    first_name=given,
+                    last_name=family
+                )
+                authors.append(author_obj)
+                
+        except (KeyError, TypeError, ValueError) as e:
+            print(colored(f"⚠️ Error parsing author data: {str(e)}", "yellow"))
             
+        return authors
+
+    def _extract_title(self, text: str) -> Optional[str]:
+        """Extract title from text using common patterns."""
+        # Look for title patterns
+        title_patterns = [
+            r'(?i)title[:\s]+([^\n]+)',  # Basic title pattern
+            r'(?m)^#\s+(.+)$',  # Markdown title
+            r'(?m)^(.+)\n={3,}$',  # Underlined title
+            r'\\title{([^}]+)}',  # LaTeX title
+        ]
+        
+        for pattern in title_patterns:
+            match = re.search(pattern, text)
+            if match:
+                title = match.group(1).strip()
+                if len(title) > 10:  # Basic validation
+                    return title
+        
+        # Fallback: try first non-empty line
+        lines = text.strip().split('\n')
+        for line in lines:
+            line = line.strip()
+            if line and len(line) > 10 and not line.startswith('#') and not line.lower().startswith('abstract'):
+                return line
+        
+        return None
+
+    def extract_metadata(self, text: str, doc_id: str, existing_metadata: Optional[Dict[str, Any]] = None) -> Optional[AcademicMetadata]:
+        """Extract metadata from text, optionally using existing metadata"""
+        try:
+            # Initialize metadata object
+            metadata = AcademicMetadata(doc_id=doc_id)
+            
+            # If we have existing metadata, use it
+            if existing_metadata:
+                metadata.title = existing_metadata.get('title', '')
+                metadata.abstract = existing_metadata.get('abstract', '')
+                metadata.identifier = existing_metadata.get('identifier', '')
+                metadata.identifier_type = existing_metadata.get('identifier_type', '')
+                metadata.year = existing_metadata.get('year')
+                metadata.journal = existing_metadata.get('journal', '')
+                metadata.source = existing_metadata.get('source', '')
+                metadata.validation_info = existing_metadata.get('validation_info', {})
+                metadata.extraction_method = existing_metadata.get('extraction_method', '')
+                
+                # Convert author dictionaries to Author objects
+                if 'authors' in existing_metadata:
+                    metadata.authors = []
+                    for author_data in existing_metadata['authors']:
+                        if isinstance(author_data, dict):
+                            given = author_data.get('given', '')
+                            family = author_data.get('family', '')
+                            full_name = author_data.get('full_name', f"{given} {family}".strip())
+                            metadata.authors.append(Author(full_name=full_name))
+            
+            # Extract references using Anystyle
+            if self.anystyle_available:
+                references = self._extract_references_with_anystyle(text)
+                if references:
+                    metadata.references = references
+                    print(colored(f"✓ Found {len(references)} references", "green"))
+                else:
+                    print(colored("⚠️ No references parsed", "yellow"))
+            
+            # Extract equations
+            equations = self.equation_extractor.extract_equations(text)
+            if equations:
+                metadata.equations = equations
+                print(colored(f"✓ Found {len(equations)} equations", "green"))
+            else:
+                print(colored("⚠️ No equations found", "yellow"))
+            
+            return metadata
+            
+        except Exception as e:
+            print(colored(f"⚠️ Error extracting metadata: {str(e)}", "yellow"))
+            return None
+
     def _extract_references_with_anystyle(self, text: str) -> List[Reference]:
-        """Extract references using Anystyle CLI with two-step process"""
-        if not self.has_anystyle:
+        """Extract references from text using Anystyle CLI."""
+        if not self.anystyle_available:
             print(colored("⚠️ Anystyle not available, skipping reference extraction", "yellow"))
             return []
-            
+
+        # Try to find references section using different patterns
+        patterns = [
+            r'#\s*\*?\*?References\*?\*?\s*\n(.*?)(?=\n#|$)',  # Single # with optional **
+            r'#{2}\s*\*?\*?References\*?\*?\s*\n(.*?)(?=\n#{2}|$)',  # Double ## with optional **
+            r'References\s*\n(.*?)(?=\n\n|$)',     # Plain text style
+            r'\[\d+\].*?(?=\[\d+\]|\Z)',          # Numbered references
+            r'\[\d+\].*?(?=\n\n|\Z)'              # Single reference
+        ]
+        
+        references_text = ""
+        for pattern in patterns:
+            matches = re.findall(pattern, text, re.DOTALL | re.MULTILINE)
+            if matches:
+                references_text = '\n'.join(matches)
+                if self.debug:
+                    print(colored(f"✓ Found references section with pattern: {pattern}", "green"))
+                break
+        
+        if not references_text:
+            print(colored("⚠️ No references section found in text", "yellow"))
+            return []
+
         try:
-            # Create temporary files
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', encoding='utf-8', delete=False) as temp_in, \
-                 tempfile.NamedTemporaryFile(mode='w', suffix='.json', encoding='utf-8', delete=False) as temp_find, \
-                 tempfile.NamedTemporaryFile(mode='w', suffix='.json', encoding='utf-8', delete=False) as temp_parse:
-                
-                # Write text to temporary file
-                temp_in.write(text)
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False, encoding='utf-8') as temp_in:
+                # Clean up reference text - remove markdown formatting
+                references_text = re.sub(r'\*\*(.*?)\*\*', r'\1', references_text)  # Remove bold
+                references_text = re.sub(r'\*(.*?)\*', r'\1', references_text)      # Remove italics
+                temp_in.write(references_text)
                 temp_in.flush()
                 
-                # Step 1: Find references in text
-                print(colored("→ Running Anystyle find to locate references...", "blue"))
-                find_cmd = ['anystyle', '--format', 'json', '--no-layout', 'find', temp_in.name, temp_find.name]
-                subprocess.run(find_cmd, capture_output=True, text=True, check=True)
+                # Run Anystyle parse command and capture output directly
+                parse_cmd = ['anystyle', '--format', 'json', 'parse', temp_in.name]
+                if self.debug:
+                    print(colored(f"Running command: {' '.join(parse_cmd)}", "blue"))
+                result = subprocess.run(parse_cmd, capture_output=True, text=True, check=True)
                 
-                # Read found references
-                with open(temp_find.name, 'r', encoding='utf-8') as f:
-                    found_refs = json.load(f)
-                
-                if not found_refs:
-                    print(colored("⚠️ No references found in text", "yellow"))
-                    return []
-                
-                # Write found references to new file for parsing
-                refs_text = "\n\n".join(ref.get('text', '') for ref in found_refs)
-                with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', encoding='utf-8', delete=False) as temp_refs:
-                    temp_refs.write(refs_text)
-                    temp_refs.flush()
-                    
-                    # Step 2: Parse found references
-                    print(colored("→ Running Anystyle parse on found references...", "blue"))
-                    parse_cmd = ['anystyle', '--format', 'json', 'parse', temp_refs.name, temp_parse.name]
-                    subprocess.run(parse_cmd, capture_output=True, text=True, check=True)
-                    
-                # Read parsed references
-                with open(temp_parse.name, 'r', encoding='utf-8') as f:
-                    parsed_refs = json.load(f)
-                    
-                if parsed_refs:
-                    # Convert parsed references to Reference objects
+                try:
+                    references_data = json.loads(result.stdout)
                     references = []
-                    for ref in parsed_refs:
+                    
+                    for ref in references_data:
                         try:
                             # Extract year from date if present
                             year = None
                             if 'date' in ref:
-                                date_str = str(ref['date'][0]) if isinstance(ref['date'], list) else str(ref['date'])
-                                year_match = re.search(r'\d{4}', date_str)
+                                year_match = re.search(r'\b\d{4}\b', ref['date'][0])
                                 if year_match:
                                     year = int(year_match.group())
                             
                             # Create Reference object
                             reference = Reference(
                                 raw_text=ref.get('original', ''),
-                                title=ref.get('title', [None])[0] if isinstance(ref.get('title', []), list) else ref.get('title'),
-                                authors=[Author(full_name=a) for a in ref.get('author', [])],
+                                title=ref.get('title', [''])[0] if ref.get('title') else '',
+                                authors=[Author(full_name=author) for author in ref.get('author', [])],
                                 year=year,
-                                doi=ref.get('doi', [None])[0] if isinstance(ref.get('doi', []), list) else ref.get('doi'),
-                                venue=ref.get('container-title', [None])[0] if isinstance(ref.get('container-title', []), list) else ref.get('container-title')
+                                doi=ref.get('doi', [''])[0] if ref.get('doi') else None,
+                                venue=ref.get('journal', [''])[0] if ref.get('journal') else None
                             )
                             references.append(reference)
-                        except Exception as err:
-                            print(colored(f"⚠️ Error parsing reference: {str(err)}", "yellow"))
+                        except (KeyError, TypeError, ValueError) as e:
+                            print(colored(f"⚠️ Error parsing reference: {e}", "yellow"))
                             continue
-                            
+                    
                     print(colored(f"✓ Successfully parsed {len(references)} references", "green"))
                     return references
-                else:
-                    print(colored("⚠️ No references parsed", "yellow"))
+                    
+                except json.JSONDecodeError as e:
+                    print(colored(f"⚠️ Error decoding JSON from Anystyle output: {e}", "red"))
                     return []
                     
-        except Exception as err:
-            print(colored(f"⚠️ Error during reference extraction: {str(err)}", "yellow"))
+        except subprocess.CalledProcessError as e:
+            print(colored(f"⚠️ Anystyle parse failed with code {e.returncode}", "red"))
+            if e.stderr:
+                print(colored(f"Error output: {e.stderr}", "red"))
+            return []
+        except Exception as e:
+            print(colored(f"⚠️ Error during reference extraction: {e}", "red"))
             return []
         finally:
-            # Clean up temporary files
-            for temp_file in [temp_in.name, temp_find.name, temp_parse.name]:
-                try:
-                    os.unlink(temp_file)
-                except Exception:
-                    pass
-                
-    def _parse_authors(self, author_data: List[Any]) -> List[Author]:
-        """Parse authors with improved filtering for addresses and institutions"""
-        authors = []
-        
-        # Common address/institution keywords to filter out
-        address_keywords = {'university', 'department', 'institute', 'school', 'college', 
-                           'street', 'road', 'ave', 'boulevard', 'blvd', 'usa', 'uk'}
-        
-        for author in author_data:
             try:
-                full_name = ""
-                if isinstance(author, dict):
-                    # Handle dictionary input (from Anystyle)
-                    given = author.get('given', '')
-                    family = author.get('family', '')
-                    full_name = f"{given} {family}".strip()
-                else:
-                    # Handle string input
-                    full_name = str(author).strip()
-                
-                # Skip if empty or looks like an address
-                if not full_name or any(keyword in full_name.lower() for keyword in address_keywords):
-                    continue
-                
-                # Create Author object with only full_name
-                authors.append(Author(full_name=full_name))
-                
-            except Exception as err:
-                print(colored(f"⚠️ Error parsing author: {str(err)}", "yellow"))
-                continue
-            
-        return authors
-        
-    def extract_metadata(self, text: str, doc_id: str, pdf_path: Optional[str] = None, existing_metadata: Optional[Dict] = None) -> AcademicMetadata:
-        """Extract metadata including references using Anystyle"""
-        try:
-            # Create base metadata object
-            metadata = AcademicMetadata(doc_id=doc_id)
-            
-            # If we have existing metadata, use it as a base
-            if existing_metadata:
-                print(colored(f"✓ Using existing metadata from {existing_metadata.get('source', 'unknown')}", "green"))
-                
-                metadata.title = existing_metadata.get('title', '')
-                metadata.abstract = existing_metadata.get('abstract', '')
-                
-                # Handle authors - only use full_name to avoid 'given' keyword error
-                authors = []
-                for author_data in existing_metadata.get('authors', []):
-                    try:
-                        if isinstance(author_data, dict):
-                            # Combine given and family names for full_name
-                            given = author_data.get('given', '')
-                            family = author_data.get('family', '')
-                            full_name = f"{given} {family}".strip()
-                            if full_name:
-                                authors.append(Author(full_name=full_name))
-                        elif isinstance(author_data, Author):
-                            authors.append(author_data)
-                        elif isinstance(author_data, str):
-                            authors.append(Author(full_name=author_data))
-                    except Exception as err:
-                        print(colored(f"⚠️ Error creating author object: {str(err)}", "yellow"))
-                        continue
-                
-                metadata.authors = authors
-            
-            # Extract references using Anystyle
-            print(colored("\n=== Extracting References with Anystyle ===", "blue"))
-            references = self._extract_references_with_anystyle(text)
-            metadata.references = references
-            
-            return metadata
-            
-        except Exception as err:
-            print(colored(f"⚠️ Error extracting metadata: {str(err)}", "yellow"))
-            # Return empty metadata object rather than None
-            return AcademicMetadata(doc_id=doc_id) 
+                os.unlink(temp_in.name)
+            except Exception as e:
+                print(colored(f"⚠️⚠️⚠️ Error removing temporary file: {e}", "yellow")) 

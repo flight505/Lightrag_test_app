@@ -2,6 +2,7 @@ import pytest
 from pathlib import Path
 from src.file_processor import FileProcessor
 from src.config_manager import ConfigManager, PDFEngine
+from src.equation_metadata import EquationExtractor
 import json
 import logging
 import subprocess
@@ -149,3 +150,37 @@ def test_anystyle_availability():
     assert result.returncode == 0, "Anystyle command failed"
     assert "anystyle version 1.5.0" in result.stdout, "Unexpected Anystyle version"
     print(colored(f"✓ Anystyle version: {result.stdout.strip()}", "green")) 
+
+def test_equation_extraction(file_processor):
+    """Test equation extraction from Markdown text"""
+    print(colored("\n=== Testing Equation Extraction ===", "blue"))
+    
+    # Process the arXiv paper which should contain equations
+    result = file_processor.process_file(str(arxiv_path))
+    assert result is not None, "Processing failed"
+    
+    metadata = result.get('metadata')
+    assert metadata is not None, "No metadata extracted"
+    
+    # Verify equations were extracted
+    equations = metadata.get('equations', [])
+    assert len(equations) > 0, "No equations extracted from paper"
+    
+    # Verify equation structure
+    first_eq = equations[0]
+    assert isinstance(first_eq, dict), "Equation not properly structured"
+    assert 'raw_text' in first_eq, "Equation missing raw_text"
+    assert 'equation_id' in first_eq, "Equation missing ID"
+    assert 'equation_type' in first_eq, "Equation missing type"
+    assert 'symbols' in first_eq, "Equation missing symbols"
+    
+    # Check if specific equation exists
+    target_eq = r'\hat{\mathbf{Y}}=\mathbf{AX}\oplus\mathbf{b}\in\mathbb{R}^{T\times C_{x}}'
+    found = False
+    for eq in equations:
+        if target_eq in eq['raw_text']:
+            found = True
+            break
+    assert found, "Expected equation not found"
+    
+    print(colored(f"✓ Found {len(equations)} equations", "green")) 

@@ -16,7 +16,6 @@ try:
 except ImportError:
     st.error("Could not import xxhash. Please install it with: pip install xxhash")
     xxhash = None
-from streamlit_navigation_bar import st_navbar
 
 from src.lightrag_helpers import ResponseProcessor
 from src.lightrag_init import DEFAULT_MODEL, SUPPORTED_MODELS, LightRAGManager
