@@ -111,7 +111,6 @@ class FileProcessor:
                             'year': paper.published.year if paper.published else None,
                             'categories': paper.categories if hasattr(paper, 'categories') else [],
                             'source': 'arxiv',
-                            'validation_info': validation_info,
                             'extraction_method': method
                         }
                         
@@ -150,7 +149,6 @@ class FileProcessor:
                             'year': work.get('published-print', {}).get('date-parts', [[None]])[0][0],
                             'journal': work.get('container-title', [None])[0],
                             'source': 'crossref',
-                            'validation_info': validation_info,
                             'extraction_method': method
                         }
                         
@@ -367,7 +365,6 @@ class FileProcessor:
             if result:
                 identifier = result.get('identifier')
                 identifier_type = result.get('identifier_type', '').lower()
-                validation_info = result.get('validation_info')
                 method = result.get('method')
                 
                 if not identifier:
@@ -417,7 +414,6 @@ class FileProcessor:
                             'year': paper.published.year if paper.published else None,
                             'categories': paper.categories if hasattr(paper, 'categories') else [],
                             'source': 'arxiv',
-                            'validation_info': validation_info,
                             'extraction_method': method
                         }
                         
@@ -456,7 +452,6 @@ class FileProcessor:
                             'year': work.get('published-print', {}).get('date-parts', [[None]])[0][0],
                             'journal': work.get('container-title', [None])[0],
                             'source': 'crossref',
-                            'validation_info': validation_info,
                             'extraction_method': method
                         }
                         
