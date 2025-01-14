@@ -6,7 +6,6 @@ import tempfile
 import json
 import os
 from .academic_metadata import Reference, Author, AcademicMetadata
-from pathlib import Path
 
 class MetadataExtractor:
     """Extracts metadata from academic documents"""
@@ -21,7 +20,7 @@ class MetadataExtractor:
             result = subprocess.run(['anystyle', '--version'], capture_output=True, text=True, check=True)
             print(colored(f"✓ Found Anystyle: {result.stdout.strip()}", "green"))
             return True
-        except Exception as e:
+        except subprocess.CalledProcessError:
             print(colored("⚠️ Anystyle not found. Please install Anystyle CLI: gem install anystyle-cli", "yellow"))
             return False
             
@@ -44,7 +43,7 @@ class MetadataExtractor:
                 # Step 1: Find references in text
                 print(colored("→ Running Anystyle find to locate references...", "blue"))
                 find_cmd = ['anystyle', '--format', 'json', '--no-layout', 'find', temp_in.name, temp_find.name]
-                result = subprocess.run(find_cmd, capture_output=True, text=True, check=True)
+                subprocess.run(find_cmd, capture_output=True, text=True, check=True)
                 
                 # Read found references
                 with open(temp_find.name, 'r', encoding='utf-8') as f:
@@ -63,8 +62,8 @@ class MetadataExtractor:
                     # Step 2: Parse found references
                     print(colored("→ Running Anystyle parse on found references...", "blue"))
                     parse_cmd = ['anystyle', '--format', 'json', 'parse', temp_refs.name, temp_parse.name]
-                    result = subprocess.run(parse_cmd, capture_output=True, text=True, check=True)
-                
+                    subprocess.run(parse_cmd, capture_output=True, text=True, check=True)
+                    
                 # Read parsed references
                 with open(temp_parse.name, 'r', encoding='utf-8') as f:
                     parsed_refs = json.load(f)
@@ -113,12 +112,72 @@ class MetadataExtractor:
                 except Exception:
                     pass
                 
-    def extract_metadata(self, text: str, doc_id: str, pdf_path: Optional[str] = None) -> AcademicMetadata:
+    def _parse_authors(self, author_data: List[Any]) -> List[Author]:
+        """Parse authors with improved filtering for addresses and institutions"""
+        authors = []
+        
+        # Common address/institution keywords to filter out
+        address_keywords = {'university', 'department', 'institute', 'school', 'college', 
+                           'street', 'road', 'ave', 'boulevard', 'blvd', 'usa', 'uk'}
+        
+        for author in author_data:
+            try:
+                full_name = ""
+                if isinstance(author, dict):
+                    # Handle dictionary input (from Anystyle)
+                    given = author.get('given', '')
+                    family = author.get('family', '')
+                    full_name = f"{given} {family}".strip()
+                else:
+                    # Handle string input
+                    full_name = str(author).strip()
+                
+                # Skip if empty or looks like an address
+                if not full_name or any(keyword in full_name.lower() for keyword in address_keywords):
+                    continue
+                
+                # Create Author object with only full_name
+                authors.append(Author(full_name=full_name))
+                
+            except Exception as e:
+                print(colored(f"⚠️ Error parsing author: {str(e)}", "yellow"))
+                continue
+            
+        return authors
+        
+    def extract_metadata(self, text: str, doc_id: str, pdf_path: Optional[str] = None, existing_metadata: Optional[Dict] = None) -> AcademicMetadata:
         """Extract metadata including references using Anystyle"""
         try:
-            # Create AcademicMetadata object first
-            metadata = AcademicMetadata()
-            metadata.doc_id = doc_id
+            # Create base metadata object
+            metadata = AcademicMetadata(doc_id=doc_id)
+            
+            # If we have existing metadata, use it as a base
+            if existing_metadata:
+                print(colored(f"✓ Using existing metadata from {existing_metadata.get('source', 'unknown')}", "green"))
+                
+                metadata.title = existing_metadata.get('title', '')
+                metadata.abstract = existing_metadata.get('abstract', '')
+                
+                # Handle authors - only use full_name to avoid 'given' keyword error
+                authors = []
+                for author_data in existing_metadata.get('authors', []):
+                    try:
+                        if isinstance(author_data, dict):
+                            # Combine given and family names for full_name
+                            given = author_data.get('given', '')
+                            family = author_data.get('family', '')
+                            full_name = f"{given} {family}".strip()
+                            if full_name:
+                                authors.append(Author(full_name=full_name))
+                        elif isinstance(author_data, Author):
+                            authors.append(author_data)
+                        elif isinstance(author_data, str):
+                            authors.append(Author(full_name=author_data))
+                    except Exception as e:
+                        print(colored(f"⚠️ Error creating author object: {str(e)}", "yellow"))
+                        continue
+                
+                metadata.authors = authors
             
             # Extract references using Anystyle
             print(colored("\n=== Extracting References with Anystyle ===", "blue"))
@@ -130,6 +189,4 @@ class MetadataExtractor:
         except Exception as e:
             print(colored(f"⚠️ Error extracting metadata: {str(e)}", "yellow"))
             # Return empty metadata object rather than None
-            metadata = AcademicMetadata()
-            metadata.doc_id = doc_id
-            return metadata 
+            return AcademicMetadata(doc_id=doc_id) 
