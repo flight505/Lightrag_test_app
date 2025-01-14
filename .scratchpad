@@ -1,0 +1,45 @@
+Issues and Progress Log:
+
+1. Initial Error: MetadataExtractor missing _extract_title method
+   - Added _extract_title method with regex patterns for title extraction
+   - Status: ✓ Fixed
+
+2. Error: MetadataExtractor missing _parse_authors method
+   - Added _parse_authors method to handle author data from Anystyle
+   - Status: ✓ Fixed
+
+3. Error: MetadataExtractor missing _extract_citations method
+   - Added _extract_citations method to extract citations from text
+   - Status: ✓ Fixed
+
+4. Reference Extraction Issues:
+   - Tests failing with "No references extracted" error
+   - Anystyle command works (version 1.5.0 verified)
+   - Fixed by:
+     * Updated FileProcessor to pass pdf_path and existing_metadata to extract_metadata
+     * Fixed extract_metadata to return AcademicMetadata object instead of dict
+     * Added proper handling of existing metadata and references
+     * Fixed Author object creation to handle given/family name correctly
+     * Updated _parse_authors method to handle author data consistently
+   - Status: ✓ Fixed
+
+5. Type Errors in FileProcessor:
+   - Missing imports for Optional, Dict, Any, Callable
+   - Added necessary imports from typing module
+   - Status: ✓ Fixed
+
+Current Status:
+✓ All tests passing
+✓ Reference extraction working for both arXiv and DOI papers
+✓ Metadata consolidation successful
+
+Remaining Warnings:
+1. Pydantic deprecation warnings for class-based config
+2. PyPDF2 deprecation warnings for PdfFileReader and getDocumentInfo
+3. ArXiv API deprecation warning for Search.results
+4. Marker library warnings about markup handling
+
+Next Steps:
+1. Address deprecation warnings if needed
+2. Add more test cases for edge cases
+3. Improve error handling and logging

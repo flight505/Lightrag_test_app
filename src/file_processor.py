@@ -1,7 +1,7 @@
-from typing import Dict, List, Any, Optional, Callable
 from pathlib import Path
 import json
 from threading import RLock
+from typing import Optional, Dict, Any, Callable, List
 from src.academic_metadata import MetadataExtractor
 from termcolor import colored
 from src.pdf_converter import MarkerConverter
@@ -204,20 +204,15 @@ class FileProcessor:
                     print(colored("\n=== Extracting References with Anystyle ===", "blue"))
                     try:
                         doc_id = Path(file_path).stem
-                        academic_metadata = self.metadata_extractor.extract_metadata(text_content, doc_id=doc_id)
-                        if academic_metadata and hasattr(academic_metadata, 'references') and academic_metadata.references:
-                            # Convert references to list of dicts, handling None values
-                            ref_dicts = []
-                            for ref in academic_metadata.references:
-                                ref_dict = {
-                                    'raw_text': ref.raw_text if hasattr(ref, 'raw_text') else '',
-                                    'title': ref.title if hasattr(ref, 'title') else None,
-                                    'authors': [{'full_name': a.full_name} for a in ref.authors] if hasattr(ref, 'authors') and ref.authors else [],
-                                    'year': ref.year if hasattr(ref, 'year') else None,
-                                    'doi': ref.doi if hasattr(ref, 'doi') else None,
-                                    'venue': ref.venue if hasattr(ref, 'venue') else None
-                                }
-                                ref_dicts.append(ref_dict)
+                        academic_metadata = self.metadata_extractor.extract_metadata(
+                            text=text_content, 
+                            doc_id=doc_id,
+                            pdf_path=file_path,
+                            existing_metadata=metadata
+                        )
+                        if academic_metadata and academic_metadata.references:
+                            # Convert references to list of dicts
+                            ref_dicts = [ref.to_dict() for ref in academic_metadata.references]
                             metadata['references'] = ref_dicts
                             print(colored(f"✓ Extracted {len(ref_dicts)} references with Anystyle", "green"))
                         else:

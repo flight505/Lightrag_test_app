@@ -4,6 +4,7 @@ from src.file_processor import FileProcessor
 from src.config_manager import ConfigManager, PDFEngine
 import json
 import logging
+import subprocess
 from termcolor import colored
 
 # Configure logging
@@ -48,18 +49,27 @@ def test_arxiv_metadata_extraction(file_processor):
     assert len(metadata['authors']) == 5
     assert metadata['identifier_type'] == 'arxiv'
     
+    # Wait for metadata file to be saved
+    metadata_file = arxiv_path.parent / f"{arxiv_path.stem}_metadata.json"
+    assert metadata_file.exists(), "Metadata file not saved"
+    
+    # Load metadata from file
+    with open(metadata_file, 'r', encoding='utf-8') as f:
+        saved_metadata = json.load(f)
+    
     # Verify Anystyle reference extraction
     print(colored("\n=== Verifying Anystyle Reference Extraction ===", "blue"))
-    references = metadata.get('references', [])
-    if references:
-        print(colored(f"✓ Found {len(references)} references with Anystyle", "green"))
-    else:
-        print(colored("⚠️ No references found by Anystyle", "yellow"))
+    references = saved_metadata.get('references', [])
+    assert len(references) > 0, "No references extracted from arXiv paper"
     
-    # Save metadata for consolidation test
-    metadata_file = arxiv_path.parent / f"{arxiv_path.stem}_metadata.json"
-    with open(metadata_file, 'w', encoding='utf-8') as f:
-        json.dump(metadata, f, indent=2)
+    # Verify reference structure
+    first_ref = references[0]
+    assert isinstance(first_ref, dict), "Reference not properly structured"
+    assert 'raw_text' in first_ref, "Reference missing raw_text"
+    assert 'title' in first_ref, "Reference missing title"
+    assert 'authors' in first_ref, "Reference missing authors"
+    
+    print(colored(f"✓ Found {len(references)} references with Anystyle", "green"))
 
 def test_doi_metadata_extraction(file_processor):
     """Test metadata extraction from DOI paper including Anystyle references"""
@@ -75,18 +85,27 @@ def test_doi_metadata_extraction(file_processor):
     # Verify basic metadata
     assert metadata['identifier_type'] == 'doi'
     
+    # Wait for metadata file to be saved
+    metadata_file = doi_path.parent / f"{doi_path.stem}_metadata.json"
+    assert metadata_file.exists(), "Metadata file not saved"
+    
+    # Load metadata from file
+    with open(metadata_file, 'r', encoding='utf-8') as f:
+        saved_metadata = json.load(f)
+    
     # Verify Anystyle reference extraction
     print(colored("\n=== Verifying Anystyle Reference Extraction ===", "blue"))
-    references = metadata.get('references', [])
-    if references:
-        print(colored(f"✓ Found {len(references)} references with Anystyle", "green"))
-    else:
-        print(colored("⚠️ No references found by Anystyle", "yellow"))
+    references = saved_metadata.get('references', [])
+    assert len(references) > 0, "No references extracted from DOI paper"
     
-    # Save metadata for consolidation test
-    metadata_file = doi_path.parent / f"{doi_path.stem}_metadata.json"
-    with open(metadata_file, 'w', encoding='utf-8') as f:
-        json.dump(metadata, f, indent=2)
+    # Verify reference structure
+    first_ref = references[0]
+    assert isinstance(first_ref, dict), "Reference not properly structured"
+    assert 'raw_text' in first_ref, "Reference missing raw_text"
+    assert 'title' in first_ref, "Reference missing title"
+    assert 'authors' in first_ref, "Reference missing authors"
+    
+    print(colored(f"✓ Found {len(references)} references with Anystyle", "green"))
 
 def test_metadata_consolidation():
     """Test loading and consolidating metadata from both papers"""
@@ -122,3 +141,11 @@ def test_metadata_consolidation():
     with open(consolidated_file, 'w', encoding='utf-8') as f:
         json.dump(consolidated, f, indent=2)
     print(colored(f"✓ Saved consolidated metadata with {consolidated['total_references']} total references", "green")) 
+
+def test_anystyle_availability():
+    """Test Anystyle CLI availability and version"""
+    print(colored("\n=== Testing Anystyle Availability ===", "blue"))
+    result = subprocess.run(['anystyle', '--version'], capture_output=True, text=True)
+    assert result.returncode == 0, "Anystyle command failed"
+    assert "anystyle version 1.5.0" in result.stdout, "Unexpected Anystyle version"
+    print(colored(f"✓ Anystyle version: {result.stdout.strip()}", "green")) 
