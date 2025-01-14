@@ -48,83 +48,58 @@ class FileProcessor:
         return None
 
     @st.cache_data(show_spinner=False)
-    def _extract_metadata_with_doi(_self, file_path: str) -> Optional[Dict[str, Any]]:
+    def _extract_metadata_with_doi(self, file_path: str) -> Optional[Dict[str, Any]]:
         """Extract metadata using DOI lookup"""
-        print(colored("\n=== Starting DOI-based Metadata Extraction ===", "blue"))
         try:
-            # Try pdf2doi first
-            print(colored("→ Attempting pdf2doi extraction...", "blue"))
-            result = pdf2doi.pdf2doi(file_path)
-            
-            # Handle pdf2doi result dictionary
-            if isinstance(result, dict):
-                identifier = result.get('identifier')
-                identifier_type = result.get('identifier_type', '').lower()
-                validation_info = result.get('validation_info')
-                method = result.get('method')
-                
-                if not identifier:
-                    print(colored("⚠️ No identifier found in PDF", "yellow"))
-                    return None
-                    
-                print(colored(f"✓ Found {identifier_type}: {identifier} (method: {method})", "green"))
+            # Try to extract DOI
+            identifier, method = self.pdf2doi.get_identifier(file_path)
+            if identifier:
+                print(colored(f"✓ Found doi: {identifier} (method: {method})", "green"))
                 
                 # Check if it's an arXiv identifier
-                if "arxiv" in identifier.lower():
+                arxiv_id = None
+                if 'arxiv' in identifier.lower():
+                    arxiv_id = identifier.split('/')[-1]
                     print(colored("→ arXiv identifier detected, fetching from arXiv API...", "blue"))
-                    try:
-                        # Extract just the raw arXiv ID number
-                        arxiv_id = identifier.lower()
-                        if '/' in arxiv_id:
-                            arxiv_id = arxiv_id.split('/')[-1]
-                        if 'arxiv.' in arxiv_id:
-                            arxiv_id = arxiv_id.split('arxiv.')[-1]
-                        if ':' in arxiv_id:
-                            arxiv_id = arxiv_id.split(':')[-1]
-                        arxiv_id = arxiv_id.strip()
-                        
-                        print(colored(f"→ Querying arXiv API with ID: {arxiv_id}", "blue"))
-                        
-                        import arxiv
-                        search = arxiv.Search(id_list=[arxiv_id])
-                        paper = next(search.results())
-                        
-                        # Process authors
-                        authors = []
-                        for author in paper.authors:
-                            name_parts = str(author).split()
-                            if len(name_parts) > 0:
-                                given = ' '.join(name_parts[:-1]) if len(name_parts) > 1 else ''
-                                family = name_parts[-1]
-                                authors.append({
-                                    'given': given,
-                                    'family': family,
-                                    'full_name': str(author)
-                                })
-                        
-                        metadata = {
-                            'title': paper.title,
-                            'authors': authors,
-                            'abstract': paper.summary,
-                            'identifier': arxiv_id,
-                            'identifier_type': 'arxiv',
-                            'year': paper.published.year if paper.published else None,
-                            'categories': paper.categories if hasattr(paper, 'categories') else [],
-                            'source': 'arxiv',
-                            'extraction_method': method
-                        }
-                        
-                        print(colored("✓ arXiv metadata extracted successfully", "green"))
-                        return metadata
-                        
-                    except Exception as e:
-                        print(colored(f"⚠️ arXiv API error: {str(e)}", "yellow"))
-                        return None
-                
+                    
+                    import arxiv
+                    print(colored(f"→ Querying arXiv API with ID: {arxiv_id}", "blue"))
+                    
+                    search = arxiv.Search(id_list=[arxiv_id])
+                    paper = next(search.results())
+                    
+                    # Process authors
+                    authors = []
+                    for author in paper.authors:
+                        name_parts = str(author).split()
+                        if len(name_parts) > 0:
+                            given = ' '.join(name_parts[:-1]) if len(name_parts) > 1 else ''
+                            family = name_parts[-1]
+                            authors.append({
+                                'given': given,
+                                'family': family,
+                                'full_name': str(author)
+                            })
+                    
+                    metadata = {
+                        'title': paper.title,
+                        'authors': authors,
+                        'abstract': paper.summary,
+                        'identifier': arxiv_id,
+                        'identifier_type': 'arxiv',
+                        'year': paper.published.year if paper.published else None,
+                        'categories': paper.categories if hasattr(paper, 'categories') else [],
+                        'source': 'arxiv',
+                        'extraction_method': method
+                    }
+                    
+                    print(colored("✓ arXiv metadata extracted successfully", "green"))
+                    return metadata
+                    
                 # If not arXiv, try Crossref
                 print(colored("→ Using Crossref for DOI lookup...", "blue"))
                 try:
-                    work = _self.works.doi(identifier)
+                    work = self.works.doi(identifier)
                     if work:
                         authors = []
                         for author in work.get('author', []):
@@ -154,21 +129,14 @@ class FileProcessor:
                         
                         print(colored("✓ Crossref metadata extracted successfully", "green"))
                         return metadata
-                    else:
-                        print(colored("⚠️ Crossref lookup failed - no metadata found", "yellow"))
+                        
                 except Exception as e:
                     print(colored(f"⚠️ Crossref API error: {str(e)}", "yellow"))
                     return None
-                
-            else:
-                print(colored("⚠️ Invalid pdf2doi result format", "yellow"))
-                
+                    
         except Exception as e:
-            logger.warning(f"DOI extraction failed: {str(e)}")
-            print(colored(f"⚠️ DOI extraction failed: {str(e)}", "yellow"))
-        
-        print(colored("⚠️ DOI-based extraction failed", "yellow"))
-        return None
+            print(colored(f"⚠️ Error extracting metadata with DOI: {str(e)}", "yellow"))
+            return None
 
     def process_file(self, file_path: str, progress_callback: Optional[Callable[[str], None]] = None) -> Optional[Dict[str, Any]]:
         """Process a single file, extracting metadata and text"""

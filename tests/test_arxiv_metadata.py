@@ -35,7 +35,7 @@ def file_processor(config_manager):
     return FileProcessor(config_manager)
 
 def test_arxiv_metadata_extraction(file_processor):
-    """Test metadata extraction from arXiv paper including Anystyle references"""
+    """Test metadata extraction from arXiv paper including API and Anystyle references"""
     print(colored("\n=== Testing arXiv Paper Processing ===", "blue"))
     
     # Process the arXiv paper
@@ -58,10 +58,10 @@ def test_arxiv_metadata_extraction(file_processor):
     with open(metadata_file, 'r', encoding='utf-8') as f:
         saved_metadata = json.load(f)
     
-    # Verify Anystyle reference extraction
-    print(colored("\n=== Verifying Anystyle Reference Extraction ===", "blue"))
+    # Verify reference extraction
+    print(colored("\n=== Verifying Reference Extraction ===", "blue"))
     references = saved_metadata.get('references', [])
-    assert len(references) > 0, "No references extracted from arXiv paper"
+    assert len(references) > 0, "No references extracted"
     
     # Verify reference structure
     first_ref = references[0]
@@ -70,10 +70,16 @@ def test_arxiv_metadata_extraction(file_processor):
     assert 'title' in first_ref, "Reference missing title"
     assert 'authors' in first_ref, "Reference missing authors"
     
-    print(colored(f"✓ Found {len(references)} references with Anystyle", "green"))
+    # Count references by source
+    api_refs = [r for r in references if r.get('source') in ['arxiv', 'crossref']]
+    text_refs = [r for r in references if not r.get('source')]
+    
+    print(colored(f"✓ Found {len(api_refs)} API-based references", "green"))
+    print(colored(f"✓ Found {len(text_refs)} text-based references", "green"))
+    print(colored(f"✓ Total references: {len(references)}", "green"))
 
 def test_doi_metadata_extraction(file_processor):
-    """Test metadata extraction from DOI paper including Anystyle references"""
+    """Test metadata extraction from DOI paper including API and Anystyle references"""
     print(colored("\n=== Testing DOI Paper Processing ===", "blue"))
     
     # Process the DOI paper
@@ -94,10 +100,10 @@ def test_doi_metadata_extraction(file_processor):
     with open(metadata_file, 'r', encoding='utf-8') as f:
         saved_metadata = json.load(f)
     
-    # Verify Anystyle reference extraction
-    print(colored("\n=== Verifying Anystyle Reference Extraction ===", "blue"))
+    # Verify reference extraction
+    print(colored("\n=== Verifying Reference Extraction ===", "blue"))
     references = saved_metadata.get('references', [])
-    assert len(references) > 0, "No references extracted from DOI paper"
+    assert len(references) > 0, "No references extracted"
     
     # Verify reference structure
     first_ref = references[0]
@@ -106,7 +112,13 @@ def test_doi_metadata_extraction(file_processor):
     assert 'title' in first_ref, "Reference missing title"
     assert 'authors' in first_ref, "Reference missing authors"
     
-    print(colored(f"✓ Found {len(references)} references with Anystyle", "green"))
+    # Count references by source
+    api_refs = [r for r in references if r.get('source') in ['arxiv', 'crossref']]
+    text_refs = [r for r in references if not r.get('source')]
+    
+    print(colored(f"✓ Found {len(api_refs)} API-based references", "green"))
+    print(colored(f"✓ Found {len(text_refs)} text-based references", "green"))
+    print(colored(f"✓ Total references: {len(references)}", "green"))
 
 def test_metadata_consolidation():
     """Test loading and consolidating metadata from both papers"""
