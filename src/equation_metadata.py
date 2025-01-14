@@ -1,37 +1,45 @@
+"""Equation metadata and processing classes."""
 import logging
 import re
-from dataclasses import dataclass, field
 from enum import Enum
-from typing import List, Set
+from typing import Any, Dict, List, Optional, Set
 
+from pydantic import BaseModel, Field
 from termcolor import colored
 
 logger = logging.getLogger(__name__)
 
+
 class EquationType(str, Enum):
+    """Type of equation in the document."""
     INLINE = "inline"
     DISPLAY = "display"
     DEFINITION = "definition"
     THEOREM = "theorem"
 
-@dataclass
-class Equation:
-    """Represents a mathematical equation with context and metadata."""
-    raw_text: str
-    equation_id: str
-    context: str = ""
-    equation_type: EquationType = EquationType.INLINE
-    symbols: Set[str] = field(default_factory=set)
-    
-    def to_dict(self) -> dict:
-        """Convert to dictionary for serialization."""
-        return {
-            'raw_text': self.raw_text,
-            'equation_id': self.equation_id,
-            'context': self.context,
-            'equation_type': self.equation_type.value,
-            'symbols': list(self.symbols)
+
+class Equation(BaseModel):
+    """Represents a mathematical equation."""
+    raw_text: str = Field(description="The raw text of the equation")
+    symbols: Set[str] = Field(default_factory=set, description="Set of mathematical symbols in the equation")
+    equation_type: EquationType = Field(default=EquationType.INLINE, description="Type of equation")
+    context: Optional[str] = Field(default=None, description="The surrounding text context of the equation")
+
+    model_config = {
+        "arbitrary_types_allowed": True,
+        "json_schema_extra": {
+            "json_encoders": {
+                set: list
+            }
         }
+    }
+
+    def model_dump(self, **kwargs) -> Dict[str, Any]:
+        """Convert equation to dictionary format for serialization."""
+        data = super().model_dump(**kwargs)
+        data['symbols'] = list(data['symbols'])  # Convert set to list
+        return data
+
 
 class EquationExtractor:
     """Handles extraction and classification of mathematical equations"""
@@ -83,15 +91,13 @@ class EquationExtractor:
                             
                             equations.append(Equation(
                                 raw_text=eq_text,
-                                equation_id=f"eq{eq_id}",
-                                context=context,
+                                symbols=symbols,
                                 equation_type=eq_type,
-                                symbols=symbols
+                                context=context
                             ))
-                            eq_id += 1
                             
                             if self.debug:
-                                self._debug_print(f"Found equation: {eq_text}")
+                                self._debug_print(f"Found {eq_type} equation: {eq_text}")
                                 
                         except Exception as e:
                             self._debug_print(f"Error processing equation match: {str(e)}", "yellow")

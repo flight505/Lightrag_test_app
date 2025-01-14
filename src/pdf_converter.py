@@ -1,12 +1,14 @@
+import logging
+import os
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional
+from pathlib import Path
+from typing import Any, Dict, Optional
+
 import pymupdf
 from PyPDF2 import PdfReader
 from termcolor import colored
-import logging
-import os
-from .config_manager import PDFEngine, ConfigManager
-from pathlib import Path
+
+from .config_manager import ConfigManager, PDFEngine
 
 # Disable tokenizers warning
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -31,9 +33,9 @@ class MarkerConverter(PDFConverter):
     
     def __init__(self):
         """Initialize Marker converter"""
+        from marker.config.parser import ConfigParser
         from marker.converters.pdf import PdfConverter
         from marker.models import create_model_dict
-        from marker.config.parser import ConfigParser
         
         # Configure Marker settings with enhanced equation detection
         config = {

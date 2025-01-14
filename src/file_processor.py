@@ -1,16 +1,18 @@
-from pathlib import Path
 import json
-from threading import RLock
-from typing import Optional, Dict, Any, Callable, List
-from src.metadata_extractor import MetadataExtractor
-from termcolor import colored
-from src.pdf_converter import MarkerConverter
-from src.config_manager import ConfigManager
 import logging
-import pdf2doi
-from crossref.restful import Works
-import streamlit as st
+from pathlib import Path
+from threading import RLock
+from typing import Any, Callable, Dict, List, Optional
+
 import arxiv
+import pdf2doi
+import streamlit as st
+from crossref.restful import Works
+from termcolor import colored
+
+from src.config_manager import ConfigManager
+from src.metadata_extractor import MetadataExtractor
+from src.pdf_converter import MarkerConverter
 
 logger = logging.getLogger(__name__)
 
@@ -124,7 +126,8 @@ class FileProcessor:
                             'year': work.get('published-print', {}).get('date-parts', [[None]])[0][0],
                             'journal': work.get('container-title', [None])[0],
                             'source': 'crossref',
-                            'extraction_method': method
+                            'extraction_method': method,
+                            'abstract': work.get('abstract', '')
                         }
                         
                         print(colored("✓ Crossref metadata extracted successfully", "green"))
@@ -139,93 +142,80 @@ class FileProcessor:
             return None
 
     def process_file(self, file_path: str, progress_callback: Optional[Callable[[str], None]] = None) -> Optional[Dict[str, Any]]:
-        """Process a single file, extracting metadata and text"""
-        if progress_callback:
-            progress_callback("Starting file processing...")
-        print(colored("\n=== Starting File Processing ===", "blue"))
-        
-        # Validate file
-        if progress_callback:
-            progress_callback("Validating file...")
-        print(colored("→ Validating file...", "blue"))
-        if not self._validate_file(file_path):
-            print(colored("⚠️ File validation failed", "yellow"))
-            if progress_callback:
-                progress_callback("File validation failed")
-            return None
-        print(colored("✓ File validation successful", "green"))
-        
-        # Extract text content
-        if progress_callback:
-            progress_callback("Extracting text content...")
-        print(colored("\n=== Extracting Text Content ===", "blue"))
-        text = self._extract_text(file_path)
-        if not text:
-            print(colored("⚠️ Text extraction failed", "yellow"))
-            if progress_callback:
-                progress_callback("Text extraction failed")
-            return None
-        
-        # Extract metadata
-        if progress_callback:
-            progress_callback("Extracting metadata...")
-        print(colored("\n=== Extracting Metadata ===", "blue"))
-        
-        # Try DOI-based extraction first
-        if progress_callback:
-            progress_callback("Attempting DOI-based extraction...")
-        print(colored("\n=== Starting DOI-based Metadata Extraction ===", "blue"))
-        doi_metadata = self._try_doi_extraction(file_path)
-        
-        # Extract additional metadata using MetadataExtractor
-        if progress_callback:
-            progress_callback("Extracting additional metadata...")
-        doc_id = Path(file_path).stem
-        metadata = self.metadata_extractor.extract_metadata(text, doc_id, existing_metadata=doi_metadata)
-        
-        if not metadata:
-            print(colored("⚠️ Metadata extraction failed", "yellow"))
-            if progress_callback:
-                progress_callback("Metadata extraction failed")
-            return None
-            
-        # Save metadata to JSON
-        if progress_callback:
-            progress_callback("Saving metadata...")
-        metadata_path = self._get_metadata_path(file_path)
+        """Process a single file and extract metadata."""
         try:
-            with open(metadata_path, 'w', encoding='utf-8') as f:
-                json.dump(metadata.to_dict(), f, indent=2, ensure_ascii=False)
-            print(colored(f"✓ Metadata saved to {metadata_path}", "green"))
-        except Exception as e:
-            print(colored(f"⚠️ Error saving metadata: {str(e)}", "yellow"))
             if progress_callback:
-                progress_callback("Error saving metadata")
-            return None
+                progress_callback("Starting file processing...")
+            print(colored("\n=== Starting File Processing ===", "blue"))
             
-        # Save text content
-        if progress_callback:
-            progress_callback("Saving text content...")
-        text_path = self._get_text_path(file_path)
-        try:
-            with open(text_path, 'w', encoding='utf-8') as f:
-                f.write(text)
-            print(colored(f"✓ Text saved to {text_path}", "green"))
-        except Exception as e:
-            print(colored(f"⚠️ Error saving text: {str(e)}", "yellow"))
+            # Validate file
             if progress_callback:
-                progress_callback("Error saving text")
+                progress_callback("Validating file...")
+            print(colored("→ Validating file...", "blue"))
+            if not self._validate_file(file_path):
+                print(colored("⚠️ File validation failed", "yellow"))
+                if progress_callback:
+                    progress_callback("File validation failed")
+                return None
+            print(colored("✓ File validation successful", "green"))
+
+            # Extract text content
+            if progress_callback:
+                progress_callback("Extracting text content...")
+            text = self._extract_text(file_path)
+            if not text:
+                print(colored("⚠️ No text content extracted", "yellow"))
+                return None
+
+            # Try DOI-based extraction first
+            if progress_callback:
+                progress_callback("Attempting DOI-based extraction...")
+            print(colored("\n=== Starting DOI-based Metadata Extraction ===", "blue"))
+            doi_metadata = self._try_doi_extraction(file_path)
+
+            # Extract metadata
+            doc_id = Path(file_path).stem
+            metadata = self.metadata_extractor.extract_metadata(text, doc_id, existing_metadata=doi_metadata)
+            if not metadata:
+                print(colored("⚠️ No metadata extracted", "yellow"))
+                return None
+
+            # Save metadata
+            metadata_path = self._get_metadata_path(file_path)
+            try:
+                metadata_dict = metadata.model_dump(mode='json')  # Use mode='json' for proper serialization
+                with open(metadata_path, 'w', encoding='utf-8') as f:
+                    json.dump(metadata_dict, f, indent=2, ensure_ascii=False)
+                print(colored(f"✓ Metadata saved to {metadata_path}", "green"))
+            except Exception as e:
+                print(colored(f"⚠️ Error saving metadata: {str(e)}", "yellow"))
+                if progress_callback:
+                    progress_callback("Error saving metadata")
+                return None
+
+            # Save text content
+            text_path = self._get_text_path(file_path)
+            try:
+                with open(text_path, 'w', encoding='utf-8') as f:
+                    f.write(text)
+                print(colored(f"✓ Text saved to {text_path}", "green"))
+            except Exception as e:
+                print(colored(f"⚠️ Error saving text: {str(e)}", "yellow"))
+
+            print(colored("\n=== Processing Complete ===", "green"))
+
+            return {
+                'metadata': metadata,
+                'text': text,
+                'metadata_path': str(metadata_path),
+                'text_path': str(text_path)
+            }
+
+        except Exception as e:
+            print(colored(f"⚠️ Error processing file: {str(e)}", "red"))
+            if progress_callback:
+                progress_callback(f"Error processing file: {str(e)}")
             return None
-            
-        print(colored("\n=== Processing Complete ===", "green"))
-        if progress_callback:
-            progress_callback("Processing complete!")
-        return {
-            'metadata': metadata.to_dict(),
-            'text': text,
-            'metadata_path': metadata_path,
-            'text_path': text_path
-        }
 
     def _load_metadata(self) -> Dict[str, Any]:
         """Load metadata from file"""
@@ -420,7 +410,8 @@ class FileProcessor:
                             'year': work.get('published-print', {}).get('date-parts', [[None]])[0][0],
                             'journal': work.get('container-title', [None])[0],
                             'source': 'crossref',
-                            'extraction_method': method
+                            'extraction_method': method,
+                            'abstract': work.get('abstract', '')
                         }
                         
                         print(colored("✓ Crossref metadata extracted successfully", "green"))

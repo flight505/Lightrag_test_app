@@ -1,194 +1,406 @@
 ## Project Overview
 The LightRAG application is a sophisticated academic research tool that combines knowledge graph capabilities with retrieval-augmented generation (RAG). Key features include:
 
-- **Advanced PDF Processing**: Uses Marker with M3 Max optimizations for high-quality PDF conversion
-- **Equation Handling**: Extracts and processes LaTeX equations with unique identifiers and context
-- **Reference Management**: Advanced citation pattern matching and reference tracking with validation
+- **Advanced PDF Processing**: Uses Marker, PyMuPDF, or PyPDF2 (configurable through PDFEngine enum)
+- **Equation Handling**: Extracts and processes LaTeX equations with symbol extraction
+- **Reference Management**: Citation pattern matching and reference tracking with CrossRef/arXiv integration
 - **Multi-Mode Search**: Supports Naive, Local, Global, Hybrid, and Mix search modes
-- **Academic Response Processing**: Formats responses in academic style with source tracking
-- **Metadata Management**: Comprehensive tracking of document metadata, equations, and references
+- **Academic Response Processing**: Formats responses with citations and equation formatting
+- **Metadata Management**: JSON-based metadata storage with automatic updates
 
-### Important Notes
-- Anystyle is a critical component for reference extraction - DO NOT REMOVE OR REPLACE IT
-- Anystyle is a Ruby gem, must be installed on the system. do not treat it as a python package.
-- Always use pymupdf instead of fitz - fitz is deprecated.
-- Marker should be used with its official Python API from marker.converters.pdf
-- PDFs are preserved in the store directory until explicit deletion
-- All text processing preserves semantic structure and layout
+### Critical Dependencies
+- **Anystyle**: Required for reference extraction (Ruby gem, not Python package)
+- **Marker**: Primary PDF converter, requires proper initialization
+- **pdf2doi**: Used for DOI/arXiv identifier extraction
+- **CrossRef/arXiv APIs**: Used for metadata enrichment
+- **LightRAG**: Core RAG functionality (version >= 1.1.0)
+- **OpenAI API**: Required for completion endpoints
 
+### Breaking Points
+1. **PDF Processing**:
+   - Marker initialization failures will break PDF processing
+   - PyMuPDF (fitz) import must use pymupdf package
+   - PDF file size limits (default 50MB)
+   - Invalid UTF-8 encoding in PDFs
+
+2. **Metadata Extraction**:
+   - Missing Anystyle installation
+   - Failed DOI/arXiv extraction
+   - API rate limits (CrossRef/arXiv)
+   - Invalid JSON in metadata files
+
+3. **Reference Processing**:
+   - Malformed citation patterns
+   - Missing reference sections
+   - Invalid DOIs or arXiv IDs
+   - Failed API lookups
+
+4. **Equation Processing**:
+   - Malformed LaTeX equations
+   - Missing equation delimiters ($$)
+   - Symbol extraction failures
+
+## Core Processing Systems
+
+### Reference Processing System
+1. **Extraction Pipeline**:
+   ```
+   PDF -> pdf2doi -> DOI/arXiv ID -> CrossRef/arXiv API -> Metadata
+                  -> Anystyle -> Raw References -> Reference Objects
+   ```
+   - pdf2doi extracts DOI or arXiv identifier
+   - If DOI found: Use CrossRef API for metadata
+   - If arXiv ID found: Use arXiv API for metadata
+   - Anystyle processes raw reference text regardless of API results
+   - Results are merged with priority to API data
+
+2. **Reference Object Structure**:
+   ```python
+   class Reference:
+       raw_text: str
+       title: Optional[str]
+       authors: List[Author]
+       year: Optional[int]
+       doi: Optional[str]
+       venue: Optional[str]
+   ```
+
+3. **Reference Validation**:
+   - Basic: Checks for required fields
+   - Standard: Validates DOI/URLs
+   - Strict: Verifies all fields and cross-references
+
+### Citation Processing System
+1. **Citation Pattern Recognition**:
+   ```python
+   PATTERNS = {
+       'numeric': [
+           r'\[(\d+(?:\s*,\s*\d+)*)\]',  # [1] or [1,2,3]
+           r'\[(\d+\s*-\s*\d+)\]'        # [1-3]
+       ],
+       'author_year': [
+           r'([A-Z][a-z]+(?:\s+et\s+al\.)?)\s*\((\d{4})\)'  # Smith et al. (2023)
+       ],
+       'cross_ref': [
+           r'cf\.\s+([A-Z][a-z]+(?:\s+et\s+al\.)?)\s*\((\d{4})\)'  # cf. Smith et al. (2023)
+       ]
+   }
+   ```
+
+2. **Citation Context Extraction**:
+   - Extracts window of text around citation (default 100 chars)
+   - Tracks citation location (paragraph and offset)
+   - Preserves citation style and formatting
+
+3. **Citation-Reference Linking**:
+   ```python
+   class CitationLink:
+       citation_text: str
+       reference: Reference
+       context: str
+       location: CitationLocation
+   ```
+
+4. **Citation Graph Generation**:
+   - Builds directed graph of citations
+   - Tracks citation frequency and patterns
+   - Enables network visualization
+   - Supports citation validation
+
+### Equation Processing System
+1. **Equation Detection**:
+   ```python
+   EQUATION_PATTERNS = [
+       (r'\$\$(.*?)\$\$', EquationType.DISPLAY),             # Display equations
+       (r'\$(.*?)\$', EquationType.INLINE),                  # Inline equations
+       (r'\\begin\{equation\}(.*?)\\end\{equation\}', EquationType.DISPLAY),
+       (r'\\[(.*?)\\]', EquationType.DISPLAY),
+       (r'\\begin\{align\*?\}(.*?)\\end\{align\*?\}', EquationType.DISPLAY),
+       (r'\\begin\{eqnarray\*?\}(.*?)\\end\{eqnarray\*?\}', EquationType.DISPLAY)
+   ]
+   ```
+
+2. **Symbol Extraction**:
+   ```python
+   SYMBOL_PATTERNS = [
+       r'\\alpha', r'\\beta', r'\\gamma', r'\\delta',    # Greek letters
+       r'\\sum', r'\\prod', r'\\int',                    # Operators
+       r'\\frac', r'\\sqrt', r'\\partial',               # Functions
+       r'\\mathcal', r'\\mathbf', r'\\mathrm'           # Styles
+   ]
+   ```
+
+3. **Equation Object Structure**:
+   ```python
+   class Equation:
+       raw_text: str
+       symbols: Set[str]
+       equation_type: EquationType
+       context: Optional[str]
+   ```
+
+4. **Equation Classification**:
+   - INLINE: Within text equations
+   - DISPLAY: Standalone equations
+   - DEFINITION: Mathematical definitions
+   - THEOREM: Mathematical theorems
+
+### Integration Flow
+1. **Document Processing**:
+   ```
+   PDF Document
+   ├── Text Extraction (Marker/PyMuPDF/PyPDF2)
+   ├── Metadata Extraction
+   │   ├── DOI/arXiv Processing
+   │   └── API Enrichment
+   ├── Reference Processing
+   │   ├── Anystyle Extraction
+   │   └── Reference Object Creation
+   ├── Citation Processing
+   │   ├── Pattern Matching
+   │   ├── Context Extraction
+   │   └── Reference Linking
+   └── Equation Processing
+       ├── Pattern Detection
+       ├── Symbol Extraction
+       └── Classification
+   ```
+
+2. **Data Storage**:
+   ```
+   store_name/
+   ├── metadata.json         # Document metadata
+   ├── converted/
+   │   ├── doc1.txt         # Converted text
+   │   └── doc1.md          # Markdown version
+   └── cache/
+       ├── embeddings/      # Vector embeddings
+       └── api_responses/   # API response cache
+   ```
+
+3. **Validation Chain**:
+   - File validation (size, encoding)
+   - Content extraction validation
+   - Reference validation
+   - Citation validation
+   - Equation validation
 
 ## Core Components
 
 1. **AcademicMetadata**:
-   - Structured metadata extraction from PDFs
-   - Metadata for Title, Author, Reference, Abstract, year, doi, is retrived using crossref if pdf2doi returns a doi, if it returns an arxiv id then use arxiv not crossref. 
-   - Equations are fenced with $$ by marker pdf conversion, the metadata that we get from marker is used for the equations. 
-   - Multiple citation style support (APA, MLA, Chicago, IEEE)
-   - Validation system with configurable levels
-   - reference metadata is also retrived using Anystyle - a critical tool for accurate reference extraction, and citations are parsed using Anystyle. 
-   - JSON serialization and persistence for metadata
-   - The consolidated metadata from each pdf is stored in the store directory in a json file as metadata.json. If the file already exists, it is not overwritten but the new metadata is appended to the existing file.
+   - Structured metadata using Pydantic models
+   - Automatic validation and type checking
+   - Handles Authors, References, Citations, Equations
+   - JSON serialization with model_dump methods
 
 2. **FileProcessor**:
-   - PDF Processing Workflow:
-     1. Metadata Extraction using pdf2doi and crossref or arxiv depending on the type of id returned by pdf2doi. 
-     2. Text Extraction: Employs Marker (optimized for M3 Max) to convert PDFs while preserving layout, equations, and figures
-     3. Academic Metadata Processing: Analyzes extracted text to identify and structure:
-        - References (using Anystyle - a critical tool for accurate reference extraction)
-        - Citations
-        - LaTeX equations
-        - Author affiliations
-        - Abstract
-     4. Results Integration: Combines all extracted data into a unified document representation
-   
-   Purpose: Ensures high-quality PDF processing while preserving academic content integrity, maintaining source files for reference, and enabling sophisticated search and analysis capabilities.
-   
-   Features:
-   - Optimized Marker configuration for M3 Max
-   - Fallback extraction chain for robustness
-   - Progress tracking for batch operations
-   - Source file preservation for validation
-   - Comprehensive error handling
+   - PDF Processing Pipeline:
+     1. File validation and size checks
+     2. PDF conversion using selected engine
+     3. Metadata extraction (DOI/arXiv)
+     4. Reference extraction (Anystyle)
+     5. Equation extraction
+     6. JSON metadata storage
 
-3. **FileManager**:
-   - Database directory structure management
-   - Store creation and organization
-   - DB root directory gitignore management
-   - Metadata file initialization
-   - Directory movement and cleanup utilities
+3. **PDFConverter**:
+   - Factory pattern for converter selection
+   - Supported engines: Marker, PyMuPDF, PyPDF2
+   - Fallback chain for robustness
+   - Enhanced equation detection
 
-4. **LightRAGManager**:
-   - Core RAG functionality with OpenAI integration
-   - Multiple model support (gpt-4o, gpt-4o-mini, o1-mini, o1)
-   - Configurable chunking strategies
-   - Document validation and indexing
-   - Query processing with temperature control
+4. **CitationProcessor**:
+   - Pattern matching for multiple citation styles
+   - Context extraction around citations
+   - Citation graph generation
+   - Citation validation
 
-5. **DocumentValidator**:
-   - File and content validation
-   - Store structure verification
-   - Error reporting and logging
+5. **EquationExtractor**:
+   - LaTeX equation detection
+   - Symbol extraction and classification
+   - Equation type detection
+   - Context preservation
 
-6. **AcademicResponseProcessor**:
-   - Academic formatting of responses
-   - Source tracking and citation management
-   - Structured response generation
-   - Context-aware reference handling
+6. **MetadataExtractor**:
+   - DOI/arXiv identifier extraction
+   - CrossRef/arXiv API integration
+   - Reference parsing with Anystyle
+   - Metadata consolidation
 
-7. **LightRAG Helpers**:
-   - Helper functions for response processing
-   - Source management utilities
-   - LaTeX equation handling
+## Configuration
 
-## Citation and Reference Processing
+1. **ProcessingConfig**:
+   ```python
+   pdf_engine: PDFEngine = PDFEngine.AUTO
+   enable_crossref: bool = True
+   enable_scholarly: bool = True
+   debug_mode: bool = False
+   max_file_size_mb: int = 50
+   timeout_seconds: int = 30
+   chunk_size: int = 500
+   chunk_overlap: int = 50
+   chunk_strategy: str = "sentence"
+   ```
 
-1. **Citation Extraction and Linking**:
-   - Multi-reference citation support (e.g., [29, 38], [32, 42])
-   - Context-aware citation linking to references
-   - Pattern matching for various citation styles:
-     - Numeric citations (e.g., [1], [1,2], [1-3])
-     - Author-year citations (e.g., Smith et al., 2023)
-     - Cross-references (e.g., cf. Author, 2023)
-   - Automatic reference resolution and validation
-
-2. **Reference Processing Pipeline**:
-   - DOI lookup and validation using pdf2doi 
-   - use CrossRef for doi identified by pdf2doi and if it is arxiv doi then use arxiv not CrossRef
-   - Author name normalization and affiliation tracking
-   - Venue and publication metadata enrichment
-   - Citation context preservation and analysis
-   - Primary extraction using Anystyle for accurate reference parsing
-
-3. **Integration with Document Processing**:
-   - Unified processing flow between test and application environments
-   - Consistent Marker configuration for text extraction
-   - Standardized citation and reference extraction
-   - Shared metadata handling across contexts
-   - Common configuration for both test and production use
-
-## Technical Specifications
-
-- **Models**: 
-  - Default: gpt-4o-mini
-  - Supported: gpt-4o, gpt-4o-mini, o1-mini, o1
-  
-- **Search Modes**:
-  - Naive: Basic search functionality
-  - Local: Context-aware local search
-  - Global: Broad knowledge base search
-  - Hybrid: Combined local and global search
-  - Mix: Adaptive search strategy
-
-- **Metadata Processing**:
-  - Multiple validation levels (Basic, Standard, Strict)
-  - Equation type classification (Inline, Display, Definition, Theorem)
-  - Author affiliation tracking
-  - DOI and venue extraction
-  - Citation network analysis
-
-- **Configuration**:
-  - Default chunk size: 500
-  - Default chunk overlap: 50
-  - Configurable temperature settings
-  - Sentence-based chunking strategy
-
-## Error Handling and Logging
-- Comprehensive try-except blocks throughout
-- Detailed logging with termcolor output
-- Progress tracking with stqdm
-- Informative error messages with context
-
-## File Management
-- UTF-8 encoding for all file operations
-- Automatic metadata tracking
-- Source file preservation
-- Cleanup utilities for unused files
+2. **Search Modes**:
+   - naive: Basic text search
+   - local: Context-aware search
+   - global: Knowledge base search
+   - hybrid: Combined search
+   - mix: Adaptive strategy
 
 ## Best Practices
-- Separation of concerns across modules
-- Comprehensive error handling
-- Progress tracking and user feedback
-- Optimized PDF processing for M3 Max
-- Environment variable based configuration
-- Parallel processing where applicable
+1. **File Operations**:
+   - Always use UTF-8 encoding
+   - Handle file paths with Path objects
+   - Validate file existence before operations
+   - Clean up temporary files
 
-## Performance Features
-- Optimized PDF conversion settings
-- Batch processing capabilities
-- Parallel document processing
-- Efficient metadata management
-- Caching mechanisms for frequent operations
+2. **Error Handling**:
+   - Use try-except blocks with specific exceptions
+   - Log errors with termcolor
+   - Provide user feedback
+   - Graceful fallbacks
 
-## UI/Frontend Components
+3. **API Usage**:
+   - Handle rate limits
+   - Cache responses when possible
+   - Validate API responses
+   - Use async where available
 
-### Navigation and Layout
-- Custom navigation bar with Dracula theme integration
-- Responsive layout with dynamic content sizing
-- Dark mode optimized interface
-- Streamlined document management interface
+4. **Performance**:
+   - Lazy initialization of heavy components
+   - Cache frequently used data
+   - Use appropriate chunk sizes
+   - Monitor memory usage
 
-### Styling Specifications
-- **Theme Colors**:
-  - Primary: #bd93f9 (Purple)
-  - Background: #282a36 (Dark)
-  - Secondary Background: #44475a (Gray)
-  - Text: #f8f8f2 (Light)
-  
-- **Navigation Bar**:
-  - Solid color design for better visibility
-  - Consistent button sizing and spacing
-  - Active state highlighting
-  - Integrated with Streamlit's native components
+## UI Components
+- Streamlit-based interface
+- Dark mode with Dracula theme
+- Progress indicators
+- Interactive visualizations
+- Citation network graphs
+- Equation rendering
 
-### User Experience Features
-- Progress indicators for long-running operations
-- Interactive document management interface
-- Real-time status updates
-- Responsive feedback for user actions
-- Streamlined store creation and management
+## Directory Structure
+```
+project/
+├── src/
+│   ├── academic_metadata.py
+│   ├── citation_metadata.py
+│   ├── equation_metadata.py
+│   ├── file_processor.py
+│   ├── pdf_converter.py
+│   └── metadata_extractor.py
+├── pages/
+│   ├── Home.py
+│   ├── Search.py
+│   ├── Manage.py
+│   └── Academic.py
+├── tests/
+│   ├── test_metadata.py
+│   └── test_citation_processor.py
+└── DB/
+    └── store_name/
+        ├── metadata.json
+        ├── converted/
+        └── cache/
+```
 
-### Component Integration
-- Seamless integration with Streamlit components
-- Custom styling for consistency
-- Optimized for dark mode visibility
-- Mobile-responsive design considerations
+## Class Relationships and Imports
+
+### Core Classes and Their Locations
+1. **Base Classes** (`base_metadata.py`):
+   ```python
+   class Author:
+       full_name: Optional[str]
+       first_name: Optional[str]
+       last_name: Optional[str]
+       affiliation: Optional[str]
+       email: Optional[str]
+       orcid: Optional[str]
+
+   class Reference:
+       raw_text: str
+       title: Optional[str]
+       authors: List[Author]
+       year: Optional[int]
+       doi: Optional[str]
+       venue: Optional[str]
+   ```
+
+2. **Academic Classes** (`academic_metadata.py`):
+   ```python
+   from .base_metadata import Author, Reference
+   
+   class Citation:
+       text: str
+       references: List[Reference]
+       context: str
+   
+   class AcademicMetadata:
+       title: str
+       authors: List[Author]
+       abstract: Optional[str]
+       references: List[Reference]
+       citations: List[Citation]
+       equations: List[str]  # References equations from equation_metadata
+   ```
+
+3. **Equation Classes** (`equation_metadata.py`):
+   ```python
+   class EquationType(str, Enum):
+       INLINE = "inline"
+       DISPLAY = "display"
+       DEFINITION = "definition"
+       THEOREM = "theorem"
+   
+   class Equation:
+       raw_text: str
+       symbols: Set[str]
+       equation_type: EquationType
+       context: Optional[str]
+   ```
+
+4. **Citation Classes** (`citation_metadata.py`):
+   ```python
+   from .base_metadata import Author, Reference
+   
+   class CitationLocation:
+       paragraph: int
+       offset: int
+   
+   class CitationLink:
+       citation_text: str
+       reference: Reference
+       context: str
+       location: CitationLocation
+   ```
+
+### Import Guidelines
+1. **Base Classes**:
+   - Always import Author and Reference from base_metadata
+   - These are the foundation for all metadata objects
+
+2. **Equations**:
+   - Import Equation and EquationType from equation_metadata
+   - Never import from academic_metadata
+
+3. **Citations**:
+   - Import Citation classes from citation_metadata
+   - Use base_metadata for Author/Reference dependencies
+
+4. **Academic Metadata**:
+   - Import AcademicMetadata from academic_metadata
+   - This class ties together all other components
+
+### Common Import Patterns
+```python
+# Correct imports
+from src.base_metadata import Author, Reference
+from src.equation_metadata import Equation, EquationType
+from src.citation_metadata import CitationLink, CitationLocation
+from src.academic_metadata import AcademicMetadata, Citation
+
+# Incorrect imports (will cause errors)
+from src.academic_metadata import Equation  # Wrong! Import from equation_metadata
+from src.citation_metadata import Reference  # Wrong! Import from base_metadata

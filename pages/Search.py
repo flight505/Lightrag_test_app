@@ -5,21 +5,23 @@ from datetime import datetime
 from typing import Dict, List
 
 import streamlit as st
+
 try:
     from docx import Document
 except ImportError:
     st.error("Could not import python-docx. Please install it with: pip install python-docx")
     Document = None
 import networkx as nx
+
 try:
     import xxhash
 except ImportError:
     st.error("Could not import xxhash. Please install it with: pip install xxhash")
     xxhash = None
 
+from src.file_manager import DB_ROOT, create_store_directory
 from src.lightrag_helpers import ResponseProcessor
 from src.lightrag_init import DEFAULT_MODEL, SUPPORTED_MODELS, LightRAGManager
-from src.file_manager import create_store_directory, DB_ROOT
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -610,8 +612,9 @@ def show_search():
                         st.markdown("### Interactive Graph Visualization")
                         
                         try:
-                            from pyvis.network import Network
                             import random
+
+                            from pyvis.network import Network
                             
                             with st.spinner("Generating interactive network visualization..."):
                                 net = Network(

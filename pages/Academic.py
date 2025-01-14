@@ -2,8 +2,9 @@ import streamlit as st
 
 from pathlib import Path
 from src.academic_metadata import (
-    AcademicMetadata, Author, Reference, Citation, Equation
+    AcademicMetadata, Author, Reference, Citation
 )
+from src.equation_metadata import Equation
 import json
 from termcolor import colored
 import pandas as pd
