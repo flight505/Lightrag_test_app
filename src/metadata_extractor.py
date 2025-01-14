@@ -91,8 +91,8 @@ class MetadataExtractor:
                                 venue=ref.get('container-title', [None])[0] if isinstance(ref.get('container-title', []), list) else ref.get('container-title')
                             )
                             references.append(reference)
-                        except Exception as e:
-                            print(colored(f"⚠️ Error parsing reference: {str(e)}", "yellow"))
+                        except Exception as err:
+                            print(colored(f"⚠️ Error parsing reference: {str(err)}", "yellow"))
                             continue
                             
                     print(colored(f"✓ Successfully parsed {len(references)} references", "green"))
@@ -101,8 +101,8 @@ class MetadataExtractor:
                     print(colored("⚠️ No references parsed", "yellow"))
                     return []
                     
-        except Exception as e:
-            print(colored(f"⚠️ Error during reference extraction: {str(e)}", "yellow"))
+        except Exception as err:
+            print(colored(f"⚠️ Error during reference extraction: {str(err)}", "yellow"))
             return []
         finally:
             # Clean up temporary files
@@ -139,8 +139,8 @@ class MetadataExtractor:
                 # Create Author object with only full_name
                 authors.append(Author(full_name=full_name))
                 
-            except Exception as e:
-                print(colored(f"⚠️ Error parsing author: {str(e)}", "yellow"))
+            except Exception as err:
+                print(colored(f"⚠️ Error parsing author: {str(err)}", "yellow"))
                 continue
             
         return authors
@@ -173,8 +173,8 @@ class MetadataExtractor:
                             authors.append(author_data)
                         elif isinstance(author_data, str):
                             authors.append(Author(full_name=author_data))
-                    except Exception as e:
-                        print(colored(f"⚠️ Error creating author object: {str(e)}", "yellow"))
+                    except Exception as err:
+                        print(colored(f"⚠️ Error creating author object: {str(err)}", "yellow"))
                         continue
                 
                 metadata.authors = authors
@@ -186,7 +186,7 @@ class MetadataExtractor:
             
             return metadata
             
-        except Exception as e:
-            print(colored(f"⚠️ Error extracting metadata: {str(e)}", "yellow"))
+        except Exception as err:
+            print(colored(f"⚠️ Error extracting metadata: {str(err)}", "yellow"))
             # Return empty metadata object rather than None
             return AcademicMetadata(doc_id=doc_id) 
