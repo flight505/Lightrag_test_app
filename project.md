@@ -40,6 +40,12 @@ The LightRAG application is a sophisticated academic research tool that combines
    - Missing equation delimiters ($$)
    - Symbol extraction failures
 
+5. **Citation Processing**:
+   - Superscript citations in PDFs may be missed
+   - Non-standard citation formats may not be recognized
+   - Citations with incorrect reference numbers will be skipped
+   - Heavy reliance on Marker's PDF conversion quality
+
 ## Core Processing Systems
 
 ### Reference Processing System
@@ -71,35 +77,24 @@ The LightRAG application is a sophisticated academic research tool that combines
    - Strict: Verifies all fields and cross-references
 
 ### Citation Processing System
-1. **Citation Pattern Recognition**:
-   ```python
-   PATTERNS = {
-       'numeric': [
-           r'\[(\d+(?:\s*,\s*\d+)*)\]',  # [1] or [1,2,3]
-           r'\[(\d+\s*-\s*\d+)\]'        # [1-3]
-       ],
-       'author_year': [
-           r'([A-Z][a-z]+(?:\s+et\s+al\.)?)\s*\((\d{4})\)'  # Smith et al. (2023)
-       ],
-       'cross_ref': [
-           r'cf\.\s+([A-Z][a-z]+(?:\s+et\s+al\.)?)\s*\((\d{4})\)'  # cf. Smith et al. (2023)
-       ]
-   }
-   ```
 
-2. **Citation Context Extraction**:
-   - Extracts window of text around citation (default 100 chars)
-   - Tracks citation location (paragraph and offset)
-   - Preserves citation style and formatting
+The system processes citations in academic papers using the following approach:
 
-3. **Citation-Reference Linking**:
-   ```python
-   class CitationLink:
-       citation_text: str
-       reference: Reference
-       context: str
-       location: CitationLocation
-   ```
+- **Citation Styles**: Currently supports:
+  - Square bracket numeric citations (e.g., `[1]`, `[1,2,3]`, `[1-3]`)
+  - Author-year citations (e.g., "Smith et al. (2023)")
+  - Cross-reference citations (e.g., "cf. Smith et al. (2023)")
+
+- **Known Limitations**:
+  - Superscript citations are not currently supported due to Marker conversion limitations
+  - Only processes citations that follow strict formatting patterns to avoid false positives
+  - Citations must exactly match reference list numbering
+
+- **Citation-Reference Linking**:
+  - Each citation is linked to its corresponding reference(s)
+  - Multiple citations of the same reference are preserved
+  - Context around each citation is captured for analysis
+  - Citations are validated against the reference list
 
 4. **Citation Graph Generation**:
    - Builds directed graph of citations
