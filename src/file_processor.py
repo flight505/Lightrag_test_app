@@ -1,20 +1,14 @@
-from typing import Dict, List, Any, Union, Optional, Callable
+from typing import Dict, List, Any, Optional, Callable
 from pathlib import Path
-from datetime import datetime
 import json
-import os
 from threading import RLock
-from src.academic_metadata import MetadataExtractor, AcademicMetadata
+from src.academic_metadata import MetadataExtractor
 from termcolor import colored
-from dataclasses import dataclass
-from src.pdf_converter import MarkerConverter, PyMuPDFConverter
+from src.pdf_converter import MarkerConverter
 from src.config_manager import ConfigManager
 import logging
 import pdf2doi
 from crossref.restful import Works
-from scholarly import scholarly
-import pymupdf  # Use only pymupdf, not fitz
-from PyPDF2 import PdfReader
 import streamlit as st
 
 logger = logging.getLogger(__name__)
@@ -205,6 +199,31 @@ class FileProcessor:
                 metadata = self._extract_metadata_with_doi(file_path)
                 if metadata:
                     print(colored(f"✓ Using metadata from {metadata.get('source', 'unknown')}", "green"))
+                    
+                    # Extract references using Anystyle
+                    print(colored("\n=== Extracting References with Anystyle ===", "blue"))
+                    try:
+                        doc_id = Path(file_path).stem
+                        academic_metadata = self.metadata_extractor.extract_metadata(text_content, doc_id=doc_id)
+                        if academic_metadata and hasattr(academic_metadata, 'references') and academic_metadata.references:
+                            # Convert references to list of dicts, handling None values
+                            ref_dicts = []
+                            for ref in academic_metadata.references:
+                                ref_dict = {
+                                    'raw_text': ref.raw_text if hasattr(ref, 'raw_text') else '',
+                                    'title': ref.title if hasattr(ref, 'title') else None,
+                                    'authors': [{'full_name': a.full_name} for a in ref.authors] if hasattr(ref, 'authors') and ref.authors else [],
+                                    'year': ref.year if hasattr(ref, 'year') else None,
+                                    'doi': ref.doi if hasattr(ref, 'doi') else None,
+                                    'venue': ref.venue if hasattr(ref, 'venue') else None
+                                }
+                                ref_dicts.append(ref_dict)
+                            metadata['references'] = ref_dicts
+                            print(colored(f"✓ Extracted {len(ref_dicts)} references with Anystyle", "green"))
+                        else:
+                            print(colored("⚠️ No references found by Anystyle", "yellow"))
+                    except Exception as e:
+                        print(colored(f"⚠️ Anystyle reference extraction failed: {str(e)}", "yellow"))
                     
                     # Save metadata to file
                     metadata_file = Path(file_path).parent / f"{Path(file_path).stem}_metadata.json"

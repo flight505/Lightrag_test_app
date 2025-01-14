@@ -23,12 +23,12 @@ tiktoken
 PyMuPDF  # fitz
 PyPDF2
 scholarly
-anystyle-cli  # Reference extraction
 pdf2doi
 crossrefapi
+arxiv
 
 # RAG packages
-lightrag-hku>=1.1.0
+lightrag-hku>=1.1.1
 
 # Development
 python-dotenv

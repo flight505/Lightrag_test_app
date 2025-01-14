@@ -730,10 +730,10 @@ class PDFMetadataExtractor:
                                 # Handle date/year parsing
                                 year = None
                                 if 'date' in ref:
-                                    date_str = str(ref['date'][0]) if isinstance(ref['date'], list) else str(ref['date'])
-                                    year_match = re.search(r'\d{4}', date_str)
-                                    if year_match:
-                                        year = int(year_match.group())
+                                        date_str = str(ref['date'][0]) if isinstance(ref['date'], list) else str(ref['date'])
+                                        year_match = re.search(r'\d{4}', date_str)
+                                        if year_match:
+                                            year = int(year_match.group())
                                 
                                 # Create reference object
                                 reference = Reference(
@@ -748,7 +748,7 @@ class PDFMetadataExtractor:
                             except Exception as e:
                                 print(colored(f"⚠️ Error parsing reference: {str(e)}", "yellow"))
                                 continue
-                        
+                                
                         print(colored(f"✓ Parsed {len(references)} references with Anystyle", "green"))
                     except json.JSONDecodeError as e:
                         print(colored(f"⚠️ Error decoding Anystyle output: {str(e)}", "yellow"))
@@ -1090,7 +1090,7 @@ class MetadataExtractor:
                 if re.match(r'^[\s]*[-*_]{3,}[\s]*$', lines[i]):
                     references_end = i
                     break
-            
+                    
             references_text = '\n'.join(lines[references_start:references_end])
             if not references_text.strip():
                 return None
@@ -1100,4 +1100,4 @@ class MetadataExtractor:
             
         except Exception as e:
             print(colored(f"⚠️ Error extracting references section: {str(e)}", "yellow"))
-            return None 
+            return None
