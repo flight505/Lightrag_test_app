@@ -1,26 +1,22 @@
 import os
+
 # Set Marker environment variables
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 os.environ["IN_STREAMLIT"] = "true"
 
+import json
 import logging
 from datetime import datetime
 from pathlib import Path
-import json
-import threading
-from termcolor import colored
-import queue
-import time
 
-import streamlit as st
 import pandas as pd
-from streamlit.runtime.scriptrunner import add_script_run_ctx
+import streamlit as st
+from termcolor import colored
 
-from src.file_manager import create_store_directory, DB_ROOT
-from src.file_processor import FileProcessor
 from src.academic_metadata import AcademicMetadata
 from src.config_manager import ConfigManager
-
+from src.file_manager import DB_ROOT, create_store_directory
+from src.file_processor import FileProcessor
 
 logger = logging.getLogger(__name__)
 

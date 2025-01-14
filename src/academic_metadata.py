@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 from enum import Enum
-from pathlib import Path
 from typing import List, Dict, Set, Optional, Any, Tuple
 import json
 import subprocess
@@ -9,7 +8,6 @@ import re
 import fitz  # Changed from pymupdf import
 from PyPDF2 import PdfReader
 import requests
-from scholarly import scholarly
 from termcolor import colored
 import os
 import logging
@@ -1029,7 +1027,7 @@ class MetadataExtractor:
             if result.returncode == 0:
                 print(colored(f"✓ Found Anystyle: {result.stdout.strip()}", "green"))
                 self.anystyle_available = True
-        except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        except (subprocess.CalledProcessError, FileNotFoundError):  # Remove 'as e'
             print(colored("⚠️ Anystyle not found. Please install it with: gem install anystyle-cli", "yellow"))
     
     def _parse_authors(self, author_data: List[Dict]) -> List[Author]:
@@ -1359,7 +1357,6 @@ class MetadataExtractor:
                     matches = re.finditer(pattern, line)
                     for match in matches:
                         citation_text = match.group(0)
-                        ref_text = match.group(1)
                         
                         # Get context (surrounding lines)
                         start = max(0, i-1)
