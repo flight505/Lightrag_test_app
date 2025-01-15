@@ -1,58 +1,15 @@
-# //A script
-# requires-python = ">=3.11"|
-# dependencies = [
-#    # Core packages
-#    "streamlit",
-#    "streamlit-navigation-bar",
-#    "watchdog",
-#    "termcolor",
-#    "networkx",
-#    "openai",
-#    "pandas",
-#    "numpy",
-#    "plotly",
-#    "marker-pdf>=1.2.3",    
-#    "matplotlib",
-#    "requests",
-#    "stqdm",
-#    "uv",
-#    "xxhash",
-#    "pyvis",
-#    "aioboto3",
-#    "ruff",
-#    "ollama",
-#    "tiktoken",
-#    "nano-vectordb",
-#    
-#    # PDF processing
-#    "PyMuPDF",
-#    "PyPDF2",
-#    "pdf2doi",
-#    "crossrefapi",
-#    "scholarly",
-#    
-#    # RAG packages
-#    "lightrag-hku>=1.1.0",
-#    
-#    # Development
-#    "python-dotenv",
-#    "python-docx",
-#    "pytest"
-#]
-#///
-
-
-
 import os
+
 import streamlit as st
 from streamlit_navigation_bar import st_navbar
-from termcolor import colored
+
+import pages as pg
 from src.file_manager import ensure_db_exists
 
 # Ensure DB directory exists at startup
 ensure_db_exists()
 
-import pages as pg
+
 
 # Page configuration
 st.set_page_config(
