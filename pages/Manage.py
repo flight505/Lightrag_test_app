@@ -109,7 +109,7 @@ def show_manage():
 
     with main_col2:
         if selected_store == "Create New...":
-            st.write("## Create Store")
+            st.write("### 🫙 Create Store")
             new_store = st.text_input("Store Name", key="new_store")
             if st.button("Create Store", key="create_store", type="primary", use_container_width=True):
                 if new_store:
@@ -138,7 +138,7 @@ def show_manage():
             if "active_store" in st.session_state and st.session_state["active_store"]:
                 st.write("### 📄 Upload Documents")
                 uploaded_files = st.file_uploader(
-                    "",
+                    "Upload PDF Files",
                     type=["pdf"],
                     accept_multiple_files=True,
                     help="Select one or more PDF files to upload. Files will be saved but not processed immediately.",
