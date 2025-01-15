@@ -13,6 +13,7 @@ from termcolor import colored
 from src.config_manager import ConfigManager
 from src.metadata_extractor import MetadataExtractor
 from src.pdf_converter import MarkerConverter
+from src.metadata_consolidator import MetadataConsolidator
 
 logger = logging.getLogger(__name__)
 
@@ -23,13 +24,15 @@ class FileProcessor:
         """Initialize FileProcessor with configuration"""
         self.config_manager = config_manager
         self.marker_converter = None  # Lazy initialization
-        self.metadata_extractor = MetadataExtractor()
+        self.metadata_extractor = MetadataExtractor(config_manager)
         self.metadata = {}
         self.metadata_lock = RLock()
         self.store_path = None
         self.metadata_file = None
         self.works = Works()  # Initialize crossref client
         self.debug = True  # Enable debug mode by default
+        self.metadata_consolidator = None
+        self.lock = RLock()
         logger.info("FileProcessor initialized")
 
     def _ensure_marker_initialized(self):
@@ -187,6 +190,11 @@ class FileProcessor:
                 with open(metadata_path, 'w', encoding='utf-8') as f:
                     json.dump(metadata_dict, f, indent=2, ensure_ascii=False)
                 print(colored(f"✓ Metadata saved to {metadata_path}", "green"))
+                
+                # Update consolidated metadata
+                if self.metadata_consolidator:
+                    self.metadata_consolidator.update_document_metadata(doc_id, metadata)
+                
             except Exception as e:
                 print(colored(f"⚠️ Error saving metadata: {str(e)}", "yellow"))
                 if progress_callback:
@@ -212,9 +220,11 @@ class FileProcessor:
             }
 
         except Exception as e:
-            print(colored(f"⚠️ Error processing file: {str(e)}", "red"))
+            error_msg = f"Error processing file: {str(e)}"
+            logger.error(error_msg)
+            print(colored(f"❌ {error_msg}", "red"))
             if progress_callback:
-                progress_callback(f"Error processing file: {str(e)}")
+                progress_callback(f"Error: {str(e)}")
             return None
 
     def _load_metadata(self) -> Dict[str, Any]:
@@ -237,6 +247,11 @@ class FileProcessor:
             self.metadata_file = self.store_path / "metadata.json"
             self.metadata = self._load_metadata()
             
+            # Initialize metadata consolidator
+            self.metadata_consolidator = MetadataConsolidator(self.store_path)
+            if not self.metadata_consolidator.consolidated_path.exists():
+                self.metadata_consolidator.initialize_consolidated_json()
+            
             logger.info(f"Store path set to: {store_path}")
             print(colored(f"✓ Store path set to: {store_path}", "green"))
             
@@ -251,7 +266,7 @@ class FileProcessor:
         return file_path.lower().endswith('.pdf')
 
     def clean_unused_files(self) -> List[str]:
-        """Remove orphaned files (txt/md/metadata without corresponding PDFs)"""
+        """Remove orphaned files and update consolidated metadata"""
         if not self.store_path:
             print(colored("⚠️ No store path set", "yellow"))
             return []
@@ -280,8 +295,13 @@ class FileProcessor:
                         file_path.unlink()
                         removed_files.append(str(file_path))
                         print(colored(f"✓ Removed orphaned metadata: {file_path.name}", "green"))
+                        
+                        # Update consolidated metadata
+                        if self.metadata_consolidator:
+                            self.metadata_consolidator.remove_document_metadata(pdf_stem)
+                            
                     except Exception as e:
-                        print(colored(f"⚠⚠⚠️ Error removing {file_path.name}: {str(e)}", "yellow"))
+                        print(colored(f"⚠️ Error removing {file_path.name}: {str(e)}", "yellow"))
             
             if removed_files:
                 print(colored(f"✓ Removed {len(removed_files)} orphaned files", "green"))
@@ -291,6 +311,7 @@ class FileProcessor:
             return removed_files
             
         except Exception as e:
+            logger.error(f"Error cleaning unused files: {str(e)}")
             print(colored(f"❌ Error cleaning unused files: {str(e)}", "red"))
             return []
 

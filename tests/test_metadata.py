@@ -17,6 +17,7 @@ from src.config_manager import ConfigManager, PDFEngine
 from src.equation_metadata import Equation, EquationExtractor
 from src.file_processor import FileProcessor
 from src.metadata_extractor import MetadataExtractor
+from src.metadata_consolidator import MetadataConsolidator
 
 # Configure logging
 logging.basicConfig(
@@ -206,3 +207,55 @@ def test_complete_pipeline(processed_files):
     assert doi_result['text_path'].endswith('.txt'), "Wrong text file extension"
     
     print(colored("✓ Complete pipeline test passed", "green")) 
+
+def test_consolidated_metadata(processed_files, tmp_path):
+    """Test consolidated metadata generation and updates"""
+    print(colored("\n=== Testing Consolidated Metadata ===", "blue"))
+    
+    # Setup test store
+    store_path = tmp_path / "test_store"
+    store_path.mkdir()
+    
+    # Initialize consolidator
+    consolidator = MetadataConsolidator(store_path)
+    consolidator.initialize_consolidated_json()
+    
+    # Verify initial state
+    consolidated = consolidator._load_json(consolidator.consolidated_path)
+    assert consolidated["store_info"]["name"] == "test_store"
+    assert len(consolidated["documents"]) == 0
+    assert consolidated["global_stats"]["total_documents"] == 0
+    
+    # Add test documents
+    for doc_type, result in processed_files.items():
+        if result and 'metadata' in result:
+            consolidator.update_document_metadata(
+                doc_type,
+                result['metadata']
+            )
+    
+    # Verify consolidated metadata
+    consolidated = consolidator._load_json(consolidator.consolidated_path)
+    assert len(consolidated["documents"]) == len(processed_files)
+    assert consolidated["global_stats"]["total_documents"] > 0
+    assert consolidated["global_stats"]["total_citations"] > 0
+    assert consolidated["global_stats"]["total_references"] > 0
+    assert consolidated["global_stats"]["total_equations"] > 0
+    
+    # Verify citation analysis
+    citation_analysis = consolidator._load_json(consolidator.citation_analysis_path)
+    assert "global_stats" in citation_analysis
+    assert citation_analysis["global_stats"]["total_citations"] > 0
+    assert citation_analysis["global_stats"]["total_references"] > 0
+    
+    # Test document removal
+    consolidator.remove_document_metadata("arxiv")
+    consolidated = consolidator._load_json(consolidator.consolidated_path)
+    assert len(consolidated["documents"]) == len(processed_files) - 1
+    
+    # Verify relationships were cleaned
+    relationships = consolidated["relationships"]
+    assert not any(rel["source"] == "arxiv" for rel in relationships["citation_network"])
+    assert not any(rel["document_id"] == "arxiv" for rel in relationships["equation_references"])
+    
+    print(colored("✓ Consolidated metadata test passed", "green")) 
