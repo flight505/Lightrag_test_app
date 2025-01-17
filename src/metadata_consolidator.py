@@ -19,7 +19,7 @@ class MetadataConsolidator:
     def __init__(self, store_path: Path):
         """Initialize consolidator with store path"""
         self.store_path = Path(store_path)
-        self.consolidated_path = self.store_path / "consolidated_metadata.json"
+        self.consolidated_path = self.store_path / "consolidated.json"
         self.citation_analysis_path = self.store_path / "citation_analysis.json"
         self.lock = RLock()  # Thread-safe operations
         
@@ -45,158 +45,180 @@ class MetadataConsolidator:
             print(colored(f"⚠️ Failed to save JSON to {path}: {str(e)}", "yellow"))
 
     def initialize_consolidated_json(self) -> None:
-        """Creates initial consolidated metadata structure"""
+        """Creates initial consolidated metadata structure with KG format"""
         base_structure = {
             "store_info": {
                 "name": self.store_path.name,
                 "created": datetime.now().isoformat(),
-                "last_updated": None
+                "last_updated": None,
+                "version": "2.0.0"
             },
-            "documents": {},
+            "nodes": {
+                "papers": [],      # Document nodes
+                "equations": [],   # Mathematical nodes
+                "citations": [],   # Citation nodes
+                "authors": [],     # Person nodes
+                "contexts": []     # Context nodes
+            },
+            "relationships": [],   # KG edges with types
             "global_stats": {
                 "total_documents": 0,
                 "total_references": 0,
                 "total_citations": 0,
-                "total_equations": 0
-            },
-            "relationships": {
-                "citation_network": [],
-                "equation_references": [],
-                "cross_references": []
+                "total_equations": 0,
+                "total_relationships": 0
             }
         }
         self._save_json(self.consolidated_path, base_structure)
         
     def update_document_metadata(self, doc_id: str, metadata: AcademicMetadata) -> None:
-        """Updates consolidated metadata with new document information"""
+        """Updates consolidated metadata with new document information using KG structure"""
         with self.lock:
             consolidated = self._load_json(self.consolidated_path)
             
-            # Update document entry
-            consolidated["documents"][doc_id] = {
+            # Create paper node
+            paper_node = {
+                "id": doc_id,
+                "type": "paper",
                 "title": metadata.title,
-                "authors": [author.model_dump() for author in metadata.authors],
-                "references_count": len(metadata.references),
-                "citations_count": len(metadata.citations),
-                "equations_count": len(metadata.equations),
-                "last_updated": datetime.now().isoformat()
+                "metadata": {
+                    "authors": [author.model_dump() for author in metadata.authors],
+                    "year": metadata.year,
+                    "venue": metadata.journal,
+                    "identifier": metadata.identifier,
+                    "identifier_type": metadata.identifier_type
+                }
             }
             
-            # Update global stats
-            self._update_global_stats(consolidated)
+            # Create author nodes and relationships
+            for author in metadata.authors:
+                author_node = {
+                    "id": f"author_{author.full_name}",
+                    "type": "author",
+                    "name": author.full_name,
+                    "metadata": author.model_dump()
+                }
+                consolidated["nodes"]["authors"].append(author_node)
+                consolidated["relationships"].append({
+                    "source": doc_id,
+                    "target": f"author_{author.full_name}",
+                    "type": "written_by",
+                    "metadata": {"confidence": 1.0}
+                })
             
-            # Update relationships
-            self._update_relationships(consolidated, doc_id, metadata)
+            # Create equation nodes and relationships
+            for idx, eq in enumerate(metadata.equations):
+                eq_id = f"{doc_id}_eq_{idx}"
+                eq_node = {
+                    "id": eq_id,
+                    "type": "equation",
+                    "raw_text": eq.raw_text,
+                    "metadata": {
+                        "symbols": list(eq.symbols),
+                        "equation_type": eq.equation_type,
+                        "context": eq.context
+                    }
+                }
+                consolidated["nodes"]["equations"].append(eq_node)
+                consolidated["relationships"].append({
+                    "source": doc_id,
+                    "target": eq_id,
+                    "type": "contains_equation",
+                    "metadata": {"context": eq.context}
+                })
+            
+            # Create citation nodes and relationships
+            for idx, citation in enumerate(metadata.citations):
+                cite_id = f"{doc_id}_cite_{idx}"
+                cite_node = {
+                    "id": cite_id,
+                    "type": "citation",
+                    "text": citation.text,
+                    "metadata": {
+                        "context": citation.context,
+                        "references": [ref.to_dict() for ref in citation.references]
+                    }
+                }
+                consolidated["nodes"]["citations"].append(cite_node)
+                consolidated["relationships"].append({
+                    "source": doc_id,
+                    "target": cite_id,
+                    "type": "contains_citation",
+                    "metadata": {"context": citation.context}
+                })
+                
+                # Add citation-reference relationships
+                for ref in citation.references:
+                    consolidated["relationships"].append({
+                        "source": cite_id,
+                        "target": ref.title or ref.raw_text,
+                        "type": "cites_paper",
+                        "metadata": {
+                            "confidence": 1.0 if ref.title else 0.8,
+                            "context": citation.context
+                        }
+                    })
+            
+            # Update paper nodes
+            paper_exists = False
+            for i, paper in enumerate(consolidated["nodes"]["papers"]):
+                if paper["id"] == doc_id:
+                    consolidated["nodes"]["papers"][i] = paper_node
+                    paper_exists = True
+                    break
+            if not paper_exists:
+                consolidated["nodes"]["papers"].append(paper_node)
+            
+            # Update global stats
+            stats = consolidated["global_stats"]
+            stats["total_documents"] = len(consolidated["nodes"]["papers"])
+            stats["total_equations"] = len(consolidated["nodes"]["equations"])
+            stats["total_citations"] = len(consolidated["nodes"]["citations"])
+            stats["total_relationships"] = len(consolidated["relationships"])
             
             # Save updated data
             consolidated["store_info"]["last_updated"] = datetime.now().isoformat()
             self._save_json(self.consolidated_path, consolidated)
             
-            # Update citation analysis
-            self._update_citation_analysis(doc_id, metadata)
-            
-    def _update_global_stats(self, consolidated: Dict[str, Any]) -> None:
-        """Update global statistics in consolidated metadata"""
-        stats = consolidated["global_stats"]
-        stats["total_documents"] = len(consolidated["documents"])
-        stats["total_references"] = sum(doc["references_count"] for doc in consolidated["documents"].values())
-        stats["total_citations"] = sum(doc["citations_count"] for doc in consolidated["documents"].values())
-        stats["total_equations"] = sum(doc["equations_count"] for doc in consolidated["documents"].values())
-        
-    def _update_relationships(self, consolidated: Dict[str, Any], doc_id: str, metadata: AcademicMetadata) -> None:
-        """Update relationship graphs in consolidated metadata"""
-        relationships = consolidated["relationships"]
-        
-        # Clear existing relationships for this document
-        relationships["citation_network"] = [
-            rel for rel in relationships["citation_network"]
-            if rel["source"] != doc_id and rel["target"] != doc_id
-        ]
-        
-        # Add citation relationships
-        for citation in metadata.citations:
-            for ref in citation.references:
-                relationships["citation_network"].append({
-                    "source": doc_id,
-                    "target": ref.title or ref.raw_text,
-                    "context": citation.context
-                })
-                
-        # Update equation references
-        relationships["equation_references"] = [
-            rel for rel in relationships["equation_references"]
-            if rel["document_id"] != doc_id
-        ]
-        for eq in metadata.equations:
-            relationships["equation_references"].append({
-                "document_id": doc_id,
-                "equation": eq.raw_text,
-                "context": eq.context
-            })
-            
-    def _update_citation_analysis(self, doc_id: str, metadata: AcademicMetadata) -> None:
-        """Update citation analysis JSON"""
+    def remove_document_metadata(self, doc_id: str) -> None:
+        """Removes document and its relationships from consolidated metadata"""
         with self.lock:
-            analysis = self._load_json(self.citation_analysis_path)
+            consolidated = self._load_json(self.consolidated_path)
             
-            # Update document citations
-            analysis[doc_id] = {
-                "citations_count": len(metadata.citations),
-                "references_count": len(metadata.references),
-                "citation_contexts": [
-                    {"text": cit.text, "context": cit.context}
-                    for cit in metadata.citations
-                ]
-            }
+            # Remove paper node
+            consolidated["nodes"]["papers"] = [
+                p for p in consolidated["nodes"]["papers"] 
+                if p["id"] != doc_id
+            ]
+            
+            # Remove related equations
+            consolidated["nodes"]["equations"] = [
+                eq for eq in consolidated["nodes"]["equations"]
+                if not eq["id"].startswith(f"{doc_id}_eq_")
+            ]
+            
+            # Remove related citations
+            consolidated["nodes"]["citations"] = [
+                cite for cite in consolidated["nodes"]["citations"]
+                if not cite["id"].startswith(f"{doc_id}_cite_")
+            ]
+            
+            # Remove relationships
+            consolidated["relationships"] = [
+                rel for rel in consolidated["relationships"]
+                if not (rel["source"] == doc_id or 
+                       rel["source"].startswith(f"{doc_id}_") or
+                       rel["target"] == doc_id or
+                       rel["target"].startswith(f"{doc_id}_"))
+            ]
             
             # Update global stats
-            total_citations = 0
-            total_references = 0
-            for doc in analysis.values():
-                if isinstance(doc, dict) and "global_stats" not in doc:
-                    total_citations += len(doc.get("citation_contexts", []))
-                    total_references += doc.get("references_count", 0)
+            stats = consolidated["global_stats"]
+            stats["total_documents"] = len(consolidated["nodes"]["papers"])
+            stats["total_equations"] = len(consolidated["nodes"]["equations"])
+            stats["total_citations"] = len(consolidated["nodes"]["citations"])
+            stats["total_relationships"] = len(consolidated["relationships"])
             
-            analysis["global_stats"] = {
-                "total_citations": total_citations,
-                "total_references": total_references,
-                "last_updated": datetime.now().isoformat()
-            }
-            
-            self._save_json(self.citation_analysis_path, analysis)
-            
-    def remove_document_metadata(self, doc_id: str) -> None:
-        """Removes document from consolidated metadata"""
-        with self.lock:
-            # Update consolidated metadata
-            consolidated = self._load_json(self.consolidated_path)
-            if doc_id in consolidated["documents"]:
-                del consolidated["documents"][doc_id]
-                self._update_global_stats(consolidated)
-                self._clean_relationships(consolidated, doc_id)
-                consolidated["store_info"]["last_updated"] = datetime.now().isoformat()
-                self._save_json(self.consolidated_path, consolidated)
-            
-            # Update citation analysis
-            analysis = self._load_json(self.citation_analysis_path)
-            if doc_id in analysis:
-                del analysis[doc_id]
-                if "global_stats" in analysis:
-                    analysis["global_stats"]["last_updated"] = datetime.now().isoformat()
-                self._save_json(self.citation_analysis_path, analysis)
-                
-    def _clean_relationships(self, consolidated: Dict[str, Any], doc_id: str) -> None:
-        """Remove all relationships involving the specified document"""
-        relationships = consolidated["relationships"]
-        
-        # Clean citation network
-        relationships["citation_network"] = [
-            rel for rel in relationships["citation_network"]
-            if rel["source"] != doc_id and rel["target"] != doc_id
-        ]
-        
-        # Clean equation references
-        relationships["equation_references"] = [
-            rel for rel in relationships["equation_references"]
-            if rel["document_id"] != doc_id
-        ] 
+            # Save updated data
+            consolidated["store_info"]["last_updated"] = datetime.now().isoformat()
+            self._save_json(self.consolidated_path, consolidated) 

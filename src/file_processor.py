@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 from threading import RLock
 from typing import Any, Callable, Dict, List, Optional
+from datetime import datetime
 
 import arxiv
 import pdf2doi
@@ -298,22 +299,34 @@ class FileProcessor:
                         
                         # Update consolidated metadata
                         if self.metadata_consolidator:
-                            self.metadata_consolidator.remove_document_metadata(pdf_stem)
+                            try:
+                                self.metadata_consolidator.remove_document_metadata(pdf_stem)
+                                print(colored(f"✓ Updated consolidated metadata for: {pdf_stem}", "green"))
+                            except Exception as e:
+                                print(colored(f"⚠️ Error updating consolidated metadata: {str(e)}", "yellow"))
                             
                     except Exception as e:
                         print(colored(f"⚠️ Error removing {file_path.name}: {str(e)}", "yellow"))
             
-            if removed_files:
-                print(colored(f"✓ Removed {len(removed_files)} orphaned files", "green"))
-            else:
-                print(colored("✓ No orphaned files found", "green"))
-                
+            # Update main metadata file
+            if self.metadata_file and self.metadata_file.exists():
+                metadata = self._load_metadata()
+                metadata["files"] = {k: v for k, v in metadata.get("files", {}).items() if k in pdfs}
+                metadata["last_updated"] = datetime.now().isoformat()
+                try:
+                    with open(self.metadata_file, 'w', encoding='utf-8') as f:
+                        json.dump(metadata, f, indent=2)
+                    print(colored("✓ Updated main metadata file", "green"))
+                except Exception as e:
+                    print(colored(f"⚠️ Error updating metadata file: {str(e)}", "yellow"))
+            
             return removed_files
             
         except Exception as e:
-            logger.error(f"Error cleaning unused files: {str(e)}")
-            print(colored(f"❌ Error cleaning unused files: {str(e)}", "red"))
-            return []
+            error_msg = f"Error cleaning unused files: {str(e)}"
+            logger.error(error_msg)
+            print(colored(f"❌ {error_msg}", "red"))
+            return removed_files
 
     def _validate_file(self, file_path: str) -> bool:
         """Validate if file exists and is a PDF"""

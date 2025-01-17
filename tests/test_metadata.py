@@ -209,7 +209,7 @@ def test_complete_pipeline(processed_files):
     print(colored("✓ Complete pipeline test passed", "green")) 
 
 def test_consolidated_metadata(processed_files, tmp_path):
-    """Test consolidated metadata generation and updates"""
+    """Test consolidated metadata generation and updates with KG structure"""
     print(colored("\n=== Testing Consolidated Metadata ===", "blue"))
     
     # Setup test store
@@ -223,8 +223,12 @@ def test_consolidated_metadata(processed_files, tmp_path):
     # Verify initial state
     consolidated = consolidator._load_json(consolidator.consolidated_path)
     assert consolidated["store_info"]["name"] == "test_store"
-    assert len(consolidated["documents"]) == 0
-    assert consolidated["global_stats"]["total_documents"] == 0
+    assert consolidated["store_info"]["version"] == "2.0.0"
+    assert len(consolidated["nodes"]["papers"]) == 0
+    assert len(consolidated["nodes"]["equations"]) == 0
+    assert len(consolidated["nodes"]["citations"]) == 0
+    assert len(consolidated["nodes"]["authors"]) == 0
+    assert len(consolidated["relationships"]) == 0
     
     # Add test documents
     for doc_type, result in processed_files.items():
@@ -236,26 +240,92 @@ def test_consolidated_metadata(processed_files, tmp_path):
     
     # Verify consolidated metadata
     consolidated = consolidator._load_json(consolidator.consolidated_path)
-    assert len(consolidated["documents"]) == len(processed_files)
-    assert consolidated["global_stats"]["total_documents"] > 0
-    assert consolidated["global_stats"]["total_citations"] > 0
-    assert consolidated["global_stats"]["total_references"] > 0
-    assert consolidated["global_stats"]["total_equations"] > 0
     
-    # Verify citation analysis
-    citation_analysis = consolidator._load_json(consolidator.citation_analysis_path)
-    assert "global_stats" in citation_analysis
-    assert citation_analysis["global_stats"]["total_citations"] > 0
-    assert citation_analysis["global_stats"]["total_references"] > 0
+    # Verify nodes
+    assert len(consolidated["nodes"]["papers"]) == len(processed_files)
+    assert len(consolidated["nodes"]["equations"]) > 0
+    assert len(consolidated["nodes"]["citations"]) > 0
+    assert len(consolidated["nodes"]["authors"]) > 0
+    
+    # Verify relationships
+    relationships = consolidated["relationships"]
+    assert len(relationships) > 0
+    
+    # Verify relationship types
+    relationship_types = {rel["type"] for rel in relationships}
+    assert "written_by" in relationship_types
+    assert "contains_equation" in relationship_types
+    assert "contains_citation" in relationship_types
+    assert "cites_paper" in relationship_types
+    
+    # Verify paper nodes structure
+    for paper in consolidated["nodes"]["papers"]:
+        assert "id" in paper
+        assert "type" in paper
+        assert paper["type"] == "paper"
+        assert "title" in paper
+        assert "metadata" in paper
+        assert "authors" in paper["metadata"]
+        assert "year" in paper["metadata"]
+        assert "venue" in paper["metadata"]
+    
+    # Verify equation nodes structure
+    for equation in consolidated["nodes"]["equations"]:
+        assert "id" in equation
+        assert "type" in equation
+        assert equation["type"] == "equation"
+        assert "raw_text" in equation
+        assert "metadata" in equation
+        assert "symbols" in equation["metadata"]
+        assert "equation_type" in equation["metadata"]
+        assert "context" in equation["metadata"]
+    
+    # Verify citation nodes structure
+    for citation in consolidated["nodes"]["citations"]:
+        assert "id" in citation
+        assert "type" in citation
+        assert citation["type"] == "citation"
+        assert "text" in citation
+        assert "metadata" in citation
+        assert "context" in citation["metadata"]
+        assert "references" in citation["metadata"]
+    
+    # Verify relationship structure
+    for rel in relationships:
+        assert "source" in rel
+        assert "target" in rel
+        assert "type" in rel
+        assert "metadata" in rel
+        if rel["type"] == "written_by":
+            assert rel["target"].startswith("author_")
+        elif rel["type"] == "contains_equation":
+            assert "_eq_" in rel["target"]
+        elif rel["type"] == "contains_citation":
+            assert "_cite_" in rel["target"]
+    
+    # Verify global stats
+    stats = consolidated["global_stats"]
+    assert stats["total_documents"] == len(consolidated["nodes"]["papers"])
+    assert stats["total_equations"] == len(consolidated["nodes"]["equations"])
+    assert stats["total_citations"] == len(consolidated["nodes"]["citations"])
+    assert stats["total_relationships"] == len(consolidated["relationships"])
     
     # Test document removal
     consolidator.remove_document_metadata("arxiv")
     consolidated = consolidator._load_json(consolidator.consolidated_path)
-    assert len(consolidated["documents"]) == len(processed_files) - 1
     
-    # Verify relationships were cleaned
-    relationships = consolidated["relationships"]
-    assert not any(rel["source"] == "arxiv" for rel in relationships["citation_network"])
-    assert not any(rel["document_id"] == "arxiv" for rel in relationships["equation_references"])
+    # Verify node removal
+    assert len([p for p in consolidated["nodes"]["papers"] if p["id"] == "arxiv"]) == 0
+    assert len([e for e in consolidated["nodes"]["equations"] if e["id"].startswith("arxiv_eq_")]) == 0
+    assert len([c for c in consolidated["nodes"]["citations"] if c["id"].startswith("arxiv_cite_")]) == 0
+    
+    # Verify relationship removal
+    assert not any(
+        rel["source"] == "arxiv" or 
+        rel["source"].startswith("arxiv_") or
+        rel["target"] == "arxiv" or
+        rel["target"].startswith("arxiv_")
+        for rel in consolidated["relationships"]
+    )
     
     print(colored("✓ Consolidated metadata test passed", "green")) 
