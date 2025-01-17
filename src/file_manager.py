@@ -77,6 +77,30 @@ def create_store_directory(store_name: str) -> Optional[str]:
                     "last_updated": None
                 }, f, indent=2)
             
+            # Initialize consolidated metadata
+            consolidated_path = os.path.join(store_path, "consolidated.json")
+            with open(consolidated_path, 'w', encoding='utf-8') as f:
+                json.dump({
+                    "store_info": {
+                        "name": store_name,
+                        "created": datetime.now().isoformat(),
+                        "last_updated": None
+                    },
+                    "documents": {},
+                    "global_stats": {
+                        "total_documents": 0,
+                        "total_references": 0,
+                        "total_citations": 0,
+                        "total_equations": 0
+                    },
+                    "relationships": {
+                        "citation_network": [],
+                        "equation_references": [],
+                        "cross_references": []
+                    }
+                }, f, indent=2)
+            print(colored("✓ Initialized consolidated metadata", "green"))
+            
             logging.info(f"Created store directory with structure: {store_path}")
             return store_path
         else:

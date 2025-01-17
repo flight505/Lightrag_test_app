@@ -7,8 +7,6 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-import arxiv
-import fitz
 import requests
 from pydantic import BaseModel, Field
 from PyPDF2 import PdfReader
