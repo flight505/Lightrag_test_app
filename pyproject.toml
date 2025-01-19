@@ -37,14 +37,18 @@ dependencies = [
     "arxiv>=2.1.3",
     
     # RAG packages
-    "lightrag-hku>=1.1.1",
+    "lightrag-hku>=1.1.2",
     
     # Development
     "python-dotenv",
     "python-docx",
     "pytest",
     "beautifulsoup4",
+    "click",
+    "rich",
 ]
+[project.scripts]
+lightrag = "cli.main:cli"
 
 [build-system]
 requires = ["hatchling"]

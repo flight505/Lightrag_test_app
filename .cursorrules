@@ -1,0 +1,169 @@
+# Project Rules
+
+## Project Information
+- **Version**: 1.0.0
+- **Last Updated**: January 19, 2025 at 04:13 AM
+- **Name**: Lightrag_test_app
+- **Language**: python
+- **Framework**: none
+- **Type**: application
+
+## Project Description
+This project, LightRAG, is a comprehensive application designed to streamline the analysis of academic papers through retrieval-augmented generation. It offers a user-friendly interface for document management, advanced search capabilities using multiple modes (hybrid, local, global, mix), and detailed academic analysis features like citation network visualization and equation analysis, targeting researchers and academics who need efficient tools for processing and understanding scholarly literature. The application leverages a modular architecture with core components for metadata extraction, PDF conversion, and response processing, and includes a command-line interface for advanced store management, emphasizing both usability and technical depth.
+
+## AI Behavior Rules
+
+### Code Generation Style
+#### Preferred Patterns
+- Use 4 spaces for indentation.
+- Use snake_case for variable and function names.
+- Use PascalCase for class names.
+- Use descriptive variable names.
+- Use f-strings for string formatting.
+- Keep lines within 100 characters when possible.
+- Use type hints for function parameters and return values.
+- Use docstrings to document functions and classes.
+- Use explicit relative imports within the 'src' directory.
+- Use standard library modules when possible (os, json, pathlib, logging, etc.).
+- Use Pydantic for data validation and model definitions.
+- Use enums for defining fixed sets of options.
+
+#### Patterns to Avoid
+- Use tabs for indentation.
+- Use camelCase for variable or function names.
+- Use inconsistent indentation.
+- Use overly short variable names.
+- Use string concatenation instead of f-strings.
+- Exceed line length limits without a good reason.
+- Omit type hints.
+- Omit docstrings.
+- Use absolute imports within the 'src' directory.
+- Implement custom functionality when standard library modules provide a solution.
+
+### Error Handling
+#### Preferred Patterns
+- Use try-except blocks to catch potential exceptions.
+- Log errors using the `logging` module with detailed messages and stack traces.
+- Use custom exception classes derived from a base `LightRAGError`.
+- Print error messages to the console using the `termcolor` library, with appropriate colors.
+- Use `click.Abort()` to gracefully exit CLI commands after an error.
+- Handle errors at the appropriate level and avoid catching broad exceptions.
+- Provide specific error messages that help with debugging.
+
+#### Patterns to Avoid
+- Use bare except blocks.
+- Omit logging of errors.
+- Use generic exception classes.
+- Omit styling of error messages.
+- Exit CLI commands abruptly without proper handling.
+- Catch exceptions too broadly and hide underlying problems.
+- Provide generic error messages that are not informative.
+
+### Performance
+#### Preferred Patterns
+- Use caching mechanisms (e.g., `st.cache_data`) for expensive operations.
+- Use multithreading or multiprocessing for parallelizable tasks.
+- Use lazy initialization of resources (e.g., MarkerConverter).
+- Avoid unnecessary computations or API calls.
+- Use efficient data structures and algorithms.
+- Use generators for handling large data sets.
+- Avoid reading large files into memory all at once.
+
+#### Patterns to Avoid
+- Perform redundant computations.
+- Load large files into memory all at once.
+- Use inefficient data structures or algorithms.
+- Make unnecessary API calls.
+- Execute code sequentially when it can be parallelized.
+
+### Module Organization
+#### Structure
+- The project is organized into a 'src' directory containing core modules, a 'pages' directory for Streamlit UI components, a 'tests' directory for unit tests, and a 'cli' directory for the command-line interface.
+- The 'src' directory contains modules for metadata extraction, file processing, configuration management, and other core functionalities.
+- The 'pages' directory contains individual Streamlit page components.
+- The 'tests' directory contains unit tests for the various modules.
+- The 'cli' directory contains modules for the command-line interface, including commands, core functionalities, and configuration.
+- Each module generally focuses on a specific aspect of the application.
+- Configuration files are placed at the root of the project and in the user's home directory (for the CLI config).
+
+#### Dependencies
+- streamlit_app.py depends on streamlit, streamlit_navigation_bar, pages, and src.file_manager.
+- tests/test_metadata.py depends on src.academic_metadata, src.base_metadata, src.citation_metadata, src.config_manager, src.equation_metadata, src.file_processor, src.metadata_extractor, and src.metadata_consolidator.
+- tests/test_citation_processor.py depends on src.base_metadata and src.citation_metadata.
+- tests/cli/test_store_cmd.py depends on cli.commands.store_cmd and cli.core.store_manager.
+- cli/main.py depends on cli.commands.store_cmd and cli.core.errors.
+- cli/core/config.py depends on standard library modules.
+- cli/core/errors.py depends on standard library modules.
+- cli/core/progress.py depends on the rich library.
+- cli/core/store_manager.py depends on cli.core.config and cli.core.errors.
+- cli/commands/store_cmd.py depends on cli.core.store_manager, cli.core.errors, and the click library.
+- pages/Home.py depends on streamlit and src.academic_metadata.
+- pages/Academic.py depends on streamlit, src.academic_metadata, src.equation_metadata, json, termcolor, pandas, plotly, networkx, pyvis, and tempfile.
+- pages/Search.py depends on streamlit, docx (optional), networkx, xxhash (optional), src.file_manager, src.lightrag_helpers, and src.lightrag_init.
+- pages/Manage.py depends on streamlit, json, logging, pathlib, pandas, termcolor, src.academic_metadata, src.config_manager, src.file_manager, and src.file_processor.
+- src/base_metadata.py depends on pydantic.
+- src/equation_metadata.py depends on logging, re, enum, typing, pydantic, and termcolor.
+- src/config_manager.py depends on logging, os, dataclasses, enum, pathlib, typing, and termcolor.
+- src/academic_response_processor.py depends on logging, os, re, typing, pandas, termcolor, and src.academic_metadata.
+- src/document_validator.py depends on os, logging, typing, pathlib, and src.file_manager.
+- src/metadata_consolidator.py depends on json, logging, datetime, pathlib, threading, typing, and termcolor.
+- src/citation_metadata.py depends on re, typing, pydantic, termcolor, and src.base_metadata.
+- src/file_processor.py depends on json, logging, pathlib, threading, typing, datetime, arxiv, pdf2doi, streamlit, crossref, and termcolor.
+- src/lightrag_helpers.py depends on logging, os, typing, pandas, and termcolor.
+- src/metadata_extractor.py depends on json, logging, os, re, subprocess, tempfile, pathlib, typing, requests, pydantic, termcolor, src.academic_metadata, src.base_metadata, src.equation_metadata, and src.citation_metadata.
+- src/academic_metadata.py depends on typing, pydantic, and termcolor.
+- src/pdf_converter.py depends on logging, os, abc, pathlib, typing, pymupdf, PyPDF2, and termcolor.
+- src/equation_extractor.py depends on typing.
+- src/lightrag_init.py depends on logging, os, typing, datetime, lightrag, termcolor, src.document_validator, src.academic_response_processor, src.file_processor, and src.config_manager.
+- src/file_manager.py depends on os, pathlib, typing, logging, shutil, datetime, and termcolor.
+
+#### Module Responsibilities
+- **streamlit_app.py**: Sets up the Streamlit application, including page configuration and navigation.
+- **tests/test_metadata.py**: Contains unit tests for metadata extraction from academic papers.
+- **tests/test_citation_processor.py**: Contains unit tests for citation processing.
+- **tests/cli/test_store_cmd.py**: Contains unit tests for the CLI store management commands.
+- **cli/main.py**: Entry point for the CLI application, defines the main command group.
+- **cli/core/config.py**: Manages the configuration settings for the CLI application.
+- **cli/core/errors.py**: Defines custom exception classes and error handling for the CLI application.
+- **cli/core/progress.py**: Provides utilities for progress reporting in the CLI application.
+- **cli/core/store_manager.py**: Manages document stores for the CLI application.
+- **cli/commands/store_cmd.py**: Defines the CLI commands for managing document stores.
+- **pages/Home.py**: Defines the content and layout for the home page of the Streamlit application.
+- **pages/Academic.py**: Defines the content and layout for the academic analysis page of the Streamlit application.
+- **pages/Search.py**: Defines the content and layout for the search page of the Streamlit application.
+- **pages/Manage.py**: Defines the content and layout for the document management page of the Streamlit application.
+- **src/base_metadata.py**: Defines base Pydantic models for authors and references.
+- **src/equation_metadata.py**: Defines Pydantic models and classes for handling equation metadata.
+- **src/config_manager.py**: Manages configuration settings for file processing.
+- **src/academic_response_processor.py**: Processes and formats responses with academic citations and references.
+- **src/document_validator.py**: Validates documents before processing in LightRAG.
+- **src/metadata_consolidator.py**: Manages consolidated metadata and citation analysis across document stores.
+- **src/citation_metadata.py**: Defines models and classes for citation processing.
+- **src/file_processor.py**: Handles file preprocessing and metadata extraction.
+- **src/lightrag_helpers.py**: Provides helper functions for processing responses.
+- **src/metadata_extractor.py**: Extracts metadata from academic documents.
+- **src/academic_metadata.py**: Defines Pydantic models for academic metadata.
+- **src/pdf_converter.py**: Provides abstract base class and concrete classes for PDF conversion to text.
+- **src/equation_extractor.py**: Defines a class to represent a mathematical equation.
+- **src/lightrag_init.py**: Initializes and configures LightRAG with specified models and embeddings.
+- **src/file_manager.py**: Manages the DB directory and creation of store directories.
+
+#### Rules
+- Modules should be grouped by functionality, with clear separation of concerns.
+- Relative imports should be used within the 'src' directory.
+- The 'pages' directory should only contain Streamlit UI components.
+- The 'tests' directory should contain unit tests for all core modules.
+- The 'cli' directory should contain code related to the command-line interface.
+- Configuration settings should be managed through the 'config_manager' module.
+- Error handling should be consistent across modules.
+- Logging should be used to track events and errors.
+- Pydantic should be used for data validation and model definitions.
+- Enums should be used for defining fixed sets of options.
+
+#### Naming Conventions
+- **variables**: snake_case
+- **functions**: snake_case
+- **classes**: PascalCase
+- **constants**: UPPER_SNAKE_CASE
+- **enums**: PascalCase
+- **modules**: snake_case
