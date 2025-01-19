@@ -35,7 +35,9 @@ class ConfigManager:
         Args:
             config_dir: Optional path to config directory. If not provided, uses ~/.lightrag
         """
-        self.config_dir = config_dir or Path.home() / ".lightrag"
+        # Check environment variable first, then parameter, then default
+        self.config_dir = (Path(os.getenv("LIGHTRAG_CONFIG_DIR")) if os.getenv("LIGHTRAG_CONFIG_DIR")
+                          else config_dir or Path.home() / ".lightrag")
         self.config_dir.mkdir(parents=True, exist_ok=True)
         self.config_file = self.config_dir / "config.json"
         self._load_config()

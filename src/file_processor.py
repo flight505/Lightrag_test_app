@@ -363,10 +363,14 @@ class FileProcessor:
                     print(colored("⚠️ No identifier found in PDF", "yellow"))
                     return None
                     
+                if not identifier_type:
+                    print(colored("⚠️ No identifier type found in PDF", "yellow"))
+                    return None
+                    
                 print(colored(f"✓ Found {identifier_type}: {identifier} (method: {method})", "green"))
                 
                 # Check if it's an arXiv identifier
-                if "arxiv" in identifier.lower():
+                if identifier and "arxiv" in identifier_type.lower():
                     print(colored("→ arXiv identifier detected, fetching from arXiv API...", "blue"))
                     try:
                         # Extract just the raw arXiv ID number

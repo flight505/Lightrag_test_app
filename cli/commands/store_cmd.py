@@ -21,24 +21,27 @@ def create(name: str):
     """Create a new document store."""
     try:
         config = ConfigManager()
+        console.print(f"Using config directory: {config.config_dir}", style="blue")
         manager = StoreManager(config_dir=config.config_dir)
+        console.print(f"Store root: {manager.store_root}", style="blue")
         store_path = manager.create_store(name)
         console.print(f"Created store '{name}' at {store_path}", style="green")
     except StoreError as e:
         handle_error(e)
         raise click.Abort()
     except Exception as e:
-        handle_error(StoreError(str(e)))
+        handle_error(StoreError(f"Failed to create store: {str(e)}"))
         raise click.Abort()
 
 @store.command()
 @click.argument('name')
-def delete(name: str):
+@click.option('--force', is_flag=True, help="Skip confirmation prompt")
+def delete(name: str, force: bool = False):
     """Delete a document store."""
     try:
         config = ConfigManager()
         manager = StoreManager(config_dir=config.config_dir)
-        if not click.confirm(f"Are you sure you want to delete store '{name}'?"):
+        if not force and not click.confirm(f"Are you sure you want to delete store '{name}'?"):
             return
         try:
             manager.delete_store(name)

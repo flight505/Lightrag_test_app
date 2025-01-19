@@ -4,6 +4,8 @@ from rich.console import Console
 from rich.traceback import install
 
 from .commands.store_cmd import store
+from .commands.pdf_cmd import pdf
+from .commands.search_cmd import search
 from .core.errors import handle_error
 
 # Install rich traceback handler
@@ -24,6 +26,8 @@ def version():
 
 # Add command groups
 cli.add_command(store)
+cli.add_command(pdf)
+cli.add_command(search)
 
 if __name__ == '__main__':
     try:

@@ -1,5 +1,6 @@
 """Tests for store management commands."""
 import json
+import os
 from pathlib import Path
 import pytest
 from click.testing import CliRunner
@@ -20,7 +21,14 @@ def test_env(tmp_path):
     config_dir.mkdir()
     config = ConfigManager(config_dir=config_dir)
     store_manager = StoreManager(config_dir=config_dir)
-    return {"config": config, "store_manager": store_manager, "tmp_path": tmp_path}
+    
+    # Set environment variable for tests
+    os.environ["LIGHTRAG_CONFIG_DIR"] = str(config_dir)
+    
+    yield {"config": config, "store_manager": store_manager, "tmp_path": tmp_path}
+    
+    # Clean up
+    os.environ.pop("LIGHTRAG_CONFIG_DIR", None)
 
 def test_create_store(runner, test_env):
     """Test creating a new store."""
@@ -61,8 +69,8 @@ def test_delete_store(runner, test_env):
         # Create store first
         runner.invoke(store, ['create', 'test_store'])
         
-        # Delete with confirmation
-        result = runner.invoke(store, ['delete', 'test_store'], input='y\n')
+        # Delete with force flag
+        result = runner.invoke(store, ['delete', 'test_store', '--force'])
         assert result.exit_code == 0
         assert "Deleted store 'test_store'" in result.output
         
@@ -73,7 +81,7 @@ def test_delete_store(runner, test_env):
 def test_delete_nonexistent_store(runner, test_env):
     """Test deleting a store that doesn't exist."""
     with runner.isolated_filesystem(temp_dir=test_env["tmp_path"]):
-        result = runner.invoke(store, ['delete', 'nonexistent'])
+        result = runner.invoke(store, ['delete', 'nonexistent', '--force'])
         assert result.exit_code != 0
         assert "not found" in result.output
 
