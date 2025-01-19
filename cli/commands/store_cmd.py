@@ -21,11 +21,9 @@ def create(name: str):
     """Create a new document store."""
     try:
         config = ConfigManager()
-        console.print(f"Using config directory: {config.config_dir}", style="blue")
         manager = StoreManager(config_dir=config.config_dir)
-        console.print(f"Store root: {manager.store_root}", style="blue")
-        store_path = manager.create_store(name)
-        console.print(f"Created store '{name}' at {store_path}", style="green")
+        manager.create_store(name)
+        return 0
     except StoreError as e:
         handle_error(e)
         raise click.Abort()
@@ -43,12 +41,11 @@ def delete(name: str, force: bool = False):
         manager = StoreManager(config_dir=config.config_dir)
         if not force and not click.confirm(f"Are you sure you want to delete store '{name}'?"):
             return
-        try:
-            manager.delete_store(name)
-            console.print(f"Deleted store '{name}'", style="green")
-        except StoreError as e:
-            handle_error(e)
-            raise click.Abort()
+        manager.delete_store(name)
+        return 0
+    except StoreError as e:
+        handle_error(e)
+        raise click.Abort()
     except Exception as e:
         handle_error(StoreError(str(e)))
         raise click.Abort()
@@ -59,34 +56,34 @@ def list():
     try:
         config = ConfigManager()
         manager = StoreManager(config_dir=config.config_dir)
-        try:
-            stores = manager.list_stores()
+        stores = manager.list_stores()
+        
+        if not stores:
+            console.print("No stores found", style="yellow")
+            return 0
             
-            if not stores:
-                console.print("No stores found", style="yellow")
-                return
-                
-            table = Table(show_header=True)
-            table.add_column("Name")
-            table.add_column("Documents")
-            table.add_column("Size")
-            table.add_column("Created")
-            table.add_column("Updated")
+        table = Table(show_header=True)
+        table.add_column("Name")
+        table.add_column("Documents")
+        table.add_column("Size")
+        table.add_column("Created")
+        table.add_column("Updated")
+        
+        for store_name in stores:
+            info = manager.get_store_info(store_name)
+            table.add_row(
+                store_name,
+                str(info["document_count"]),
+                f"{info['size'] / 1024 / 1024:.1f} MB",
+                info["created"].split("T")[0],
+                info["updated"].split("T")[0]
+            )
             
-            for store_name in stores:
-                info = manager.get_store_info(store_name)
-                table.add_row(
-                    store_name,
-                    str(info["document_count"]),
-                    f"{info['size'] / 1024 / 1024:.1f} MB",
-                    info["created"].split("T")[0],
-                    info["updated"].split("T")[0]
-                )
-                
-            console.print(table)
-        except StoreError as e:
-            handle_error(e)
-            raise click.Abort()
+        console.print(table)
+        return 0
+    except StoreError as e:
+        handle_error(e)
+        raise click.Abort()
     except Exception as e:
         handle_error(StoreError(str(e)))
         raise click.Abort()
@@ -98,18 +95,18 @@ def info(name: str):
     try:
         config = ConfigManager()
         manager = StoreManager(config_dir=config.config_dir)
-        try:
-            info = manager.get_store_info(name)
-            
-            console.print(f"\nStore: {name}", style="bold blue")
-            console.print(f"Path: {info['path']}")
-            console.print(f"Documents: {info['document_count']}")
-            console.print(f"Size: {info['size'] / 1024 / 1024:.1f} MB")
-            console.print(f"Created: {info['created']}")
-            console.print(f"Updated: {info['updated']}\n")
-        except StoreError as e:
-            handle_error(e)
-            raise click.Abort()
+        info = manager.get_store_info(name)
+        
+        console.print(f"\nStore: {name}", style="bold blue")
+        console.print(f"Path: {info['path']}")
+        console.print(f"Documents: {info['document_count']}")
+        console.print(f"Size: {info['size'] / 1024 / 1024:.1f} MB")
+        console.print(f"Created: {info['created']}")
+        console.print(f"Updated: {info['updated']}\n")
+        return 0
+    except StoreError as e:
+        handle_error(e)
+        raise click.Abort()
     except Exception as e:
         handle_error(StoreError(str(e)))
         raise click.Abort() 

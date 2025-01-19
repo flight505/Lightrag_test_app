@@ -6,6 +6,7 @@ from rich.traceback import install
 from .commands.store_cmd import store
 from .commands.pdf_cmd import pdf
 from .commands.search_cmd import search
+from .commands.metadata_cmd import metadata
 from .core.errors import handle_error
 
 # Install rich traceback handler
@@ -28,6 +29,7 @@ def version():
 cli.add_command(store)
 cli.add_command(pdf)
 cli.add_command(search)
+cli.add_command(metadata)
 
 if __name__ == '__main__':
     try:

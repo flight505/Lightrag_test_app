@@ -22,18 +22,19 @@ Key Requirements:
 ├─ 📄 streamlit_app.py (79 lines) - Python script containing project logic
 ├─ 📁 cli
 │  ├─ 📄 __init__.py (1 lines) - Python script containing project logic
-│  ├─ 📄 main.py (37 lines) - Python script containing project logic
+│  ├─ 📄 main.py (39 lines) - Python script containing project logic
 │  ├─ 📁 commands
 │  │  ├─ 📄 __init__.py (1 lines) - Python script containing project logic
+│  │  ├─ 📄 metadata_cmd.py (171 lines) - Python script containing project logic
 │  │  ├─ 📄 pdf_cmd.py (159 lines) - Python script containing project logic
 │  │  ├─ 📄 search_cmd.py (194 lines) - Python script containing project logic
-│  │  └─ 📄 store_cmd.py (115 lines) - Python script containing project logic
+│  │  └─ 📄 store_cmd.py (112 lines) - Python script containing project logic
 │  └─ 📁 core
 │     ├─ 📄 __init__.py (1 lines) - Python script containing project logic
 │     ├─ 📄 config.py (89 lines) - Python script containing project logic
 │     ├─ 📄 errors.py (40 lines) - Python script containing project logic
 │     ├─ 📄 progress.py (33 lines) - Python script containing project logic
-│     └─ 📄 store_manager.py (229 lines) - Python script containing project logic
+│     └─ 📄 store_manager.py (201 lines) - Python script containing project logic
 ├─ 📁 pages
 │  ├─ 📄 Academic.py (213 lines) - Python script containing project logic
 │  ├─ 📄 Home.py (78 lines) - Python script containing project logic
@@ -61,9 +62,10 @@ Key Requirements:
    ├─ 📄 test_citation_processor.py (166 lines) - Python script containing project logic
    ├─ 📄 test_metadata.py (331 lines) - Python script containing project logic
    └─ 📁 cli
-      ├─ 📄 test_pdf_cmd.py (113 lines) - Python script containing project logic
-      ├─ 📄 test_search_cmd.py (145 lines) - Python script containing project logic
-      └─ 📄 test_store_cmd.py (119 lines) - Python script containing project logic
+      ├─ 📄 test_metadata_cmd.py (169 lines) - Python script containing project logic
+      ├─ 📄 test_pdf_cmd.py (163 lines) - Python script containing project logic
+      ├─ 📄 test_search_cmd.py (172 lines) - Python script containing project logic
+      └─ 📄 test_store_cmd.py (178 lines) - Python script containing project logic
 
 # 🔍 Key Files with Methods
 
@@ -218,7 +220,7 @@ Functions:
 - load_documents
 - query
 
-`cli/main.py` (37 lines)
+`cli/main.py` (39 lines)
 Functions:
 - cli
 - version
@@ -231,6 +233,14 @@ Functions:
 - process_files
 - show_manage
 - update_status
+
+`cli/commands/metadata_cmd.py` (171 lines)
+Functions:
+- consolidate
+- extract
+- metadata
+- show
+- stats
 
 `src/metadata_consolidator.py` (224 lines)
 Functions:
@@ -311,7 +321,7 @@ Functions:
 - search
 - stats
 
-`cli/commands/store_cmd.py` (115 lines)
+`cli/commands/store_cmd.py` (112 lines)
 Functions:
 - create
 - delete
@@ -319,7 +329,7 @@ Functions:
 - list
 - store
 
-`cli/core/store_manager.py` (229 lines)
+`cli/core/store_manager.py` (201 lines)
 Functions:
 - StoreManager
 - create_store
@@ -356,10 +366,26 @@ Functions:
 - test_doi_metadata_extraction
 - test_equation_extraction
 
-`tests/cli/test_pdf_cmd.py` (113 lines)
+`tests/cli/test_metadata_cmd.py` (169 lines)
 Functions:
 - runner
+- test_consolidate_metadata
+- test_consolidate_nonexistent_store
 - test_env
+- test_extract_metadata
+- test_extract_nonexistent_document
+- test_extract_nonexistent_store
+- test_show_metadata
+- test_show_nonexistent_document
+- test_show_nonexistent_store
+- test_stats_command
+
+`tests/cli/test_pdf_cmd.py` (163 lines)
+Functions:
+- runner
+- test_convert_pdf
+- test_env
+- test_extract_metadata
 - test_list_empty_store
 - test_list_pdfs
 - test_pdf_info
@@ -367,10 +393,10 @@ Functions:
 - test_process_nonexistent_pdf
 - test_process_nonexistent_store
 - test_process_pdf
+- test_show_metadata
 
-`tests/cli/test_search_cmd.py` (145 lines)
+`tests/cli/test_search_cmd.py` (172 lines)
 Functions:
-- patch
 - runner
 - test_env
 - test_graph_command
@@ -381,7 +407,7 @@ Functions:
 - test_stats_command
 - test_stats_nonexistent_store
 
-`tests/cli/test_store_cmd.py` (119 lines)
+`tests/cli/test_store_cmd.py` (178 lines)
 Functions:
 - runner
 - test_create_existing_store
@@ -391,12 +417,13 @@ Functions:
 - test_env
 - test_list_empty_stores
 - test_list_stores
+- test_show_store
 - test_store_info
 
 # 📊 Project Overview
-**Files:** 38  |  **Lines:** 6,501
+**Files:** 40  |  **Lines:** 6,948
 
 ## 📁 File Distribution
-- .py: 38 files (6,501 lines)
+- .py: 40 files (6,948 lines)
 
-*Updated: January 19, 2025 at 11:08 AM*
+*Updated: January 19, 2025 at 12:10 PM*

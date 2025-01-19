@@ -38,11 +38,14 @@ class StoreManager:
         store_path = self.store_root / store_name
         return store_path.exists() and store_path.is_dir()
         
-    def create_store(self, store_name: str) -> None:
+    def create_store(self, store_name: str) -> Path:
         """Create a new document store.
         
         Args:
             store_name: Name of the store to create
+            
+        Returns:
+            Path: Path to the created store
             
         Raises:
             StoreError: If store already exists or creation fails
@@ -53,74 +56,43 @@ class StoreManager:
             
         try:
             # Create store directory
-            store_path.mkdir()
+            store_path.mkdir(exist_ok=True)
             
             # Create subdirectories
-            (store_path / "documents").mkdir()
-            (store_path / "metadata").mkdir()
-            (store_path / "text").mkdir()
+            (store_path / "converted").mkdir(exist_ok=True)
+            (store_path / "cache").mkdir(exist_ok=True)
             
             # Initialize metadata file
             metadata = {
                 "name": store_name,
-                "created": str(datetime.now()),
-                "last_updated": str(datetime.now()),
-                "version": "1.0.0",
+                "created": datetime.now().isoformat(),
+                "updated": datetime.now().isoformat(),
+                "document_count": 0,
+                "size": 0,
+                "path": str(store_path),
                 "documents": []
             }
             with open(store_path / "metadata.json", "w", encoding="utf-8") as f:
                 json.dump(metadata, f, indent=2)
                 
-            # Initialize consolidated metadata
-            consolidated = {
-                "store_info": {
-                    "name": store_name,
-                    "created": str(datetime.now()),
-                    "last_updated": str(datetime.now()),
-                    "version": "2.0.0"
-                },
-                "nodes": {
-                    "papers": [],
-                    "equations": [],
-                    "citations": [],
-                    "authors": [],
-                    "contexts": []
-                },
-                "relationships": [],
-                "global_stats": {
-                    "total_documents": 0,
-                    "total_equations": 0,
-                    "total_citations": 0,
-                    "total_authors": 0,
-                    "total_relationships": 0
-                }
-            }
-            with open(store_path / "consolidated.json", "w", encoding="utf-8") as f:
-                json.dump(consolidated, f, indent=2)
-                
-            console.print(f"✓ Created store '{store_name}'", style="green")
+            console.print(f"Store created successfully", style="green")
+            return store_path
             
         except Exception as e:
             if store_path.exists():
                 shutil.rmtree(store_path)
             raise StoreError(f"Failed to create store: {str(e)}")
             
-    def list_stores(self) -> List[Dict]:
+    def list_stores(self) -> List[str]:
         """List all document stores.
         
         Returns:
-            list: List of store metadata dictionaries
+            list: List of store names
         """
         stores = []
         for store_path in self.store_root.iterdir():
-            if store_path.is_dir():
-                try:
-                    with open(store_path / "metadata.json", "r", encoding="utf-8") as f:
-                        metadata = json.load(f)
-                        stores.append(metadata)
-                except:
-                    # Skip stores with invalid metadata
-                    continue
+            if store_path.is_dir() and self.validate_store_path(store_path):
+                stores.append(store_path.name)
         return stores
         
     def get_store(self, name: str) -> Path:
@@ -155,7 +127,7 @@ class StoreManager:
             
         try:
             shutil.rmtree(store_path)
-            console.print(f"✓ Deleted store '{store_name}'", style="green")
+            console.print(f"Store deleted successfully", style="green")
         except Exception as e:
             raise StoreError(f"Failed to delete store: {str(e)}")
             

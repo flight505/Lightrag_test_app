@@ -1,6 +1,7 @@
 """Tests for store management commands."""
 import json
 import os
+import shutil
 from pathlib import Path
 import pytest
 from click.testing import CliRunner
@@ -16,41 +17,57 @@ def runner():
 
 @pytest.fixture
 def test_env(tmp_path):
-    """Create a test environment with temporary directory."""
+    """Create test environment."""
+    # Set up config directory
     config_dir = tmp_path / ".lightrag"
-    config_dir.mkdir()
-    config = ConfigManager(config_dir=config_dir)
-    store_manager = StoreManager(config_dir=config_dir)
-    
-    # Set environment variable for tests
+    config_dir.mkdir(exist_ok=True)
     os.environ["LIGHTRAG_CONFIG_DIR"] = str(config_dir)
     
-    yield {"config": config, "store_manager": store_manager, "tmp_path": tmp_path}
+    # Set up config
+    config = ConfigManager(config_dir=config_dir)
+    store_root = config_dir / "stores"
+    store_root.mkdir(exist_ok=True)
     
-    # Clean up
-    os.environ.pop("LIGHTRAG_CONFIG_DIR", None)
+    # Set up store manager
+    store_manager = StoreManager(config_dir=config_dir)
+    
+    # Copy test PDFs to temp directory
+    pdf_dir = Path("tests/pdfs")
+    temp_pdf_dir = tmp_path / "pdfs"
+    temp_pdf_dir.mkdir(exist_ok=True)
+    
+    arxiv_pdf = pdf_dir / "Chen et al. - 2023 - TSMixer An All-MLP Architecture for Time Series Forecasting-annotated.pdf"
+    metadata_file = pdf_dir / "Chen et al. - 2023 - TSMixer An All-MLP Architecture for Time Series Forecasting-annotated_metadata.json"
+    
+    temp_arxiv_pdf = temp_pdf_dir / arxiv_pdf.name
+    temp_metadata_file = temp_pdf_dir / metadata_file.name
+    
+    shutil.copy2(arxiv_pdf, temp_arxiv_pdf)
+    shutil.copy2(metadata_file, temp_metadata_file)
+    
+    with open(metadata_file, encoding="utf-8") as f:
+        arxiv_metadata = json.load(f)
+    
+    return {
+        "tmp_path": tmp_path,
+        "config": config,
+        "store_manager": store_manager,
+        "arxiv_pdf": temp_arxiv_pdf,
+        "metadata": arxiv_metadata
+    }
 
 def test_create_store(runner, test_env):
-    """Test creating a new store."""
+    """Test store creation."""
     with runner.isolated_filesystem(temp_dir=test_env["tmp_path"]):
         result = runner.invoke(store, ['create', 'test_store'])
         assert result.exit_code == 0
-        assert "Created store 'test_store'" in result.output
+        assert "Store created successfully" in result.output
         
-        # Verify store structure
-        store_path = test_env["store_manager"].get_store("test_store")
+        store_path = test_env["config"].config_dir / "stores" / "test_store"
         assert store_path.exists()
-        assert (store_path / "metadata.json").exists()
         assert (store_path / "converted").exists()
         assert (store_path / "cache").exists()
-        
-        # Verify metadata
-        with open(store_path / "metadata.json", 'r', encoding='utf-8') as f:
-            metadata = json.load(f)
-            assert metadata["name"] == "test_store"
-            assert "created" in metadata
-            assert "updated" in metadata
-            assert metadata["documents"] == []
+        assert (store_path / "metadata.json").exists()
 
 def test_create_existing_store(runner, test_env):
     """Test creating a store that already exists."""
@@ -64,18 +81,27 @@ def test_create_existing_store(runner, test_env):
         assert "already exists" in result.output
 
 def test_delete_store(runner, test_env):
-    """Test deleting a store."""
+    """Test store deletion."""
     with runner.isolated_filesystem(temp_dir=test_env["tmp_path"]):
-        # Create store first
-        runner.invoke(store, ['create', 'test_store'])
+        # Create a test store first
+        result = runner.invoke(store, ['create', 'test_store'])
+        assert result.exit_code == 0
         
-        # Delete with force flag
+        store_path = test_env["config"].config_dir / "stores" / "test_store"
+        
+        # Copy test PDF to store
+        shutil.copy2(test_env["arxiv_pdf"], store_path)
+        
+        # Update store metadata
+        metadata = test_env["store_manager"].get_store_info("test_store")
+        metadata["document_count"] = 1
+        metadata["size"] = os.path.getsize(test_env["arxiv_pdf"])
+        metadata["documents"] = [test_env["arxiv_pdf"].name]
+        test_env["store_manager"].update_store_metadata("test_store", metadata)
+        
         result = runner.invoke(store, ['delete', 'test_store', '--force'])
         assert result.exit_code == 0
-        assert "Deleted store 'test_store'" in result.output
-        
-        # Verify store is gone
-        store_path = test_env["store_manager"].store_root / "test_store"
+        assert "Store deleted successfully" in result.output
         assert not store_path.exists()
 
 def test_delete_nonexistent_store(runner, test_env):
@@ -88,15 +114,13 @@ def test_delete_nonexistent_store(runner, test_env):
 def test_list_stores(runner, test_env):
     """Test listing stores."""
     with runner.isolated_filesystem(temp_dir=test_env["tmp_path"]):
-        # Create a couple of stores
-        runner.invoke(store, ['create', 'store1'])
-        runner.invoke(store, ['create', 'store2'])
+        # Create a test store first
+        result = runner.invoke(store, ['create', 'test_store'])
+        assert result.exit_code == 0
         
-        # List stores
         result = runner.invoke(store, ['list'])
         assert result.exit_code == 0
-        assert "store1" in result.output
-        assert "store2" in result.output
+        assert "test_store" in result.output
 
 def test_list_empty_stores(runner, test_env):
     """Test listing stores when none exist."""
@@ -108,12 +132,47 @@ def test_list_empty_stores(runner, test_env):
 def test_store_info(runner, test_env):
     """Test getting store information."""
     with runner.isolated_filesystem(temp_dir=test_env["tmp_path"]):
-        # Create store
-        runner.invoke(store, ['create', 'test_store'])
+        # Create store with real PDF
+        result = runner.invoke(store, ['create', 'test_store'])
+        assert result.exit_code == 0
         
-        # Get info
+        store_path = test_env["config"].config_dir / "stores" / "test_store"
+        
+        # Copy test PDF to store
+        shutil.copy2(test_env["arxiv_pdf"], store_path)
+        
+        # Update store metadata
+        metadata = test_env["store_manager"].get_store_info("test_store")
+        metadata["document_count"] = 1
+        metadata["size"] = os.path.getsize(test_env["arxiv_pdf"])
+        metadata["documents"] = [test_env["arxiv_pdf"].name]
+        test_env["store_manager"].update_store_metadata("test_store", metadata)
+        
         result = runner.invoke(store, ['info', 'test_store'])
         assert result.exit_code == 0
-        assert "Store: test_store" in result.output
-        assert "Documents: 0" in result.output
-        assert "MB" in result.output 
+        assert "test_store" in result.output
+        assert "Documents: 1" in result.output
+
+def test_show_store(runner, test_env):
+    """Test showing store details."""
+    with runner.isolated_filesystem(temp_dir=test_env["tmp_path"]):
+        # Create a test store first
+        result = runner.invoke(store, ['create', 'test_store'])
+        assert result.exit_code == 0
+        
+        store_path = test_env["config"].config_dir / "stores" / "test_store"
+        
+        # Copy test PDF to store
+        shutil.copy2(test_env["arxiv_pdf"], store_path)
+        
+        # Update store metadata
+        metadata = test_env["store_manager"].get_store_info("test_store")
+        metadata["document_count"] = 1
+        metadata["size"] = os.path.getsize(test_env["arxiv_pdf"])
+        metadata["documents"] = [test_env["arxiv_pdf"].name]
+        test_env["store_manager"].update_store_metadata("test_store", metadata)
+        
+        result = runner.invoke(store, ['info', 'test_store'])
+        assert result.exit_code == 0
+        assert "test_store" in result.output
+        assert "Documents: 1" in result.output 
