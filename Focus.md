@@ -62,7 +62,7 @@ Key Requirements:
    ├─ 📄 test_metadata.py (331 lines) - Python script containing project logic
    └─ 📁 cli
       ├─ 📄 test_pdf_cmd.py (113 lines) - Python script containing project logic
-      ├─ 📄 test_search_cmd.py (262 lines) - Python script containing project logic
+      ├─ 📄 test_search_cmd.py (145 lines) - Python script containing project logic
       └─ 📄 test_store_cmd.py (119 lines) - Python script containing project logic
 
 # 🔍 Key Files with Methods
@@ -368,10 +368,9 @@ Functions:
 - test_process_nonexistent_store
 - test_process_pdf
 
-`tests/cli/test_search_cmd.py` (262 lines)
+`tests/cli/test_search_cmd.py` (145 lines)
 Functions:
-- mock_components
-- mock_init
+- patch
 - runner
 - test_env
 - test_graph_command
@@ -395,9 +394,9 @@ Functions:
 - test_store_info
 
 # 📊 Project Overview
-**Files:** 38  |  **Lines:** 6,618
+**Files:** 38  |  **Lines:** 6,501
 
 ## 📁 File Distribution
-- .py: 38 files (6,618 lines)
+- .py: 38 files (6,501 lines)
 
-*Updated: January 19, 2025 at 11:03 AM*
+*Updated: January 19, 2025 at 11:08 AM*
