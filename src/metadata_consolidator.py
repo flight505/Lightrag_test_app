@@ -4,24 +4,26 @@ import logging
 from datetime import datetime
 from pathlib import Path
 from threading import RLock
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Union
 
 from termcolor import colored
 
-from .academic_metadata import AcademicMetadata
-from .base_metadata import Author, Reference
+from src.academic_metadata import AcademicMetadata
+from cli.core.errors import MetadataError
 
 logger = logging.getLogger(__name__)
 
 class MetadataConsolidator:
     """Manages consolidated metadata and citation analysis across a store"""
     
-    def __init__(self, store_path: Path):
-        """Initialize consolidator with store path"""
+    def __init__(self, store_path: Union[str, Path]):
+        """Initialize the metadata consolidator with a store path."""
         self.store_path = Path(store_path)
-        self.consolidated_path = self.store_path / "consolidated.json"
+        self.metadata_dir = self.store_path / "metadata"
+        self.consolidated_file = self.store_path / "consolidated.json"
         self.citation_analysis_path = self.store_path / "citation_analysis.json"
         self.lock = RLock()  # Thread-safe operations
+        self.logger = logging.getLogger(__name__)
         
     def _load_json(self, path: Path) -> Dict[str, Any]:
         """Load JSON file with error handling"""
@@ -69,12 +71,12 @@ class MetadataConsolidator:
                 "total_relationships": 0
             }
         }
-        self._save_json(self.consolidated_path, base_structure)
+        self._save_json(self.consolidated_file, base_structure)
         
     def update_document_metadata(self, doc_id: str, metadata: AcademicMetadata) -> None:
         """Updates consolidated metadata with new document information using KG structure"""
         with self.lock:
-            consolidated = self._load_json(self.consolidated_path)
+            consolidated = self._load_json(self.consolidated_file)
             
             # Create paper node
             paper_node = {
@@ -178,12 +180,12 @@ class MetadataConsolidator:
             
             # Save updated data
             consolidated["store_info"]["last_updated"] = datetime.now().isoformat()
-            self._save_json(self.consolidated_path, consolidated)
+            self._save_json(self.consolidated_file, consolidated)
             
     def remove_document_metadata(self, doc_id: str) -> None:
         """Removes document and its relationships from consolidated metadata"""
         with self.lock:
-            consolidated = self._load_json(self.consolidated_path)
+            consolidated = self._load_json(self.consolidated_file)
             
             # Remove paper node
             consolidated["nodes"]["papers"] = [
@@ -221,4 +223,42 @@ class MetadataConsolidator:
             
             # Save updated data
             consolidated["store_info"]["last_updated"] = datetime.now().isoformat()
-            self._save_json(self.consolidated_path, consolidated) 
+            self._save_json(self.consolidated_file, consolidated)
+
+    def consolidate_metadata(self) -> Dict[str, Any]:
+        """Consolidate metadata from all documents in the store."""
+        try:
+            if not self.metadata_dir.exists():
+                raise MetadataError(f"Metadata directory not found at {self.metadata_dir}")
+
+            metadata_files = list(self.metadata_dir.glob("*.json"))
+            if not metadata_files:
+                raise MetadataError("No metadata files found in store")
+
+            consolidated = {
+                "document_count": len(metadata_files),
+                "total_equations": 0,
+                "total_references": 0,
+                "documents": []
+            }
+
+            for metadata_file in metadata_files:
+                with open(metadata_file, "r", encoding="utf-8") as f:
+                    doc_metadata = json.load(f)
+                    consolidated["total_equations"] += len(doc_metadata.get("equations", []))
+                    consolidated["total_references"] += len(doc_metadata.get("references", []))
+                    consolidated["documents"].append({
+                        "title": doc_metadata.get("title", "Unknown"),
+                        "authors": [a.get("full_name", "Unknown") for a in doc_metadata.get("authors", [])],
+                        "equations": len(doc_metadata.get("equations", [])),
+                        "references": len(doc_metadata.get("references", []))
+                    })
+
+            with open(self.consolidated_file, "w", encoding="utf-8") as f:
+                json.dump(consolidated, f, indent=2)
+
+            return consolidated
+
+        except Exception as e:
+            self.logger.error(f"Error consolidating metadata: {str(e)}")
+            raise MetadataError(f"Failed to consolidate metadata: {str(e)}") 

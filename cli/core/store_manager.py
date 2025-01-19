@@ -58,9 +58,11 @@ class StoreManager:
             # Create store directory
             store_path.mkdir(exist_ok=True)
             
-            # Create subdirectories
-            (store_path / "converted").mkdir(exist_ok=True)
-            (store_path / "cache").mkdir(exist_ok=True)
+            # Create required subdirectories
+            (store_path / "documents").mkdir(exist_ok=True)  # For original PDFs
+            (store_path / "metadata").mkdir(exist_ok=True)   # For document metadata
+            (store_path / "converted").mkdir(exist_ok=True)  # For converted text
+            (store_path / "cache").mkdir(exist_ok=True)      # For search cache
             
             # Initialize metadata file
             metadata = {
@@ -74,6 +76,33 @@ class StoreManager:
             }
             with open(store_path / "metadata.json", "w", encoding="utf-8") as f:
                 json.dump(metadata, f, indent=2)
+                
+            # Initialize consolidated metadata
+            consolidated = {
+                "store_info": {
+                    "name": store_name,
+                    "created": datetime.now().isoformat(),
+                    "last_updated": datetime.now().isoformat(),
+                    "version": "1.0.0"
+                },
+                "nodes": {
+                    "papers": [],
+                    "equations": [],
+                    "citations": [],
+                    "authors": [],
+                    "contexts": []
+                },
+                "relationships": [],
+                "global_stats": {
+                    "total_papers": 0,
+                    "total_equations": 0,
+                    "total_citations": 0,
+                    "total_authors": 0,
+                    "total_relationships": 0
+                }
+            }
+            with open(store_path / "consolidated.json", "w", encoding="utf-8") as f:
+                json.dump(consolidated, f, indent=2)
                 
             console.print(f"Store created successfully", style="green")
             return store_path
@@ -166,16 +195,17 @@ class StoreManager:
             return False
             
         # Check required subdirectories
-        if not all((store_path / d).exists() for d in ["converted", "cache"]):
+        required_dirs = ["documents", "metadata", "converted", "cache"]
+        if not all((store_path / d).exists() for d in required_dirs):
             return False
             
-        # Check metadata file
-        metadata_path = store_path / "metadata.json"
-        if not metadata_path.exists():
+        # Check required files
+        required_files = ["metadata.json", "consolidated.json"]
+        if not all((store_path / f).exists() for f in required_files):
             return False
             
         try:
-            with open(metadata_path, 'r', encoding='utf-8') as f:
+            with open(store_path / "metadata.json", 'r', encoding='utf-8') as f:
                 metadata = json.load(f)
                 return all(k in metadata for k in ["name", "created", "updated", "documents"])
         except:

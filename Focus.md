@@ -25,7 +25,7 @@ Key Requirements:
 │  ├─ 📄 main.py (39 lines) - Python script containing project logic
 │  ├─ 📁 commands
 │  │  ├─ 📄 __init__.py (1 lines) - Python script containing project logic
-│  │  ├─ 📄 metadata_cmd.py (171 lines) - Python script containing project logic
+│  │  ├─ 📄 metadata_cmd.py (184 lines) - Python script containing project logic
 │  │  ├─ 📄 pdf_cmd.py (159 lines) - Python script containing project logic
 │  │  ├─ 📄 search_cmd.py (194 lines) - Python script containing project logic
 │  │  └─ 📄 store_cmd.py (112 lines) - Python script containing project logic
@@ -34,7 +34,7 @@ Key Requirements:
 │     ├─ 📄 config.py (89 lines) - Python script containing project logic
 │     ├─ 📄 errors.py (40 lines) - Python script containing project logic
 │     ├─ 📄 progress.py (33 lines) - Python script containing project logic
-│     └─ 📄 store_manager.py (201 lines) - Python script containing project logic
+│     └─ 📄 store_manager.py (231 lines) - Python script containing project logic
 ├─ 📁 pages
 │  ├─ 📄 Academic.py (213 lines) - Python script containing project logic
 │  ├─ 📄 Home.py (78 lines) - Python script containing project logic
@@ -55,14 +55,14 @@ Key Requirements:
 │  ├─ 📄 file_processor.py (479 lines) - Python script containing project logic
 │  ├─ 📄 lightrag_helpers.py (185 lines) - Python script containing project logic
 │  ├─ 📄 lightrag_init.py (236 lines) - Python script containing project logic
-│  ├─ 📄 metadata_consolidator.py (224 lines) - Python script containing project logic
+│  ├─ 📄 metadata_consolidator.py (264 lines) - Python script containing project logic
 │  ├─ 📄 metadata_extractor.py (661 lines) - Python script containing project logic
 │  └─ 📄 pdf_converter.py (301 lines) - Python script containing project logic
 └─ 📁 tests
    ├─ 📄 test_citation_processor.py (166 lines) - Python script containing project logic
    ├─ 📄 test_metadata.py (331 lines) - Python script containing project logic
    └─ 📁 cli
-      ├─ 📄 test_metadata_cmd.py (169 lines) - Python script containing project logic
+      ├─ 📄 test_metadata_cmd.py (171 lines) - Python script containing project logic
       ├─ 📄 test_pdf_cmd.py (163 lines) - Python script containing project logic
       ├─ 📄 test_search_cmd.py (172 lines) - Python script containing project logic
       └─ 📄 test_store_cmd.py (178 lines) - Python script containing project logic
@@ -234,19 +234,21 @@ Functions:
 - show_manage
 - update_status
 
-`cli/commands/metadata_cmd.py` (171 lines)
+`cli/commands/metadata_cmd.py` (184 lines)
 Functions:
 - consolidate
 - extract
+- isinstance
 - metadata
 - show
 - stats
 
-`src/metadata_consolidator.py` (224 lines)
+`src/metadata_consolidator.py` (264 lines)
 Functions:
 - MetadataConsolidator
 - _load_json
 - _save_json
+- consolidate_metadata
 - initialize_consolidated_json
 - remove_document_metadata
 - update_document_metadata
@@ -329,7 +331,7 @@ Functions:
 - list
 - store
 
-`cli/core/store_manager.py` (201 lines)
+`cli/core/store_manager.py` (231 lines)
 Functions:
 - StoreManager
 - create_store
@@ -366,7 +368,7 @@ Functions:
 - test_doi_metadata_extraction
 - test_equation_extraction
 
-`tests/cli/test_metadata_cmd.py` (169 lines)
+`tests/cli/test_metadata_cmd.py` (171 lines)
 Functions:
 - runner
 - test_consolidate_metadata
@@ -421,9 +423,9 @@ Functions:
 - test_store_info
 
 # 📊 Project Overview
-**Files:** 40  |  **Lines:** 6,948
+**Files:** 40  |  **Lines:** 7,033
 
 ## 📁 File Distribution
-- .py: 40 files (6,948 lines)
+- .py: 40 files (7,033 lines)
 
-*Updated: January 19, 2025 at 12:10 PM*
+*Updated: January 19, 2025 at 12:18 PM*

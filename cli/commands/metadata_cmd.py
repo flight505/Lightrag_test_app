@@ -8,7 +8,7 @@ import json
 
 from ..core.config import ConfigManager
 from ..core.store_manager import StoreManager
-from ..core.errors import handle_error, MetadataError
+from ..core.errors import handle_error, MetadataError, StoreError
 from src.metadata_consolidator import MetadataConsolidator
 from src.metadata_extractor import MetadataExtractor
 
@@ -23,7 +23,7 @@ def metadata():
 @click.argument('store')
 @click.argument('document')
 def show(store: str, document: str):
-    """Show metadata for a specific document."""
+    """Show metadata for a document"""
     try:
         config = ConfigManager()
         store_manager = StoreManager(config_dir=config.config_dir)
@@ -32,26 +32,36 @@ def show(store: str, document: str):
             raise MetadataError(f"Store '{store}' not found")
             
         store_path = config.get_store_root() / store
-        metadata_path = store_path / "metadata" / f"{Path(document).stem}_metadata.json"
-        
-        if not metadata_path.exists():
-            raise MetadataError(f"No metadata found for document '{document}'")
-            
-        # Read metadata directly from JSON file
-        with open(metadata_path, 'r', encoding='utf-8') as f:
+        metadata_file = store_path / "metadata" / f"{document}.json"
+        if not metadata_file.exists():
+            raise StoreError(f"No metadata found for document '{document}' in store '{store}'")
+
+        with open(metadata_file, "r", encoding="utf-8") as f:
             metadata = json.load(f)
-        
-        # Display metadata in a table
-        table = Table(title=f"Metadata for {document}")
+
+        table = Table(title=f"Metadata for {document}", show_header=True, header_style="bold")
         table.add_column("Field", style="cyan")
-        table.add_column("Value", style="green")
-        
-        for field, value in metadata.items():
-            if isinstance(value, (list, dict)):
-                value = str(value)
+        table.add_column("Value", style="green", overflow="fold", max_width=80)
+
+        field_order = ["title", "authors", "abstract", "references", "equations"]
+        for field in field_order:
+            value = metadata.get(field)
+            if field == "authors":
+                value = "No authors found" if not value else ", ".join(a.get("full_name", "Unknown") for a in value)
+            elif field == "references":
+                value = f"{len(value)} references found" if value else "No references found"
+            elif field == "equations":
+                value = f"{len(value)} equations found" if value else "No equations found"
+            elif field == "abstract":
+                value = value[:500] + "..." if value and len(value) > 500 else value
+            elif isinstance(value, dict):
+                value = json.dumps(value, indent=2)
+            elif value is None:
+                value = "N/A"
             table.add_row(field, str(value))
-            
+
         console.print(table)
+        return 0
         
     except Exception as e:
         handle_error(e)
@@ -102,6 +112,7 @@ def extract(store: str, document: str, force: bool):
             progress.update(task, completed=100)
             
             console.print("[green]Metadata extracted successfully[/green]")
+            return 0
             
     except Exception as e:
         handle_error(e)
@@ -119,7 +130,7 @@ def consolidate(store: str):
             raise MetadataError(f"Store '{store}' not found")
             
         store_path = config.get_store_root() / store
-        consolidator = MetadataConsolidator(store_path)
+        consolidator = MetadataConsolidator(store_path=store_path)
         
         with Progress() as progress:
             task = progress.add_task("Consolidating metadata...", total=100)
@@ -127,6 +138,7 @@ def consolidate(store: str):
             progress.update(task, completed=100)
             
         console.print(f"[green]Successfully consolidated metadata for store '{store}'[/green]")
+        return 0
         
     except Exception as e:
         handle_error(e)
@@ -144,7 +156,7 @@ def stats(store: str):
             raise MetadataError(f"Store '{store}' not found")
             
         store_path = config.get_store_root() / store
-        consolidator = MetadataConsolidator(store_path)
+        consolidator = MetadataConsolidator(store_path=store_path)
         consolidated = consolidator._load_json("consolidated.json")
         
         if not consolidated:
@@ -165,6 +177,7 @@ def stats(store: str):
         table.add_row("Total Relationships", str(len(relationships)))
         
         console.print(table)
+        return 0
         
     except Exception as e:
         handle_error(e)
