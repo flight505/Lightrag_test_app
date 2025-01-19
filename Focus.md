@@ -22,16 +22,16 @@ Key Requirements:
 ├─ 📄 streamlit_app.py (79 lines) - Python script containing project logic
 ├─ 📁 cli
 │  ├─ 📄 __init__.py (1 lines) - Python script containing project logic
-│  ├─ 📄 main.py (35 lines) - Python script containing project logic
+│  ├─ 📄 main.py (37 lines) - Python script containing project logic
 │  ├─ 📁 commands
 │  │  ├─ 📄 __init__.py (1 lines) - Python script containing project logic
 │  │  ├─ 📄 pdf_cmd.py (159 lines) - Python script containing project logic
-│  │  ├─ 📄 search_cmd.py (181 lines) - Python script containing project logic
+│  │  ├─ 📄 search_cmd.py (194 lines) - Python script containing project logic
 │  │  └─ 📄 store_cmd.py (115 lines) - Python script containing project logic
 │  └─ 📁 core
 │     ├─ 📄 __init__.py (1 lines) - Python script containing project logic
 │     ├─ 📄 config.py (89 lines) - Python script containing project logic
-│     ├─ 📄 errors.py (35 lines) - Python script containing project logic
+│     ├─ 📄 errors.py (40 lines) - Python script containing project logic
 │     ├─ 📄 progress.py (33 lines) - Python script containing project logic
 │     └─ 📄 store_manager.py (229 lines) - Python script containing project logic
 ├─ 📁 pages
@@ -62,7 +62,7 @@ Key Requirements:
    ├─ 📄 test_metadata.py (331 lines) - Python script containing project logic
    └─ 📁 cli
       ├─ 📄 test_pdf_cmd.py (113 lines) - Python script containing project logic
-      ├─ 📄 test_search_cmd.py (110 lines) - Python script containing project logic
+      ├─ 📄 test_search_cmd.py (262 lines) - Python script containing project logic
       └─ 📄 test_store_cmd.py (119 lines) - Python script containing project logic
 
 # 🔍 Key Files with Methods
@@ -160,11 +160,12 @@ Functions:
 - model_dump
 - search
 
-`cli/core/errors.py` (35 lines)
+`cli/core/errors.py` (40 lines)
 Functions:
 - LightRAGError
 - MetadataError
 - PDFProcessingError
+- SearchError
 - StoreError
 - handle_error
 
@@ -217,7 +218,7 @@ Functions:
 - load_documents
 - query
 
-`cli/main.py` (35 lines)
+`cli/main.py` (37 lines)
 Functions:
 - cli
 - version
@@ -303,7 +304,7 @@ Functions:
 - summarize_conversation
 - update_conversation_with_summary
 
-`cli/commands/search_cmd.py` (181 lines)
+`cli/commands/search_cmd.py` (194 lines)
 Functions:
 - graph
 - query
@@ -367,8 +368,10 @@ Functions:
 - test_process_nonexistent_store
 - test_process_pdf
 
-`tests/cli/test_search_cmd.py` (110 lines)
+`tests/cli/test_search_cmd.py` (262 lines)
 Functions:
+- mock_components
+- mock_init
 - runner
 - test_env
 - test_graph_command
@@ -392,9 +395,9 @@ Functions:
 - test_store_info
 
 # 📊 Project Overview
-**Files:** 38  |  **Lines:** 6,446
+**Files:** 38  |  **Lines:** 6,618
 
 ## 📁 File Distribution
-- .py: 38 files (6,446 lines)
+- .py: 38 files (6,618 lines)
 
-*Updated: January 19, 2025 at 10:17 AM*
+*Updated: January 19, 2025 at 11:03 AM*

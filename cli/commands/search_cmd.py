@@ -1,4 +1,5 @@
 """Search commands for LightRAG CLI."""
+import os
 import click
 from pathlib import Path
 from rich.console import Console
@@ -37,7 +38,11 @@ def query(query: str, store: str, mode: str, limit: int, show_graph: bool):
             
         # Initialize LightRAG
         store_path = store_manager.store_root / store
-        rag_manager = LightRAGManager(str(store_path))
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise SearchError("OpenAI API key not found. Please set OPENAI_API_KEY environment variable.")
+            
+        rag_manager = LightRAGManager(api_key=api_key, input_dir=str(store_path))
         
         # Perform search with progress
         with Progress() as progress:
@@ -109,7 +114,11 @@ def graph(store: str, type: str):
             
         # Initialize LightRAG
         store_path = store_manager.store_root / store
-        rag_manager = LightRAGManager(str(store_path))
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise SearchError("OpenAI API key not found. Please set OPENAI_API_KEY environment variable.")
+            
+        rag_manager = LightRAGManager(api_key=api_key, input_dir=str(store_path))
         
         with Progress() as progress:
             task = progress.add_task("Generating graph...", total=100)
@@ -158,7 +167,11 @@ def stats(store: str):
             
         # Initialize LightRAG
         store_path = store_manager.store_root / store
-        rag_manager = LightRAGManager(str(store_path))
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise SearchError("OpenAI API key not found. Please set OPENAI_API_KEY environment variable.")
+            
+        rag_manager = LightRAGManager(api_key=api_key, input_dir=str(store_path))
         
         # Get stats
         stats = rag_manager.get_stats()

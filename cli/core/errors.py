@@ -1,4 +1,4 @@
-"""Error handling for LightRAG CLI."""
+"""Error types for LightRAG CLI."""
 from typing import Type
 from rich.console import Console
 
@@ -8,23 +8,28 @@ class LightRAGError(Exception):
     """Base exception for all LightRAG errors."""
     pass
 
+class StoreError(LightRAGError):
+    """Store management errors."""
+    pass
+
 class PDFProcessingError(LightRAGError):
-    """PDF processing specific errors."""
+    """PDF processing errors."""
+    pass
+
+class SearchError(LightRAGError):
+    """Search operation errors."""
     pass
 
 class MetadataError(LightRAGError):
     """Metadata handling errors."""
     pass
 
-class StoreError(LightRAGError):
-    """Store management errors."""
-    pass
-
 # Error style mapping
 ERROR_STYLES = {
     PDFProcessingError: "red bold",
     MetadataError: "yellow bold",
-    StoreError: "blue bold",
+    SearchError: "red",
+    StoreError: "red",
     LightRAGError: "red"
 }
 
