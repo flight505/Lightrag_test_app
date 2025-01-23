@@ -25,8 +25,8 @@ Key Requirements:
 │  ├─ 📄 main.py (39 lines) - Python script containing project logic
 │  ├─ 📁 commands
 │  │  ├─ 📄 __init__.py (1 lines) - Python script containing project logic
-│  │  ├─ 📄 metadata_cmd.py (184 lines) - Python script containing project logic
-│  │  ├─ 📄 pdf_cmd.py (159 lines) - Python script containing project logic
+│  │  ├─ 📄 metadata_cmd.py (185 lines) - Python script containing project logic
+│  │  ├─ 📄 pdf_cmd.py (167 lines) - Python script containing project logic
 │  │  ├─ 📄 search_cmd.py (194 lines) - Python script containing project logic
 │  │  └─ 📄 store_cmd.py (112 lines) - Python script containing project logic
 │  └─ 📁 core
@@ -34,7 +34,7 @@ Key Requirements:
 │     ├─ 📄 config.py (89 lines) - Python script containing project logic
 │     ├─ 📄 errors.py (40 lines) - Python script containing project logic
 │     ├─ 📄 progress.py (33 lines) - Python script containing project logic
-│     └─ 📄 store_manager.py (231 lines) - Python script containing project logic
+│     └─ 📄 store_manager.py (251 lines) - Python script containing project logic
 ├─ 📁 pages
 │  ├─ 📄 Academic.py (213 lines) - Python script containing project logic
 │  ├─ 📄 Home.py (78 lines) - Python script containing project logic
@@ -51,8 +51,8 @@ Key Requirements:
 │  ├─ 📄 document_validator.py (118 lines) - Python script containing project logic
 │  ├─ 📄 equation_extractor.py (15 lines) - Python script containing project logic
 │  ├─ 📄 equation_metadata.py (148 lines) - Python script containing project logic
-│  ├─ 📄 file_manager.py (113 lines) - Python script containing project logic
-│  ├─ 📄 file_processor.py (479 lines) - Python script containing project logic
+│  ├─ 📄 file_manager.py (161 lines) - Python script containing project logic
+│  ├─ 📄 file_processor.py (629 lines) - Python script containing project logic
 │  ├─ 📄 lightrag_helpers.py (185 lines) - Python script containing project logic
 │  ├─ 📄 lightrag_init.py (236 lines) - Python script containing project logic
 │  ├─ 📄 metadata_consolidator.py (264 lines) - Python script containing project logic
@@ -62,8 +62,8 @@ Key Requirements:
    ├─ 📄 test_citation_processor.py (166 lines) - Python script containing project logic
    ├─ 📄 test_metadata.py (331 lines) - Python script containing project logic
    └─ 📁 cli
-      ├─ 📄 test_metadata_cmd.py (171 lines) - Python script containing project logic
-      ├─ 📄 test_pdf_cmd.py (163 lines) - Python script containing project logic
+      ├─ 📄 test_metadata_cmd.py (173 lines) - Python script containing project logic
+      ├─ 📄 test_pdf_cmd.py (214 lines) - Python script containing project logic
       ├─ 📄 test_search_cmd.py (172 lines) - Python script containing project logic
       └─ 📄 test_store_cmd.py (178 lines) - Python script containing project logic
 
@@ -102,7 +102,6 @@ Functions:
 - ensure_names
 - model_dump
 - parse_name
-- to_dict
 
 `src/citation_metadata.py` (199 lines)
 Functions:
@@ -171,26 +170,32 @@ Functions:
 - StoreError
 - handle_error
 
-`src/file_manager.py` (113 lines)
+`src/file_manager.py` (161 lines)
 Functions:
 - create_store_directory
 - ensure_db_exists
+- isdir
+- validate_store_structure
 
-`src/file_processor.py` (479 lines)
+`src/file_processor.py` (629 lines)
 Functions:
 - FileProcessor
 - _convert_pdf_with_marker
 - _ensure_marker_initialized
 - _extract_metadata_with_doi
 - _extract_text
+- _get_document_path
 - _get_metadata_path
 - _get_text_path
 - _load_metadata
 - _try_doi_extraction
 - _validate_file
 - clean_unused_files
+- convert_pdf
+- get_pdf_info
 - glob
 - is_supported_file
+- list_processed_pdfs
 - lower
 - process_file
 - set_store_path
@@ -234,7 +239,7 @@ Functions:
 - show_manage
 - update_status
 
-`cli/commands/metadata_cmd.py` (184 lines)
+`cli/commands/metadata_cmd.py` (185 lines)
 Functions:
 - consolidate
 - extract
@@ -268,8 +273,9 @@ Functions:
 - hasattr
 - isinstance
 
-`cli/commands/pdf_cmd.py` (159 lines)
+`cli/commands/pdf_cmd.py` (167 lines)
 Functions:
+- convert
 - info
 - list
 - pdf
@@ -331,7 +337,7 @@ Functions:
 - list
 - store
 
-`cli/core/store_manager.py` (231 lines)
+`cli/core/store_manager.py` (251 lines)
 Functions:
 - StoreManager
 - create_store
@@ -368,7 +374,7 @@ Functions:
 - test_doi_metadata_extraction
 - test_equation_extraction
 
-`tests/cli/test_metadata_cmd.py` (171 lines)
+`tests/cli/test_metadata_cmd.py` (173 lines)
 Functions:
 - runner
 - test_consolidate_metadata
@@ -382,12 +388,12 @@ Functions:
 - test_show_nonexistent_store
 - test_stats_command
 
-`tests/cli/test_pdf_cmd.py` (163 lines)
+`tests/cli/test_pdf_cmd.py` (214 lines)
 Functions:
+- glob
 - runner
 - test_convert_pdf
 - test_env
-- test_extract_metadata
 - test_list_empty_store
 - test_list_pdfs
 - test_pdf_info
@@ -395,7 +401,6 @@ Functions:
 - test_process_nonexistent_pdf
 - test_process_nonexistent_store
 - test_process_pdf
-- test_show_metadata
 
 `tests/cli/test_search_cmd.py` (172 lines)
 Functions:
@@ -423,9 +428,9 @@ Functions:
 - test_store_info
 
 # 📊 Project Overview
-**Files:** 40  |  **Lines:** 7,033
+**Files:** 40  |  **Lines:** 7,313
 
 ## 📁 File Distribution
-- .py: 40 files (7,033 lines)
+- .py: 40 files (7,313 lines)
 
-*Updated: January 19, 2025 at 12:18 PM*
+*Updated: January 19, 2025 at 08:55 PM*

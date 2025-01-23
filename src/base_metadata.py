@@ -63,7 +63,7 @@ class Reference(BaseModel):
         "arbitrary_types_allowed": True
     }
 
-    def to_dict(self) -> Dict[str, Any]:
+    def model_dump(self, **kwargs) -> Dict[str, Any]:
         """Convert Reference to dictionary for JSON serialization."""
         return {
             'raw_text': self.raw_text,

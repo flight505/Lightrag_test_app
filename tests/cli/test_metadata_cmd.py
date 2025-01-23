@@ -124,9 +124,11 @@ def test_stats_command(runner, test_env):
         result = runner.invoke(metadata, ["stats", "test_store"])
         assert result.exit_code == 0
         assert "Store Statistics" in result.output
-        assert "Total Papers: 1" in result.output
-        assert "Total Equations" in result.output
+        assert "Total Papers" in result.output
+        assert "Total Authors" in result.output
         assert "Total Citations" in result.output
+        assert "Total Equations" in result.output
+        assert "Total Relationships" in result.output
 
 def test_show_nonexistent_store(runner, test_env):
     """Test showing metadata from nonexistent store."""

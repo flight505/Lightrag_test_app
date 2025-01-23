@@ -4,110 +4,91 @@ from pathlib import Path
 from rich.console import Console
 from rich.progress import Progress
 from rich.table import Table
+import json
 
 from ..core.store_manager import StoreManager
 from ..core.config import ConfigManager, PDFEngine
 from ..core.errors import PDFProcessingError, handle_error
 from src.file_processor import FileProcessor
+from src.pdf_converter import PDFConverterFactory
 
 console = Console()
 
 @click.group()
-def pdf():
-    """PDF document processing commands."""
-    pass
+@click.pass_context
+def pdf(ctx):
+    """PDF processing commands."""
+    if ctx.obj is None:
+        ctx.obj = ConfigManager()
 
 @pdf.command()
 @click.argument('file')
 @click.argument('store')
-@click.option('--engine', type=click.Choice(['auto', 'marker', 'pymupdf', 'pypdf2']), default='auto', help="PDF processing engine to use")
-def process(file: str, store: str, engine: str):
-    """Process a PDF file and add it to a store."""
+@click.option('--engine', type=click.Choice(['auto', 'marker', 'pymupdf', 'pypdf2']), default='marker')
+@click.pass_obj
+def process(config, file: str, store: str, engine: str):
+    """Process a PDF file."""
     try:
-        # Initialize managers
-        config = ConfigManager()
         store_manager = StoreManager(config_dir=config.config_dir)
+        store_path = store_manager.get_store(store)
         
-        # Validate store exists
-        if not store_manager.store_exists(store):
-            raise PDFProcessingError(f"Store '{store}' not found")
-            
-        # Create file processor with specified engine
-        if engine == 'auto':
-            # Use PyMuPDF by default for testing
-            file_processor = FileProcessor(config, pdf_engine=PDFEngine.PYMUPDF)
-        else:
-            file_processor = FileProcessor(config, pdf_engine=PDFEngine(engine))
-            
-        # Set store path
-        store_path = store_manager.store_root / store
-        file_processor.set_store_path(str(store_path))
+        processor = FileProcessor(config)
+        file_path = Path(file)
         
-        # Process file
+        if not file_path.exists():
+            raise PDFProcessingError(f"PDF file not found: {file}")
+            
         with Progress() as progress:
-            task = progress.add_task("Processing PDF...", total=100)
-            def update_progress(percent):
-                progress.update(task, completed=percent)
-            result = file_processor.process_file(file, progress_callback=update_progress)
+            task = progress.add_task("Processing PDF", total=100)
             
-        if not result:
-            raise PDFProcessingError("Failed to process PDF file")
+            def update_progress(current, total):
+                progress.update(task, completed=int((current/total) * 100))
             
-        progress.update(task, completed=100)
-        console.print(f"\n✓ Successfully processed {Path(file).name}", style="green")
-        
-        # Show metadata summary
-        metadata = result.get("metadata", {})
-        console.print("\nMetadata Summary:", style="bold blue")
-        if metadata.get("title"):
-            console.print(f"Title: {metadata['title']}")
-        if metadata.get("authors"):
-            console.print(f"Authors: {', '.join(a['name'] for a in metadata['authors'])}")
-        if metadata.get("doi"):
-            console.print(f"DOI: {metadata['doi']}")
-        if metadata.get("arxiv_id"):
-            console.print(f"arXiv ID: {metadata['arxiv_id']}")
-        if metadata.get("references"):
-            console.print(f"References: {len(metadata['references'])}")
-        if metadata.get("equations"):
-            console.print(f"Equations: {len(metadata['equations'])}")
+            result = processor.process_file(
+                file_path,
+                str(store_path),
+                engine=PDFEngine[engine.upper()],
+                progress_callback=update_progress
+            )
             
+            if result:
+                console.print("✓ Completed successfully", style="green")
+                return result
+            else:
+                raise PDFProcessingError("Processing failed")
+                
     except Exception as e:
         handle_error(e)
         raise click.Abort()
 
 @pdf.command()
 @click.argument('store')
-def list(store: str):
-    """List all PDF files in a store."""
+@click.pass_obj
+def list(config, store: str):
+    """List processed PDFs in a store."""
     try:
-        # Initialize managers
-        config = ConfigManager()
         store_manager = StoreManager(config_dir=config.config_dir)
+        store_path = store_manager.get_store(store)
         
-        # Get store info
-        info = store_manager.get_store_info(store)
+        processor = FileProcessor(config)
+        pdfs = processor.list_processed_pdfs(str(store_path))
         
-        if not info.get("documents", []):
-            console.print("No documents found in store", style="yellow")
+        if not pdfs:
+            console.print("No PDFs found in store", style="yellow")
             return
             
-        # Display documents table
         table = Table(show_header=True)
         table.add_column("File")
         table.add_column("Title")
         table.add_column("Authors")
-        table.add_column("DOI/arXiv")
         table.add_column("References")
         
-        for doc in info.get("documents", []):
-            metadata = doc.get("metadata", {})
+        for pdf in pdfs:
             table.add_row(
-                doc.get("file", ""),
-                metadata.get("title", ""),
-                ", ".join(a["name"] for a in metadata.get("authors", [])),
-                metadata.get("doi", "") or metadata.get("arxiv_id", ""),
-                str(len(metadata.get("references", [])))
+                pdf['name'],
+                pdf['metadata'].get("title", "Unknown"),
+                ", ".join(a["name"] for a in pdf['metadata'].get("authors", [])),
+                str(len(pdf['metadata'].get("references", [])))
             )
             
         console.print(table)
@@ -117,43 +98,70 @@ def list(store: str):
         raise click.Abort()
 
 @pdf.command()
-@click.argument('store')
 @click.argument('file')
-def info(store: str, file: str):
-    """Show detailed information about a PDF file in a store."""
+@click.argument('store')
+@click.pass_obj
+def convert(config, file: str, store: str):
+    """Convert PDF to text."""
     try:
-        # Initialize managers
-        config = ConfigManager()
         store_manager = StoreManager(config_dir=config.config_dir)
+        store_path = store_manager.get_store(store)
         
-        # Get store info
-        info = store_manager.get_store_info(store)
+        processor = FileProcessor(config)
+        file_path = Path(file)
         
-        # Find document
-        doc = next((d for d in info.get("documents", []) if d["file"] == file), None)
-        if not doc:
-            raise PDFProcessingError(f"Document '{file}' not found in store '{store}'")
+        if not file_path.exists():
+            raise PDFProcessingError(f"PDF file not found: {file}")
             
-        # Display detailed info
-        metadata = doc.get("metadata", {})
-        console.print(f"\nDocument: {file}", style="bold blue")
-        console.print(f"Title: {metadata.get('title', '')}")
-        console.print(f"Authors: {', '.join(a['name'] for a in metadata.get('authors', []))}")
-        if metadata.get("doi"):
-            console.print(f"DOI: {metadata['doi']}")
-        if metadata.get("arxiv_id"):
-            console.print(f"arXiv ID: {metadata['arxiv_id']}")
-        if metadata.get("abstract"):
-            console.print(f"\nAbstract:\n{metadata['abstract']}")
-        if metadata.get("references"):
-            console.print(f"\nReferences: {len(metadata['references'])}")
-            for ref in metadata["references"]:
-                console.print(f"- {ref.get('title', 'Untitled')}")
-        if metadata.get("equations"):
-            console.print(f"\nEquations: {len(metadata['equations'])}")
-            for eq in metadata["equations"]:
-                console.print(f"- {eq.get('latex', '')}")
+        with Progress() as progress:
+            task = progress.add_task("Converting PDF", total=100)
+            
+            def update_progress(current, total):
+                progress.update(task, completed=int((current/total) * 100))
+            
+            result = processor.convert_pdf(
+                file_path,
+                str(store_path),
+                progress_callback=update_progress
+            )
+            
+            if result:
+                console.print("✓ Conversion complete", style="green")
+                return result
+            else:
+                raise PDFProcessingError("Conversion failed")
                 
+    except Exception as e:
+        handle_error(e)
+        raise click.Abort()
+
+@pdf.command()
+@click.argument('file')
+@click.argument('store')
+@click.pass_obj
+def info(config, file: str, store: str):
+    """Display PDF information."""
+    try:
+        store_manager = StoreManager(config_dir=config.config_dir)
+        store_path = store_manager.get_store(store)
+        
+        processor = FileProcessor(config)
+        file_path = Path(file)
+        
+        if not file_path.exists():
+            raise PDFProcessingError(f"PDF file not found: {file}")
+            
+        metadata = processor.get_pdf_info(file_path, str(store_path))
+        
+        if not metadata:
+            raise PDFProcessingError("No metadata found")
+            
+        console.print("\n[bold]PDF Information[/bold]")
+        console.print(f"Title: {metadata.get('title', 'Unknown')}")
+        console.print(f"Authors: {', '.join(a['name'] for a in metadata.get('authors', []))}")
+        console.print(f"References: {len(metadata.get('references', []))}")
+        console.print(f"Equations: {len(metadata.get('equations', []))}")
+        
     except Exception as e:
         handle_error(e)
         raise click.Abort() 

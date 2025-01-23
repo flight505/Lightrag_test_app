@@ -4,17 +4,19 @@ from pathlib import Path
 from threading import RLock
 from typing import Any, Callable, Dict, List, Optional
 from datetime import datetime
+from functools import lru_cache
+import shutil
 
 import arxiv
 import pdf2doi
-import streamlit as st
 from crossref.restful import Works
 from termcolor import colored
 
-from src.config_manager import ConfigManager
+from src.config_manager import ConfigManager, PDFEngine
 from src.metadata_extractor import MetadataExtractor
-from src.pdf_converter import MarkerConverter
+from src.pdf_converter import MarkerConverter, PDFConverterFactory
 from src.metadata_consolidator import MetadataConsolidator
+from src.file_manager import validate_store_structure
 
 logger = logging.getLogger(__name__)
 
@@ -25,13 +27,13 @@ class FileProcessor:
         """Initialize FileProcessor with configuration"""
         self.config_manager = config_manager
         self.marker_converter = None  # Lazy initialization
-        self.metadata_extractor = MetadataExtractor(config_manager)
+        self.metadata_extractor = MetadataExtractor(debug=True)
         self.metadata = {}
         self.metadata_lock = RLock()
         self.store_path = None
         self.metadata_file = None
-        self.works = Works()  # Initialize crossref client
-        self.debug = True  # Enable debug mode by default
+        self.works = Works()
+        self.debug = True
         self.metadata_consolidator = None
         self.lock = RLock()
         logger.info("FileProcessor initialized")
@@ -53,12 +55,12 @@ class FileProcessor:
         print(colored(f"❌ No text extracted from {Path(pdf_path).name}", "red"))
         return None
 
-    @st.cache_data(show_spinner=False)
+    @lru_cache(maxsize=32)
     def _extract_metadata_with_doi(self, file_path: str) -> Optional[Dict[str, Any]]:
         """Extract metadata using DOI lookup"""
         try:
             # Try to extract DOI
-            identifier, method = self.pdf2doi.get_identifier(file_path)
+            identifier, method = pdf2doi.get_identifier(file_path)
             if identifier:
                 print(colored(f"✓ Found doi: {identifier} (method: {method})", "green"))
                 
@@ -145,47 +147,71 @@ class FileProcessor:
             print(colored(f"⚠️ Error extracting metadata with DOI: {str(e)}", "yellow"))
             return None
 
-    def process_file(self, file_path: str, progress_callback: Optional[Callable[[str], None]] = None) -> Optional[Dict[str, Any]]:
+    def process_file(self, file_path: str, store: str, engine: PDFEngine = PDFEngine.MARKER, progress_callback: Optional[Callable[[int, int], None]] = None) -> Optional[Dict[str, Any]]:
         """Process a single file and extract metadata."""
         try:
             if progress_callback:
-                progress_callback("Starting file processing...")
+                progress_callback(0, 100)
             print(colored("\n=== Starting File Processing ===", "blue"))
+            
+            # Convert file_path to Path object and set store path
+            file_path = Path(file_path)
+            self.store_path = Path(store)
+            
+            # Validate store structure
+            if not validate_store_structure(str(self.store_path)):
+                raise ValueError(f"Invalid store structure at {store}")
+            
+            # Copy document to store
+            document_path = self._get_document_path(file_path)
+            document_path.parent.mkdir(parents=True, exist_ok=True)
+            if not document_path.exists():
+                shutil.copy2(file_path, document_path)
             
             # Validate file
             if progress_callback:
-                progress_callback("Validating file...")
+                progress_callback(10, 100)
             print(colored("→ Validating file...", "blue"))
-            if not self._validate_file(file_path):
+            if not self._validate_file(str(file_path)):
                 print(colored("⚠️ File validation failed", "yellow"))
                 if progress_callback:
-                    progress_callback("File validation failed")
+                    progress_callback(100, 100)
                 return None
             print(colored("✓ File validation successful", "green"))
 
-            # Extract text content
+            # Extract text content based on engine
             if progress_callback:
-                progress_callback("Extracting text content...")
-            text = self._extract_text(file_path)
+                progress_callback(20, 100)
+            if engine == PDFEngine.MARKER:
+                text = self._convert_pdf_with_marker(str(file_path))
+            else:
+                converter = PDFConverterFactory.create_converter(engine)
+                text = converter.extract_text(file_path)
+            
             if not text:
                 print(colored("⚠️ No text content extracted", "yellow"))
                 return None
 
             # Try DOI-based extraction first
             if progress_callback:
-                progress_callback("Attempting DOI-based extraction...")
+                progress_callback(40, 100)
             print(colored("\n=== Starting DOI-based Metadata Extraction ===", "blue"))
-            doi_metadata = self._try_doi_extraction(file_path)
+            doi_metadata = self._try_doi_extraction(str(file_path))
 
             # Extract metadata
-            doc_id = Path(file_path).stem
+            if progress_callback:
+                progress_callback(60, 100)
+            doc_id = file_path.stem
             metadata = self.metadata_extractor.extract_metadata(text, doc_id, existing_metadata=doi_metadata)
             if not metadata:
                 print(colored("⚠️ No metadata extracted", "yellow"))
                 return None
 
             # Save metadata
-            metadata_path = self._get_metadata_path(file_path)
+            if progress_callback:
+                progress_callback(80, 100)
+            metadata_path = self._get_metadata_path(str(file_path))
+            metadata_path.parent.mkdir(parents=True, exist_ok=True)
             try:
                 metadata_dict = metadata.model_dump(mode='json')  # Use mode='json' for proper serialization
                 with open(metadata_path, 'w', encoding='utf-8') as f:
@@ -199,11 +225,12 @@ class FileProcessor:
             except Exception as e:
                 print(colored(f"⚠️ Error saving metadata: {str(e)}", "yellow"))
                 if progress_callback:
-                    progress_callback("Error saving metadata")
+                    progress_callback(100, 100)
                 return None
 
             # Save text content
-            text_path = self._get_text_path(file_path)
+            text_path = self._get_text_path(str(file_path))
+            text_path.parent.mkdir(parents=True, exist_ok=True)
             try:
                 with open(text_path, 'w', encoding='utf-8') as f:
                     f.write(text)
@@ -211,10 +238,12 @@ class FileProcessor:
             except Exception as e:
                 print(colored(f"⚠️ Error saving text: {str(e)}", "yellow"))
 
+            if progress_callback:
+                progress_callback(100, 100)
             print(colored("\n=== Processing Complete ===", "green"))
 
             return {
-                'metadata': metadata,
+                'metadata': metadata_dict,
                 'text': text,
                 'metadata_path': str(metadata_path),
                 'text_path': str(text_path)
@@ -225,8 +254,129 @@ class FileProcessor:
             logger.error(error_msg)
             print(colored(f"❌ {error_msg}", "red"))
             if progress_callback:
-                progress_callback(f"Error: {str(e)}")
+                progress_callback(100, 100)
             return None
+
+    def convert_pdf(self, file_path: str, store: str, progress_callback: Optional[Callable[[int, int], None]] = None) -> Optional[Dict[str, Any]]:
+        """Convert PDF to text and save it."""
+        try:
+            if progress_callback:
+                progress_callback(0, 100)
+            
+            # Convert file_path to Path object and set store path
+            file_path = Path(file_path)
+            self.store_path = Path(store)
+            
+            # Validate store structure
+            if not validate_store_structure(str(self.store_path)):
+                raise ValueError(f"Invalid store structure at {store}")
+            
+            # Validate file
+            if progress_callback:
+                progress_callback(20, 100)
+            print(colored("→ Validating file...", "blue"))
+            if not self._validate_file(str(file_path)):
+                print(colored("⚠️ File validation failed", "yellow"))
+                if progress_callback:
+                    progress_callback(100, 100)
+                return None
+            print(colored("✓ File validation successful", "green"))
+
+            # Extract text content
+            if progress_callback:
+                progress_callback(40, 100)
+            text = self._convert_pdf_with_marker(str(file_path))
+            if not text:
+                print(colored("⚠️ No text content extracted", "yellow"))
+                return None
+
+            # Save text content
+            if progress_callback:
+                progress_callback(80, 100)
+            text_path = self._get_text_path(str(file_path))
+            try:
+                with open(text_path, 'w', encoding='utf-8') as f:
+                    f.write(text)
+                print(colored(f"✓ Text saved to {text_path}", "green"))
+            except Exception as e:
+                print(colored(f"⚠️ Error saving text: {str(e)}", "yellow"))
+                return None
+
+            if progress_callback:
+                progress_callback(100, 100)
+            print(colored("\n=== Conversion Complete ===", "green"))
+
+            return {
+                'text': text,
+                'text_path': str(text_path)
+            }
+
+        except Exception as e:
+            error_msg = f"Error converting file: {str(e)}"
+            logger.error(error_msg)
+            print(colored(f"❌ {error_msg}", "red"))
+            if progress_callback:
+                progress_callback(100, 100)
+            return None
+
+    def get_pdf_info(self, file_path: str, store: str) -> Optional[Dict[str, Any]]:
+        """Get PDF information."""
+        try:
+            # Convert file_path to Path object and set store path
+            file_path = Path(file_path)
+            self.store_path = Path(store)
+            
+            # Validate store structure
+            if not validate_store_structure(str(self.store_path)):
+                raise ValueError(f"Invalid store structure at {store}")
+            
+            # Get metadata path
+            metadata_path = self._get_metadata_path(str(file_path))
+            
+            # Load metadata
+            if metadata_path.exists():
+                with open(metadata_path, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            return None
+            
+        except Exception as e:
+            error_msg = f"Error getting PDF info: {str(e)}"
+            logger.error(error_msg)
+            print(colored(f"❌ {error_msg}", "red"))
+            return None
+
+    def list_processed_pdfs(self, store: str) -> List[Dict[str, Any]]:
+        """List all processed PDFs in a store."""
+        try:
+            # Set store path
+            store_path = Path(store)
+            
+            # Validate store structure
+            if not validate_store_structure(str(store_path)):
+                raise ValueError(f"Invalid store structure at {store}")
+            
+            metadata_dir = store_path / "metadata"
+            results = []
+            
+            for metadata_file in metadata_dir.glob("*.json"):
+                try:
+                    with open(metadata_file, 'r', encoding='utf-8') as f:
+                        metadata = json.load(f)
+                        results.append({
+                            'name': metadata_file.stem.replace('_metadata', ''),
+                            'metadata': metadata
+                        })
+                except Exception as e:
+                    logger.error(f"Error loading metadata file {metadata_file}: {str(e)}")
+                    continue
+                    
+            return results
+            
+        except Exception as e:
+            error_msg = f"Error listing PDFs: {str(e)}"
+            logger.error(error_msg)
+            print(colored(f"❌ {error_msg}", "red"))
+            return []
 
     def _load_metadata(self) -> Dict[str, Any]:
         """Load metadata from file"""
@@ -245,21 +395,14 @@ class FileProcessor:
             self.store_path = Path(store_path)
             self.store_path.mkdir(parents=True, exist_ok=True)
             
+            # Set metadata file path
             self.metadata_file = self.store_path / "metadata.json"
-            self.metadata = self._load_metadata()
             
             # Initialize metadata consolidator
             self.metadata_consolidator = MetadataConsolidator(self.store_path)
-            if not self.metadata_consolidator.consolidated_path.exists():
-                self.metadata_consolidator.initialize_consolidated_json()
-            
-            logger.info(f"Store path set to: {store_path}")
-            print(colored(f"✓ Store path set to: {store_path}", "green"))
             
         except Exception as e:
-            error_msg = f"Failed to set store path: {str(e)}"
-            logger.error(error_msg)
-            print(colored(f"❌ {error_msg}", "red"))
+            logger.error(f"Error setting store path: {str(e)}")
             raise
 
     def is_supported_file(self, file_path: str) -> bool:
@@ -329,25 +472,28 @@ class FileProcessor:
             return removed_files
 
     def _validate_file(self, file_path: str) -> bool:
-        """Validate if file exists and is a PDF"""
+        """Validate file exists and is a PDF."""
         path = Path(file_path)
         if not path.exists():
-            print(colored(f"❌ File not found: {path}", "red"))
+            print(colored(f"❌ File not found: {file_path}", "red"))
             return False
         if path.suffix.lower() != '.pdf':
-            print(colored(f"❌ Not a PDF file: {path}", "red"))
+            print(colored(f"❌ Not a PDF file: {file_path}", "red"))
             return False
         return True
 
     def _extract_text(self, file_path: str) -> Optional[str]:
-        """Extract text from a PDF file using Marker"""
-        self._ensure_marker_initialized()
-        text = self.marker_converter.extract_text(str(file_path))
-        if text:
-            print(colored("✓ Text extracted with semantic structure preserved", "green"))
-            return text
-        print(colored(f"❌ No text extracted from {Path(file_path).name}", "red"))
-        return None
+        """Extract text from PDF using configured engine"""
+        try:
+            text = self._convert_pdf_with_marker(file_path)
+            if text:
+                print(colored("✓ Text extracted successfully", "green"))
+                return text
+            print(colored("⚠️ No text extracted from PDF", "yellow"))
+            return None
+        except Exception as e:
+            print(colored(f"❌ Error extracting text: {str(e)}", "red"))
+            return None
 
     def _try_doi_extraction(self, file_path: str) -> Optional[Dict[str, Any]]:
         """Try to extract metadata using DOI from PDF"""
@@ -470,10 +616,14 @@ class FileProcessor:
         print(colored("⚠️ DOI-based extraction failed", "yellow"))
         return None
 
+    def _get_document_path(self, file_path: Path) -> Path:
+        """Get path for storing the original document."""
+        return self.store_path / "documents" / file_path.name
+
     def _get_metadata_path(self, file_path: str) -> Path:
-        """Get path for metadata JSON file"""
-        return Path(file_path).parent / f"{Path(file_path).stem}_metadata.json"
+        """Get path for storing metadata."""
+        return self.store_path / "metadata" / f"{Path(file_path).stem}.json"
 
     def _get_text_path(self, file_path: str) -> Path:
-        """Get path for extracted text file"""
-        return Path(file_path).parent / f"{Path(file_path).stem}.txt"
+        """Get path for storing converted text."""
+        return self.store_path / "converted" / f"{Path(file_path).stem}.txt"

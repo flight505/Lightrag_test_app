@@ -32,7 +32,7 @@ def show(store: str, document: str):
             raise MetadataError(f"Store '{store}' not found")
             
         store_path = config.get_store_root() / store
-        metadata_file = store_path / "metadata" / f"{document}.json"
+        metadata_file = store_path / "metadata" / f"{Path(document).stem}_metadata.json"
         if not metadata_file.exists():
             raise StoreError(f"No metadata found for document '{document}' in store '{store}'")
 
@@ -156,25 +156,26 @@ def stats(store: str):
             raise MetadataError(f"Store '{store}' not found")
             
         store_path = config.get_store_root() / store
-        consolidator = MetadataConsolidator(store_path=store_path)
-        consolidated = consolidator._load_json("consolidated.json")
+        consolidated_file = store_path / "consolidated.json"
         
-        if not consolidated:
+        if not consolidated_file.exists():
             raise MetadataError("No consolidated metadata found. Run 'metadata consolidate' first")
+            
+        with open(consolidated_file, "r", encoding="utf-8") as f:
+            consolidated = json.load(f)
             
         # Display statistics in a table
         table = Table(title="Store Statistics")
         table.add_column("Metric", style="cyan")
         table.add_column("Count", style="green")
         
-        nodes = consolidated.get("nodes", {})
-        relationships = consolidated.get("relationships", [])
+        stats = consolidated.get("global_stats", {})
         
-        table.add_row("Total Papers", str(len(nodes.get("papers", []))))
-        table.add_row("Total Authors", str(len(nodes.get("authors", []))))
-        table.add_row("Total Citations", str(len(nodes.get("citations", []))))
-        table.add_row("Total Equations", str(len(nodes.get("equations", []))))
-        table.add_row("Total Relationships", str(len(relationships)))
+        table.add_row("Total Papers", str(stats.get("total_papers", 0)))
+        table.add_row("Total Authors", str(stats.get("total_authors", 0)))
+        table.add_row("Total Citations", str(stats.get("total_citations", 0)))
+        table.add_row("Total Equations", str(stats.get("total_equations", 0)))
+        table.add_row("Total Relationships", str(stats.get("total_relationships", 0)))
         
         console.print(table)
         return 0

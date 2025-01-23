@@ -137,8 +137,10 @@ class StoreManager:
             StoreError: If store doesn't exist or is invalid
         """
         store_path = self.store_root / name
+        if not store_path.exists():
+            raise StoreError(f"Store '{name}' not found")
         if not self.validate_store_path(store_path):
-            raise StoreError(f"Store '{name}' not found or invalid")
+            raise StoreError(f"Store '{name}' has invalid structure")
         return store_path
         
     def delete_store(self, store_name: str) -> None:
@@ -191,24 +193,42 @@ class StoreManager:
         Returns:
             True if path is a valid store, False otherwise
         """
-        if not store_path.exists() or not store_path.is_dir():
-            return False
-            
-        # Check required subdirectories
-        required_dirs = ["documents", "metadata", "converted", "cache"]
-        if not all((store_path / d).exists() for d in required_dirs):
-            return False
-            
-        # Check required files
-        required_files = ["metadata.json", "consolidated.json"]
-        if not all((store_path / f).exists() for f in required_files):
-            return False
-            
         try:
-            with open(store_path / "metadata.json", 'r', encoding='utf-8') as f:
-                metadata = json.load(f)
-                return all(k in metadata for k in ["name", "created", "updated", "documents"])
-        except:
+            if not store_path.exists() or not store_path.is_dir():
+                return False
+            
+            # Check required subdirectories
+            required_dirs = ["documents", "metadata", "converted", "cache", "exports"]
+            if not all((store_path / d).exists() for d in required_dirs):
+                return False
+            
+            # Check required files
+            required_files = ["metadata.json", "consolidated.json"]
+            if not all((store_path / f).exists() for f in required_files):
+                return False
+            
+            # Validate metadata file structure
+            try:
+                with open(store_path / "metadata.json", 'r', encoding='utf-8') as f:
+                    metadata = json.load(f)
+                    if not all(k in metadata for k in ["name", "created", "documents"]):
+                        return False
+            except:
+                return False
+            
+            # Validate consolidated file structure
+            try:
+                with open(store_path / "consolidated.json", 'r', encoding='utf-8') as f:
+                    consolidated = json.load(f)
+                    if not all(k in consolidated for k in ["store_info", "nodes", "relationships", "global_stats"]):
+                        return False
+            except:
+                return False
+            
+            return True
+        
+        except Exception as e:
+            logger.error(f"Error validating store structure: {str(e)}")
             return False
             
     def update_store_metadata(self, name: str, metadata: dict) -> None:

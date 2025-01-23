@@ -1,3 +1,4 @@
+"""File management utilities."""
 import os
 from pathlib import Path
 from typing import Optional
@@ -8,7 +9,13 @@ from termcolor import colored
 
 # Constants
 DB_ROOT = "DB"
-GITIGNORE_PATH = ".gitignore"
+STORE_STRUCTURE = {
+    "documents": "Original PDF documents",
+    "metadata": "Document metadata files",
+    "converted": "Converted text files",
+    "cache": "Search cache and embeddings",
+    "exports": "Exported data and reports"
+}
 
 logger = logging.getLogger(__name__)
 
@@ -62,9 +69,11 @@ def create_store_directory(store_name: str) -> Optional[str]:
             os.makedirs(store_path, mode=0o755, exist_ok=True)
             print(colored(f"✓ Created store directory at {store_path}", "green"))
             
-            # Create required subdirectories
-            os.makedirs(os.path.join(store_path, "converted"), exist_ok=True)  # For converted documents
-            os.makedirs(os.path.join(store_path, "cache"), exist_ok=True)      # For embeddings cache
+            # Create required subdirectories with descriptions
+            for subdir, description in STORE_STRUCTURE.items():
+                subdir_path = os.path.join(store_path, subdir)
+                os.makedirs(subdir_path, exist_ok=True)
+                print(colored(f"✓ Created {subdir} directory: {description}", "green"))
             
             # Initialize metadata file
             metadata_path = os.path.join(store_path, "metadata.json")
@@ -74,7 +83,10 @@ def create_store_directory(store_name: str) -> Optional[str]:
                     "name": store_name,
                     "created": datetime.now().isoformat(),
                     "files": {},
-                    "last_updated": None
+                    "last_updated": None,
+                    "document_count": 0,
+                    "size": 0,
+                    "documents": []
                 }, f, indent=2)
             
             # Initialize consolidated metadata
@@ -84,22 +96,26 @@ def create_store_directory(store_name: str) -> Optional[str]:
                     "store_info": {
                         "name": store_name,
                         "created": datetime.now().isoformat(),
-                        "last_updated": None
+                        "last_updated": None,
+                        "version": "1.0.0"
                     },
-                    "documents": {},
+                    "nodes": {
+                        "papers": [],
+                        "equations": [],
+                        "citations": [],
+                        "authors": [],
+                        "contexts": []
+                    },
+                    "relationships": [],
                     "global_stats": {
-                        "total_documents": 0,
-                        "total_references": 0,
+                        "total_papers": 0,
+                        "total_equations": 0,
                         "total_citations": 0,
-                        "total_equations": 0
-                    },
-                    "relationships": {
-                        "citation_network": [],
-                        "equation_references": [],
-                        "cross_references": []
+                        "total_authors": 0,
+                        "total_relationships": 0
                     }
                 }, f, indent=2)
-            print(colored("✓ Initialized consolidated metadata", "green"))
+            print(colored("✓ Initialized metadata files", "green"))
             
             logging.info(f"Created store directory with structure: {store_path}")
             return store_path
@@ -111,3 +127,35 @@ def create_store_directory(store_name: str) -> Optional[str]:
         logger.error(f"Failed to create store directory: {str(e)}")
         print(colored(f"⚠️ Failed to create store directory: {str(e)}", "red"))
         raise
+
+def validate_store_structure(store_path: str) -> bool:
+    """
+    Validate if a store has the correct directory structure.
+    
+    Args:
+        store_path: Path to the store directory
+    
+    Returns:
+        bool: True if valid, False otherwise
+    """
+    try:
+        # Check if store exists and is a directory
+        if not os.path.exists(store_path) or not os.path.isdir(store_path):
+            return False
+            
+        # Check required subdirectories
+        for subdir in STORE_STRUCTURE.keys():
+            if not os.path.exists(os.path.join(store_path, subdir)):
+                return False
+                
+        # Check required metadata files
+        required_files = ["metadata.json", "consolidated.json"]
+        for file in required_files:
+            if not os.path.exists(os.path.join(store_path, file)):
+                return False
+                
+        return True
+        
+    except Exception as e:
+        logger.error(f"Error validating store structure: {str(e)}")
+        return False
